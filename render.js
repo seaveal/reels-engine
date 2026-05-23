@@ -73,6 +73,15 @@ await renderMedia({
   muted: true,
   concurrency: concurrencyArg ? parseInt(concurrencyArg.slice('--concurrency='.length), 10) : null,
   chromiumOptions: { gl: 'angle' },
+  // 4K via scale 2× (acté Cyrille 2026-05-24).
+  // Composition reste à 1080×1920 natif (constants.js), mais Remotion produit
+  // l'output à 2160×3840 via scale=2 lors de l'encoding. C'est plus robuste que
+  // le 4K natif (qui timeout au render canvas en headless browser sur grosse
+  // résolution) et le résultat visuel pour du texte vectoriel/SVG reste excellent
+  // — chaque frame est dessinée à 1080p (rapide) puis upscalée à l'encoding.
+  // Output prêt pour TikTok/YouTube/IG en 4K, downscale serveur si la plateforme
+  // limite à 1080p.
+  scale: 2,
   onProgress: ({ progress }) => {
     process.stdout.write(`\r[render] ${(progress * 100).toFixed(0)}%   `);
   },
