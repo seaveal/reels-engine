@@ -4,8 +4,9 @@ import { FADE_SEC, FPS, STAGGER_GAP_SEC, STAGGER_LEAD_IN_SEC, ALL_AT_ONCE_DELAY_
 import { SegmentLine } from './SegmentLine.jsx';
 import { computeAutoFitFontSize } from './autoFit.js';
 
-const BLOCK_GAP_EM = 0.55;
-const LINE_GAP_EM = 0.15;
+// Gaps tunés sur références : la ref aère beaucoup entre les blocs heading/body.
+const BLOCK_GAP_EM = 0.85;
+const LINE_GAP_EM = 0.20;
 
 /**
  * Pile centrée H+V dans la safe box. Auto-fit calculé sur la pile complète

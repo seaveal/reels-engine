@@ -43,7 +43,10 @@ export const computeAutoFitFontSize = ({
   lineGapEm = 0.15,
   fontFamily = FONT_FAMILY,
   minSize = 16,
-  maxSize = 220,
+  // maxSize 180 (était 220) : empêche le titre court de devenir disproportionné
+  // par rapport aux corps. Référence : sur quand-il-est-seul.json, le titre
+  // tenait à ~210 px (3 lignes) alors que la ref est plus modeste.
+  maxSize = 180,
 }) => {
   const totalHeight = (fs) => {
     let H = 0;
