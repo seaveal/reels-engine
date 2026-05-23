@@ -6,5 +6,6 @@ references/*.mp4
 references/*.mov
 references/*.MP4
 references/*.MOV
+qa/*.jpg
 *.log
 .DS_Store
