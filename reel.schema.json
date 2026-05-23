@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://h3c.life/schemas/reel.schema.json",
+  "title": "Reel typographique @lecorpsnetrichejamais",
+  "description": "Contrat de spec consommé par le moteur reels-engine. width/height/fps sont constants (1080x1920x30) et non exposés à l'agent rédacteur.",
+  "type": "object",
+  "required": ["slug", "reveal", "segments"],
+  "additionalProperties": false,
+  "properties": {
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "description": "Identifiant kebab-case sans accents. Sert au nom de fichier de sortie."
+    },
+    "reveal": {
+      "enum": ["all_at_once", "staggered"],
+      "description": "all_at_once = tout le bloc apparaît en fondu d'un coup. staggered = segments un par un avec re-centrage vertical."
+    },
+    "hand_emoji": {
+      "type": "boolean",
+      "default": false,
+      "description": "Si true, affiche 👆 en bas-droite de la safe zone en fin de réel (utile quand le CTA renvoie en légende/commentaires)."
+    },
+    "duration_s": {
+      "type": ["number", "null"],
+      "default": null,
+      "description": "Durée totale en secondes. null = auto (calculé selon le mode reveal et le nombre de segments)."
+    },
+    "segments": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "items": { "$ref": "#/$defs/segment" }
+    }
+  },
+  "$defs": {
+    "segment": {
+      "type": "object",
+      "required": ["role"],
+      "additionalProperties": false,
+      "properties": {
+        "role": { "enum": ["title", "block", "cta"] },
+        "text": { "type": "string", "minLength": 1, "maxLength": 220 },
+        "heading": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "body": { "type": "string", "minLength": 1, "maxLength": 240 },
+        "bold": {
+          "type": "boolean",
+          "description": "Override du gras pour tout le segment. Défaut : title/heading = true, body/cta/block.text = false."
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "role": { "const": "title" } } },
+          "then": { "required": ["text"], "not": { "anyOf": [{ "required": ["heading"] }, { "required": ["body"] }] } }
+        },
+        {
+          "if": { "properties": { "role": { "const": "cta" } } },
+          "then": { "required": ["text"], "not": { "anyOf": [{ "required": ["heading"] }, { "required": ["body"] }] } }
+        },
+        {
+          "if": { "properties": { "role": { "const": "block" } } },
+          "then": {
+            "oneOf": [
+              { "required": ["text"], "not": { "anyOf": [{ "required": ["heading"] }, { "required": ["body"] }] } },
+              { "required": ["heading"], "not": { "required": ["text"] } }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

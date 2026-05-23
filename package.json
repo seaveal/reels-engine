@@ -1,0 +1,24 @@
+{
+  "name": "reels-engine",
+  "version": "0.1.0",
+  "description": "Moteur Remotion typographique pour les Reels @lecorpsnetrichejamais (PHM)",
+  "private": true,
+  "type": "module",
+  "license": "UNLICENSED",
+  "scripts": {
+    "render": "node render.js",
+    "studio": "remotion studio src/index.jsx"
+  },
+  "dependencies": {
+    "@remotion/bundler": "4.0.230",
+    "@remotion/cli": "4.0.230",
+    "@remotion/google-fonts": "4.0.230",
+    "@remotion/layout-utils": "4.0.230",
+    "@remotion/renderer": "4.0.230",
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "remotion": "4.0.230"
+  }
+}

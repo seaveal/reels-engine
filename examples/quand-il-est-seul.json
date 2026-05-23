@@ -1,0 +1,12 @@
+{
+  "slug": "quand-il-est-seul",
+  "reveal": "staggered",
+  "hand_emoji": true,
+  "duration_s": null,
+  "segments": [
+    { "role": "title", "text": "QUAND IL EST [[SEUL]], IL [[AVANCE]]. EN [[COUPLE]], IL [[S'ÉGARE]]" },
+    { "role": "block", "text": "VOICI POURQUOI CERTAINS [[HOMMES]] SE SENTENT [[LIBRES]] [[SEULS]]..." },
+    { "role": "block", "text": "... MAIS [[PRISONNIERS]] EN [[COUPLE]] ..." },
+    { "role": "cta", "text": "(LISEZ LA LÉGENDE)" }
+  ]
+}

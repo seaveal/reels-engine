@@ -1,0 +1,10 @@
+node_modules/
+out/
+.remotion/
+public/backgrounds/*.mp4
+references/*.mp4
+references/*.mov
+references/*.MP4
+references/*.MOV
+*.log
+.DS_Store
