@@ -19,12 +19,15 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const args = process.argv.slice(2);
 if (args.length === 0 || args[0].startsWith('-')) {
-  console.error('usage: node render.js path/to/spec.json [--out=path/to/file.mp4]');
+  console.error('usage: node render.js path/to/spec.json [--out=path/to/file.mp4] [--scale=1|2]');
   process.exit(64);
 }
 const specPath = resolve(args[0]);
 const outArg = args.find((a) => a.startsWith('--out='));
 const concurrencyArg = args.find((a) => a.startsWith('--concurrency='));
+// Scale : 1 = 1080p natif (preview rapide ~1.5min), 2 = 4K via upscale (~5-10min, final post-validation)
+const scaleArg = args.find((a) => a.startsWith('--scale='));
+const scale = scaleArg ? parseInt(scaleArg.slice('--scale='.length), 10) : 1;
 
 const spec = JSON.parse(readFileSync(specPath, 'utf-8'));
 const schema = JSON.parse(readFileSync(resolve(__dirname, 'reel.schema.json'), 'utf-8'));
@@ -73,15 +76,12 @@ await renderMedia({
   muted: true,
   concurrency: concurrencyArg ? parseInt(concurrencyArg.slice('--concurrency='.length), 10) : null,
   chromiumOptions: { gl: 'angle' },
-  // 4K via scale 2× (acté Cyrille 2026-05-24).
-  // Composition reste à 1080×1920 natif (constants.js), mais Remotion produit
-  // l'output à 2160×3840 via scale=2 lors de l'encoding. C'est plus robuste que
-  // le 4K natif (qui timeout au render canvas en headless browser sur grosse
-  // résolution) et le résultat visuel pour du texte vectoriel/SVG reste excellent
-  // — chaque frame est dessinée à 1080p (rapide) puis upscalée à l'encoding.
-  // Output prêt pour TikTok/YouTube/IG en 4K, downscale serveur si la plateforme
-  // limite à 1080p.
-  scale: 2,
+  // Scale via --scale=N CLI (acté Cyrille 2026-05-24).
+  // 1 (défaut) = 1080×1920 natif → preview rapide ~1.5min (validation Telegram)
+  // 2 = 2160×3840 4K via upscale → final post-validation ~5-10min (publication)
+  // Composition reste à 1080×1920 (constants.js) ; Remotion upscale à l'encoding
+  // si scale>1. Pour du texte vectoriel/SVG le résultat reste excellent.
+  scale,
   onProgress: ({ progress }) => {
     process.stdout.write(`\r[render] ${(progress * 100).toFixed(0)}%   `);
   },
