@@ -16,6 +16,10 @@
  *   size   : heading='l', cta='s', body='m' ; override via line.size.
  *   align  : heading='center', cta='center', body='left' ; override via line.align.
  *            (corps justifié possible via align:'justify' — réel « stoique ».)
+ *   color  : couleur de BASE de la ligne (white|yellow|cream). Override via line.color.
+ *            Défaut : cta='cream', heading/body='white'. Sert aux TITRES ENTIÈREMENT
+ *            JAUNES des originaux (« verites », « ressentir ») — plus robuste que
+ *            wrapper toute la ligne en [[…]]. Les spans [[mot]] restent jaunes par-dessus.
  *
  * ADDITIF : ne touche pas segments.js (format court).
  */
@@ -23,6 +27,8 @@ const ROLE_TO_KIND = { heading: 'heading', cta: 'cta', body: 'block' };
 const DEFAULT_BOLD = { heading: true, cta: true, body: false };
 const DEFAULT_SIZE = { heading: 'l', cta: 's', body: 'm' };
 const DEFAULT_ALIGN = { heading: 'center', cta: 'center', body: 'left' };
+const DEFAULT_COLOR = { heading: 'white', cta: 'cream', body: 'white' };
+const VALID_COLORS = ['white', 'yellow', 'cream'];
 
 // Multiplicateurs de taille relatifs (appliqués à la taille auto-fit de base).
 export const SIZE_MUL = { xl: 1.30, l: 1.15, m: 1.0, s: 0.82 };
@@ -38,7 +44,11 @@ export const normalisePages = (pages) => pages.map((page, pi) => {
     const sizeKey = line.size ?? DEFAULT_SIZE[role];
     const sizeMul = SIZE_MUL[sizeKey] ?? 1.0;
     const align = line.align ?? DEFAULT_ALIGN[role];
-    return { text: line.text, bold, kind, sizeMul, align };
+    const color = line.color ?? DEFAULT_COLOR[role];
+    if (!VALID_COLORS.includes(color)) {
+      throw new Error(`page[${pi}].lines[${li}].color inconnu : ${color}`);
+    }
+    return { text: line.text, bold, kind, sizeMul, align, color };
   });
   return { id: pi, lines, arrow: page.arrow === true };
 });

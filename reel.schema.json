@@ -165,6 +165,10 @@
         "align": {
           "enum": ["left", "center", "right", "justify"],
           "description": "Alignement de la ligne. Défaut : heading/cta = center, body = left. Les originaux varient : corps justifié (réel « stoique ») ou aligné à gauche (réels « ressentir » / liste), titres centrés ou alignés gauche selon le réel."
+        },
+        "color": {
+          "enum": ["white", "yellow", "cream"],
+          "description": "Couleur de BASE de toute la ligne. Défaut : cta = cream, heading/body = white. Mettre 'yellow' pour un TITRE ENTIÈREMENT JAUNE (originaux « verites » / « ressentir ») — plus robuste que d'entourer toute la ligne de [[…]]. Les mots [[surlignés]] restent jaunes par-dessus."
         }
       }
     }

@@ -38,5 +38,8 @@ all = check('long-size-align-arrow', { slug:'x', layout:'long', pages:[ { lines:
 all = check('long-reject-bad-size', { slug:'x', layout:'long', pages:[{lines:[{text:'a', size:'xxl'}]}] }, false) && all;
 all = check('long-reject-bad-align', { slug:'x', layout:'long', pages:[{lines:[{text:'a', align:'middle'}]}] }, false) && all;
 all = check('long-reject-bad-arrow', { slug:'x', layout:'long', pages:[{lines:[{text:'a'}], arrow:'yes'}] }, false) && all;
+// Couleur de ligne (titre full-jaune) : valeurs valides + rejet
+all = check('long-color-yellow-title', { slug:'x', layout:'long', pages:[{lines:[{text:'TITRE FULL JAUNE', role:'heading', color:'yellow'}, {text:'corps', color:'white'}]}] }, true) && all;
+all = check('long-reject-bad-color', { slug:'x', layout:'long', pages:[{lines:[{text:'a', color:'rouge'}]}] }, false) && all;
 console.log(all ? '\nALL SCHEMA CHECKS PASS' : '\nSOME SCHEMA CHECKS FAILED');
 process.exit(all ? 0 : 1);

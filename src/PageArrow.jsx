@@ -3,15 +3,13 @@
  * page suivante » présent sur toutes les pages des originaux SAUF la dernière).
  *
  * Tracé : une ligne horizontale légèrement ondulée + une pointe ouverte, façon
- * feutre. Couleur par défaut crème #F9E9DB (même teinte que le CTA). Posée en
- * bas, centrée vers la droite, marge sous le dernier paragraphe assurée par le
- * flex column parent (margin-top auto la pousse en bas du bloc restant).
+ * feutre. Couleur par défaut crème #F9E9DB (même teinte que le CTA). Centrée par
+ * sa bande parente (PageStack réserve une bande de bas DANS la safe box) : ni la
+ * flèche ni le texte ne franchissent SAFE bottom (zone légende/icônes IG basses).
  */
 export const PageArrow = ({ color = '#F9E9DB' }) => (
   <div
     style={{
-      marginTop: 'auto',
-      paddingTop: 24,
       width: '100%',
       display: 'flex',
       justifyContent: 'center',

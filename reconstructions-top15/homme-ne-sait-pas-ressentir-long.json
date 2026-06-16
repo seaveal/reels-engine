@@ -6,7 +6,7 @@
     {
       "arrow": true,
       "lines": [
-        { "text": "Un homme qui ne sait pas ressentir ne sait pas aimer. Il finira toujours par perdre ce qui comptait le plus pour lui", "role": "heading", "size": "l", "align": "center" },
+        { "text": "Un homme qui ne sait pas ressentir ne sait pas aimer. Il finira toujours par perdre ce qui comptait le plus pour lui", "role": "heading", "color": "yellow", "size": "l", "align": "center" },
         { "text": "Pourquoi ?", "align": "left" },
         { "text": "Parce qu'il [[vit]] dans sa [[tête]]. Parce qu'il [[intellectualise tout]] et veut [[avoir raison]].", "align": "left" },
         { "text": "Parce qu'il [[argumente]] au lieu d'écouter, qu'il [[analyse]] au lieu de [[ressentir]].", "align": "left" },

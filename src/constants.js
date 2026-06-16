@@ -19,12 +19,47 @@ export const COLORS = {
 //   incrusté dans le fond noir-nuages.mp4 (sinon chevauchement titre/handle).
 // - bottom 0.22 : conserve l'espace au-dessus de la légende IG + icônes.
 // - left/right 0.10 : marges H symétriques, largeur utile 80 %.
+// FORMAT COURT : INCHANGÉ (non-régression). Le format long a son propre SAFE_LONG.
 export const SAFE = {
   left: 0.10,
   right: 0.10,
   top: 0.17,
   bottom: 0.22,
 };
+
+// --- Format LONG : SAFE zone MESURÉE sur les 3 réels originaux (v3, 2026-06-16) ---
+// Mesures (bbox du bloc de texte, proportions de 720x1280 ; handle exclu) :
+//   marge gauche  : stoique 0.119-0.133 · verites 0.111-0.126 · ressentir 0.101-0.118
+//   marge droite  : stoique 0.103-0.136 · verites 0.094-0.125 · ressentir 0.074-0.115
+//   début contenu : ~0.155-0.16 sous le handle (handle @ ~0.11)
+//   fin contenu   : pages denses à ~0.84 (marge basse ~0.16) ; pages CTA plus haut
+//   largeur texte : 0.74 → 0.82 (ressentir le plus large)
+// Objectif Cyrille « occuper l'espace au max tout en restant lisible » + hors UI IG :
+//   left  0.09  (≈ marge gauche observée, on gagne un peu de largeur),
+//   right 0.11  (texte util ~0.89 ; marge droite > gauche pour amorcer la garde
+//               icônes IG côté droit. Largeur util = 0.80, = largeur médiane des
+//               originaux 0.74-0.82),
+//   top   0.155 (le texte démarre juste sous le handle, gagne du vertical vs 0.17),
+//   bottom 0.16 (les pages denses des originaux descendent à ~0.84).
+// Tout en PROPORTIONS → responsive : tient identique sur toute taille de téléphone.
+export const SAFE_LONG = {
+  left: 0.09,
+  right: 0.11,
+  top: 0.155,
+  bottom: 0.16,
+};
+
+// SAFE ZONE icônes Instagram (like / commentaire / partage / enregistrer) :
+// colonne VERTICALE côté DROIT, MOITIÉ BASSE de l'écran (y >= ICON_ZONE_TOP).
+// Les icônes IG occupent en pratique le ~12-14 % le plus à droite. Sous cette
+// bande (lower-right), AUCUN glyphe ne doit déborder au-delà de (1 - ICON_SAFE_RIGHT).
+// Marge de sécurité responsive : 0.14 > emprise icônes → tient sur tous écrans.
+// Les originaux laissent leur lower-right à x<=~0.86-0.90 ; on borne à 0.86.
+export const ICON_SAFE_RIGHT = 0.14; // marge droite imposée dans la moitié basse
+export const ICON_ZONE_TOP = 0.50;   // la colonne d'icônes commence à mi-hauteur
+
+// SAFE ZONE basse (caption / handle / audio IG) : déjà couverte par SAFE_LONG.bottom
+// (0.16 → le texte s'arrête à ~0.84, au-dessus de la légende qui démarre ~0.86+).
 
 export const BACKGROUND_DURATION_SEC = 29;
 export const BACKGROUND_DURATION_FRAMES = Math.round(BACKGROUND_DURATION_SEC * FPS);
@@ -70,6 +105,19 @@ export const safeBox = (width, height) => ({
   y: Math.round(SAFE.top * height),
   width: Math.round(width * (1 - SAFE.left - SAFE.right)),
   height: Math.round(height * (1 - SAFE.top - SAFE.bottom)),
+});
+
+// Safe box du FORMAT LONG (marges mesurées sur originaux). Sépare le court (SAFE)
+// du long (SAFE_LONG) → édition du long sans toucher le rendu court (non-régression).
+// Renvoie aussi `iconSafeRight` (px) = marge droite à respecter dans la moitié basse
+// pour ne pas passer sous la colonne d'icônes IG, et `iconZoneTopY` (px, absolu).
+export const safeBoxLong = (width, height) => ({
+  x: Math.round(SAFE_LONG.left * width),
+  y: Math.round(SAFE_LONG.top * height),
+  width: Math.round(width * (1 - SAFE_LONG.left - SAFE_LONG.right)),
+  height: Math.round(height * (1 - SAFE_LONG.top - SAFE_LONG.bottom)),
+  iconSafeRight: Math.round(ICON_SAFE_RIGHT * width),
+  iconZoneTopY: Math.round(ICON_ZONE_TOP * height),
 });
 
 // Volume de texte VISIBLE d'une page = nombre de caractères (marqueurs [[ ]] / **

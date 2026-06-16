@@ -10,7 +10,7 @@ import assert from 'node:assert/strict';
 import { normaliseSegments } from '../src/segments.js';
 import { normalisePages, SIZE_MUL } from '../src/pages.js';
 import { parseHighlights, stripHighlights, parseInline, stripInline } from '../src/highlight.js';
-import { safeBox, computeDurationSec, computePageHoldSec, computePageHolds, pageCharCount, PAGE_CHARS_PER_SEC } from '../src/constants.js';
+import { safeBox, safeBoxLong, SAFE_LONG, ICON_SAFE_RIGHT, computeDurationSec, computePageHoldSec, computePageHolds, pageCharCount, PAGE_CHARS_PER_SEC } from '../src/constants.js';
 
 let passed = 0;
 let failed = 0;
@@ -186,6 +186,33 @@ test('safeBox proportionnel pour 540×960', () => {
   assert.equal(sb.height, 586);
 });
 
+console.log('\n=== safeBoxLong (format long : marges mesurées + safe icônes IG) ===');
+
+test('safeBoxLong = marges SAFE_LONG mesurées (left 0.09 / right 0.11 / top 0.155 / bottom 0.16)', () => {
+  const sb = safeBoxLong(1080, 1920);
+  assert.equal(sb.x, Math.round(0.09 * 1080));      // 97
+  assert.equal(sb.y, Math.round(0.155 * 1920));     // 298
+  assert.equal(sb.width, Math.round(1080 * (1 - 0.09 - 0.11)));  // 864
+  assert.equal(sb.height, Math.round(1920 * (1 - 0.155 - 0.16))); // 1315
+});
+
+test('safeBoxLong expose la garde icônes IG (right + moitié basse)', () => {
+  const sb = safeBoxLong(1080, 1920);
+  assert.equal(sb.iconSafeRight, Math.round(ICON_SAFE_RIGHT * 1080)); // 151
+  assert.equal(sb.iconZoneTopY, Math.round(0.50 * 1920));             // 960
+});
+
+test('safeBoxLong responsive (proportions) pour 540×960', () => {
+  const sb = safeBoxLong(540, 960);
+  assert.equal(sb.x, Math.round(0.09 * 540));
+  assert.equal(sb.width, Math.round(540 * (1 - SAFE_LONG.left - SAFE_LONG.right)));
+});
+
+test('format long occupe plus de vertical que le court (top plus haut, bottom plus bas)', () => {
+  assert.ok(SAFE_LONG.top < 0.17);     // démarre plus haut que le court
+  assert.ok(SAFE_LONG.bottom < 0.22);  // descend plus bas que le court
+});
+
 console.log('\n=== computeDurationSec ===');
 
 test('staggered 4 segments → 0.3 + 1.1*3 + 0.4 + 3.5 = 7.5s', () => {
@@ -289,6 +316,38 @@ test('arrow:true propagé sur la page ; absent = false', () => {
   const out = normalisePages([{ lines: [{ text: 'x' }], arrow: true }, { lines: [{ text: 'y' }] }]);
   assert.equal(out[0].arrow, true);
   assert.equal(out[1].arrow, false);
+});
+
+console.log('\n=== normalisePages : color (titre full-jaune / défauts par rôle) ===');
+
+test('couleur par défaut : body/heading = white, cta = cream', () => {
+  const out = normalisePages([{ lines: [
+    { text: 'corps' },
+    { text: 'HOOK', role: 'heading' },
+    { text: 'CTA', role: 'cta' },
+  ] }]);
+  const [body, head, cta] = out[0].lines;
+  assert.equal(body.color, 'white');
+  assert.equal(head.color, 'white');
+  assert.equal(cta.color, 'cream');
+});
+
+test('color:yellow force un TITRE ENTIÈREMENT JAUNE (fix bug verites/ressentir)', () => {
+  const out = normalisePages([{ lines: [{ text: 'TITRE JAUNE', role: 'heading', color: 'yellow' }] }]);
+  assert.equal(out[0].lines[0].color, 'yellow');
+});
+
+test('color:white force un titre BLANC malgré le rôle (réel stoique)', () => {
+  const out = normalisePages([{ lines: [{ text: 'Titre blanc', color: 'white', bold: true }] }]);
+  assert.equal(out[0].lines[0].color, 'white');
+  assert.equal(out[0].lines[0].bold, true);
+});
+
+test('color inconnue lève une erreur explicite', () => {
+  assert.throws(
+    () => normalisePages([{ lines: [{ text: 'x', color: 'rouge' }] }]),
+    /color inconnu : rouge/,
+  );
 });
 
 console.log('\n=== pageCharCount / computePageHoldSec (loi de timing char-volume) ===');

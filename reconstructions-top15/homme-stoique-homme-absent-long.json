@@ -6,7 +6,7 @@
     {
       "arrow": true,
       "lines": [
-        { "text": "[[**Un homme prisonnier de ses traumatismes d'enfance détruit son couple sans le vouloir.**]]", "align": "justify" },
+        { "text": "Un homme prisonnier de ses traumatismes d'enfance détruit son couple sans le vouloir.", "bold": true, "color": "yellow", "align": "justify" },
         { "text": "Accès de [[colères]] soudains, sur la [[défensive]] à chaque remarque, et ce [[silence froid]] dès que sa femme ose exprimer un désaccord ou une frustration.", "align": "justify" },
         { "text": "[[Coupé]] de ses propres [[émotions]], il ne peut pas entendre ce qu'elle dit vraiment.", "align": "justify" },
         { "text": "Il est [[incapable]] de [[voir l'amour]] sincère qu'elle lui offre.", "align": "justify" }

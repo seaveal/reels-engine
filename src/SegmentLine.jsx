@@ -16,11 +16,19 @@ import { parseInline } from './highlight.js';
  *
  * `align` défaut 'center' (préserve le rendu du FORMAT COURT inchangé). Le format
  * long passe 'left'/'justify'/'right' explicitement.
+ *
+ * `color` (format long) = couleur de BASE de la ligne ('white'|'yellow'|'cream').
+ * Absent (format court) → dérivée du `kind` (cta=crème, sinon blanc) : rendu COURT
+ * inchangé. Les spans jaunes [[mot]] restent jaunes par-dessus toute couleur de base.
  */
-export const SegmentLine = ({ text, bold, kind, fontSize, align = 'center' }) => {
+const NAMED_COLOR = { white: COLORS.white, yellow: COLORS.yellow, cream: COLORS.cream };
+
+export const SegmentLine = ({ text, bold, kind, fontSize, align = 'center', color }) => {
   const pieces = parseInline(text);
   const isUpper = kind === 'title' || kind === 'heading' || kind === 'cta';
-  const baseColor = kind === 'cta' ? COLORS.cream : COLORS.white;
+  const baseColor = color != null
+    ? (NAMED_COLOR[color] ?? COLORS.white)
+    : (kind === 'cta' ? COLORS.cream : COLORS.white);
   return (
     <div
       style={{

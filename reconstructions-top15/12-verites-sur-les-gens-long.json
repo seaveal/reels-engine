@@ -6,7 +6,7 @@
     {
       "arrow": true,
       "lines": [
-        { "text": "12 [[VÉRITÉS DIFFICILES]] À ACCEPTER... MAIS QUI VOUS [[RÉVÈLENT]] TOUT SUR LES [[GENS]]", "role": "heading", "size": "l", "align": "center" },
+        { "text": "12 VÉRITÉS DIFFICILES À ACCEPTER... MAIS QUI VOUS RÉVÈLENT TOUT SUR LES GENS", "role": "heading", "color": "yellow", "size": "l", "align": "center" },
         { "text": "1. Les plus [[effrayés]] → attaquent.", "size": "s", "align": "left" },
         { "text": "2. Les plus [[superficiels]] → parlent le plus", "size": "s", "align": "left" },
         { "text": "3. Les plus [[insatisfaits]] → sont envieux.", "size": "s", "align": "left" },

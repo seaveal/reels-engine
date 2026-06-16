@@ -3,7 +3,7 @@ import { Background } from './Background.jsx';
 import { TextStack } from './TextStack.jsx';
 import { PageStack } from './PageStack.jsx';
 import { HandEmoji } from './HandEmoji.jsx';
-import { safeBox, COLORS, STAGGER_LEAD_IN_SEC, STAGGER_GAP_SEC, ALL_AT_ONCE_DELAY_SEC, FPS, FADE_SEC, HAND_EMOJI_DELAY_AFTER_LAST_SEC, computePageHolds } from './constants.js';
+import { safeBox, safeBoxLong, COLORS, STAGGER_LEAD_IN_SEC, STAGGER_GAP_SEC, ALL_AT_ONCE_DELAY_SEC, FPS, FADE_SEC, HAND_EMOJI_DELAY_AFTER_LAST_SEC, computePageHolds } from './constants.js';
 import { normaliseSegments } from './segments.js';
 import { normalisePages } from './pages.js';
 
@@ -41,6 +41,9 @@ export const Reel = (props) => {
   // fenêtre temporelle (Series) ; la page suivante remplace la précédente.
   // ADDITIF : le format court (ci-dessous) reste strictement inchangé.
   if (props.layout === 'long') {
+    // Le format long utilise sa PROPRE safe box (marges mesurées sur originaux),
+    // distincte du court → on n'altère pas le rendu court (non-régression).
+    const safeLong = safeBoxLong(width, height);
     const pages = normalisePages(props.pages ?? []);
     const holds = computePageHolds(props);
     return (
@@ -53,7 +56,7 @@ export const Reel = (props) => {
               key={page.id}
               durationInFrames={Math.max(1, Math.round((holds[i] ?? 0) * FPS))}
             >
-              <PageStack page={page} safe={safe} />
+              <PageStack page={page} safe={safeLong} />
             </Series.Sequence>
           ))}
         </Series>
