@@ -1,12 +1,32 @@
-import { AbsoluteFill, useVideoConfig } from 'remotion';
-import { loadFont } from '@remotion/google-fonts/Oswald';
+import { AbsoluteFill, Series, useVideoConfig, staticFile } from 'remotion';
 import { Background } from './Background.jsx';
 import { TextStack } from './TextStack.jsx';
+import { PageStack } from './PageStack.jsx';
 import { HandEmoji } from './HandEmoji.jsx';
-import { safeBox, COLORS, STAGGER_LEAD_IN_SEC, STAGGER_GAP_SEC, ALL_AT_ONCE_DELAY_SEC, FPS, FADE_SEC, HAND_EMOJI_DELAY_AFTER_LAST_SEC } from './constants.js';
+import { safeBox, COLORS, STAGGER_LEAD_IN_SEC, STAGGER_GAP_SEC, ALL_AT_ONCE_DELAY_SEC, FPS, FADE_SEC, HAND_EMOJI_DELAY_AFTER_LAST_SEC, computePageHolds } from './constants.js';
 import { normaliseSegments } from './segments.js';
+import { normalisePages } from './pages.js';
 
-loadFont('normal', { weights: ['400', '700'], subsets: ['latin'] });
+// Audit V3 #4 — Embed Oswald local (TTF dans public/fonts/) au lieu de
+// @remotion/google-fonts/Oswald qui télécharge depuis fonts.gstatic.com au bundle.
+// Élimine la dépendance externe : si Google Fonts est down, le rendu fonctionne quand même.
+// Police 400/700 livrée par Cyrille 2026-05-24 (Oswald.zip Google Fonts officiel).
+const OSWALD_FONT_FACE = `
+@font-face {
+  font-family: 'Oswald';
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+  src: url(${JSON.stringify(staticFile('fonts/Oswald-Regular.ttf'))}) format('truetype');
+}
+@font-face {
+  font-family: 'Oswald';
+  font-weight: 700;
+  font-style: normal;
+  font-display: block;
+  src: url(${JSON.stringify(staticFile('fonts/Oswald-Bold.ttf'))}) format('truetype');
+}
+`;
 
 // Quand hand_emoji=true, on réserve une bande verticale (16% de la safe height)
 // en bas de la safe box pour l'emoji 👆, et on rétrécit la zone texte d'autant.
@@ -16,6 +36,32 @@ const HAND_BAND_RATIO = 0.16;
 export const Reel = (props) => {
   const { width, height } = useVideoConfig();
   const safe = safeBox(width, height);
+
+  // FORMAT LONG (layout:"long") — paging / replace. Chaque page occupe sa propre
+  // fenêtre temporelle (Series) ; la page suivante remplace la précédente.
+  // ADDITIF : le format court (ci-dessous) reste strictement inchangé.
+  if (props.layout === 'long') {
+    const pages = normalisePages(props.pages ?? []);
+    const holds = computePageHolds(props);
+    return (
+      <AbsoluteFill style={{ backgroundColor: COLORS.black }}>
+        <style dangerouslySetInnerHTML={{ __html: OSWALD_FONT_FACE }} />
+        <Background name={props.background} />
+        <Series>
+          {pages.map((page, i) => (
+            <Series.Sequence
+              key={page.id}
+              durationInFrames={Math.max(1, Math.round((holds[i] ?? 0) * FPS))}
+            >
+              <PageStack page={page} safe={safe} />
+            </Series.Sequence>
+          ))}
+        </Series>
+      </AbsoluteFill>
+    );
+  }
+
+  // FORMAT COURT (historique, inchangé).
   const segments = normaliseSegments(props.segments ?? []);
 
   const handBand = props.hand_emoji ? Math.round(safe.height * HAND_BAND_RATIO) : 0;
@@ -32,7 +78,8 @@ export const Reel = (props) => {
 
   return (
     <AbsoluteFill style={{ backgroundColor: COLORS.black }}>
-      <Background />
+      <style dangerouslySetInnerHTML={{ __html: OSWALD_FONT_FACE }} />
+      <Background name={props.background} />
       <TextStack segments={segments} reveal={props.reveal} safe={textSafe} />
       {props.hand_emoji && (
         <HandEmoji zone={handZone} startFrame={handStartFrame} />
