@@ -1,20 +1,19 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://h3c.life/schemas/reel.schema.json",
+  "$id": "https://h3c.life/schemas/reel.schema.json/v1",
+  "$comment": "Versioning SemVer aligné (audit V3 #11) — toute breaking change = nouveau $id v2 + script de migration des Sortants/*/v*/reel.json existants. Évolutions backwards-compatible peuvent rester sur v1. 2026-06-16 : ajout ADDITIF du format long (layout:long + pages[]) — le format court (layout absent/short + segments[1-8]) reste strictement v1-compatible.",
   "title": "Reel typographique @lecorpsnetrichejamais",
-  "description": "Contrat de spec consommé par le moteur reels-engine. width/height/fps sont constants (1080x1920x30) et non exposés à l'agent rédacteur.",
+  "description": "Contrat de spec consommé par le moteur reels-engine. width/height/fps sont constants (1080x1920x30) et non exposés à l'agent rédacteur. Deux formats : court (layout absent ou 'short', via segments[1-8]) et long (layout:'long', narration paginée via pages[]).",
   "type": "object",
-  "required": ["slug", "reveal", "segments"],
-  "additionalProperties": false,
-  "properties": {
+  "oneOf": [
+    { "$ref": "#/$defs/shortReel" },
+    { "$ref": "#/$defs/longReel" }
+  ],
+  "$defs": {
     "slug": {
       "type": "string",
       "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
       "description": "Identifiant kebab-case sans accents. Sert au nom de fichier de sortie."
-    },
-    "reveal": {
-      "enum": ["all_at_once", "staggered"],
-      "description": "all_at_once = tout le bloc apparaît en fondu d'un coup. staggered = segments un par un avec re-centrage vertical."
     },
     "hand_emoji": {
       "type": "boolean",
@@ -24,16 +23,62 @@
     "duration_s": {
       "type": ["number", "null"],
       "default": null,
-      "description": "Durée totale en secondes. null = auto (calculé selon le mode reveal et le nombre de segments)."
+      "description": "Durée totale en secondes. null = auto (court : calculé selon reveal+nb segments ; long : somme des hold_s de pages)."
     },
-    "segments": {
-      "type": "array",
-      "minItems": 1,
-      "maxItems": 8,
-      "items": { "$ref": "#/$defs/segment" }
-    }
-  },
-  "$defs": {
+    "background": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "description": "Nom du fond vidéo (sans extension) dans public/backgrounds/. Optionnel — défaut: noir-nuages. Audit V4 #2 : permet de varier la signature visuelle par pilier ou archétype (Blessure / Mécanisme / Déclic / Sortie peuvent avoir un fond distinct). L'agent rédacteur peut suggérer un fond cohérent avec le ton du Reel."
+    },
+    "shortReel": {
+      "type": "object",
+      "required": ["slug", "reveal", "segments"],
+      "additionalProperties": false,
+      "description": "FORMAT COURT (historique, inchangé). Accroche typographique 1-8 segments.",
+      "properties": {
+        "slug": { "$ref": "#/$defs/slug" },
+        "layout": {
+          "const": "short",
+          "description": "Optionnel pour le court. Si présent, doit valoir 'short'. Absent = court par défaut."
+        },
+        "reveal": {
+          "enum": ["all_at_once", "staggered"],
+          "description": "all_at_once = tout le bloc apparaît en fondu d'un coup. staggered = segments un par un avec re-centrage vertical."
+        },
+        "hand_emoji": { "$ref": "#/$defs/hand_emoji" },
+        "duration_s": { "$ref": "#/$defs/duration_s" },
+        "background": { "$ref": "#/$defs/background" },
+        "segments": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "items": { "$ref": "#/$defs/segment" }
+        }
+      }
+    },
+    "longReel": {
+      "type": "object",
+      "required": ["slug", "layout", "pages"],
+      "additionalProperties": false,
+      "description": "FORMAT LONG (narration paginée). Chaque page = un écran plein de texte affiché d'un coup, tenu, puis remplacé par la page suivante (paging / replace). Pas de segments ni reveal.",
+      "properties": {
+        "slug": { "$ref": "#/$defs/slug" },
+        "layout": {
+          "const": "long",
+          "description": "Discriminant : 'long' active le mode narration paginée."
+        },
+        "hand_emoji": { "$ref": "#/$defs/hand_emoji" },
+        "duration_s": { "$ref": "#/$defs/duration_s" },
+        "background": { "$ref": "#/$defs/background" },
+        "pages": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 12,
+          "description": "Suite de pages affichées l'une après l'autre (replace). 1 à 12 pages.",
+          "items": { "$ref": "#/$defs/page" }
+        }
+      }
+    },
     "segment": {
       "type": "object",
       "required": ["role"],
@@ -67,6 +112,48 @@
           }
         }
       ]
+    },
+    "page": {
+      "type": "object",
+      "required": ["lines"],
+      "additionalProperties": false,
+      "description": "Un écran plein. Toutes les lignes apparaissent simultanément (fade in), tenues hold_s, puis la page est remplacée.",
+      "properties": {
+        "lines": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 24,
+          "description": "Lignes affichées simultanément sur la page (1 à 24). Auto-fit vertical de l'ensemble.",
+          "items": { "$ref": "#/$defs/longLine" }
+        },
+        "hold_s": {
+          "type": ["number", "null"],
+          "default": null,
+          "description": "Durée d'affichage de la page en secondes. null = auto (proportionnel au nombre de lignes)."
+        }
+      }
+    },
+    "longLine": {
+      "type": "object",
+      "required": ["text"],
+      "additionalProperties": false,
+      "properties": {
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 240,
+          "description": "Texte de la ligne. Supporte le surlignage [[mot]] (rendu jaune #FFFF00)."
+        },
+        "role": {
+          "enum": ["heading", "body", "cta"],
+          "default": "body",
+          "description": "heading = CAPS + gras (hook). cta = CAPS régulier (renvoi légende). body (défaut) = corps régulier casse d'origine."
+        },
+        "bold": {
+          "type": "boolean",
+          "description": "Override du gras pour la ligne. Défaut : heading = true ; body/cta = false."
+        }
+      }
     }
   }
 }
