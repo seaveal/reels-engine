@@ -1,0 +1,13 @@
+{
+  "slug": "votre-vie-amoureuse",
+  "reveal": "staggered",
+  "hand_emoji": false,
+  "duration_s": null,
+  "segments": [
+    { "role": "title", "text": "VOTRE VIE AMOUREUSE EST LE [[MIROIR]] DE VOTRE [[ENFANCE]]" },
+    { "role": "block", "heading": "UN PÈRE ÉMOTIONNELLEMENT [[INDISPONIBLE]]", "body": "Attendez-vous à [[attirer des partenaires]] qui le seront tout autant." },
+    { "role": "block", "heading": "UNE MÈRE EXTRÊMEMENT [[CRITIQUE]]", "body": "Vous chercherez constamment à obtenir la [[validation de votre partenaire]], affamé d'approbation." },
+    { "role": "block", "heading": "UNE MÈRE ÉMOTIONNELLEMENT [[INDISPONIBLE]]", "body": "Vous oscillerez entre une [[hyper-indépendance étouffante]] ou une [[dépendance totale]]." },
+    { "role": "cta", "text": "LA SOLUTION EST DANS LA [[LÉGENDE]]" }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "slug": "corps-ne-triche-jamais-test",
+  "reveal": "staggered",
+  "hand_emoji": true,
+  "duration_s": null,
+  "segments": [
+    {
+      "role": "title",
+      "text": "LE CORPS NE [[TRICHE JAMAIS]]"
+    },
+    {
+      "role": "block",
+      "text": "Votre mental dit que [[tout va bien]]."
+    },
+    {
+      "role": "block",
+      "text": "Votre corps dit la [[fatigue]], les [[douleurs]], le [[souffle court]]."
+    },
+    {
+      "role": "cta",
+      "text": "TAPEZ [[SOUVERAINE]] EN DM"
+    }
+  ]
+}

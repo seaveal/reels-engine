@@ -3,19 +3,43 @@
  * Render CLI : `node render.js path/to/spec.json [--out=out/<slug>.mp4]`
  *
  * - valide le JSON contre reel.schema.json
- * - bundle Remotion
+ * - bundle Remotion (avec cache .bundle-cache/<hash-src>/ — audit V3 #2)
  * - calcule durationInFrames via calculateMetadata
  * - rend en H.264 yuv420p muet dans out/<slug>.mp4 par défaut
  */
-import { readFileSync, mkdirSync } from 'node:fs';
-import { resolve, dirname, basename } from 'node:path';
+import { readFileSync, readdirSync, statSync, existsSync, mkdirSync, cpSync, writeFileSync, rmSync } from 'node:fs';
+import { resolve, dirname, basename, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createHash } from 'node:crypto';
 import Ajv from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
 import { bundle } from '@remotion/bundler';
 import { renderMedia, selectComposition } from '@remotion/renderer';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+
+/**
+ * Audit V3 #2 — Hash récursif du dossier `src/` pour identifier le bundle.
+ * Tout changement de code source → hash différent → re-bundle.
+ * Bundles obsolètes nettoyés en début d'invocation.
+ */
+function hashDirContent(dir) {
+  const hash = createHash('md5');
+  const walk = (d) => {
+    for (const entry of readdirSync(d).sort()) {
+      const p = join(d, entry);
+      const st = statSync(p);
+      hash.update(entry);
+      if (st.isFile()) {
+        hash.update(readFileSync(p));
+      } else if (st.isDirectory()) {
+        walk(p);
+      }
+    }
+  };
+  walk(dir);
+  return hash.digest('hex').slice(0, 12);
+}
 
 const args = process.argv.slice(2);
 if (args.length === 0 || args[0].startsWith('-')) {
@@ -48,14 +72,49 @@ const outPath = outArg
   : resolve(__dirname, 'out', `${spec.slug}.mp4`);
 mkdirSync(dirname(outPath), { recursive: true });
 
-console.log(`[bundle] entry=src/index.jsx`);
-const t0 = Date.now();
-const bundleLocation = await bundle({
-  entryPoint: resolve(__dirname, 'src/index.jsx'),
-  webpackOverride: (cfg) => cfg,
-});
+// Audit V3 #2 — Cache bundle Remotion : hash récursif src/ → .bundle-cache/<hash>/.
+// Cache hit : skip le bundle webpack (5-15s gagnés par render). Cache miss : bundle
+// frais, copie dans le cache, touch sentinelle. Anciens caches purgés.
+const srcDir = resolve(__dirname, 'src');
+const srcHash = hashDirContent(srcDir);
+const cacheBase = resolve(__dirname, '.bundle-cache');
+const cacheDir = resolve(cacheBase, srcHash);
+const sentinel = resolve(cacheDir, '.bundle-complete');
 
-console.log(`[bundle] ok in ${(Date.now() - t0) / 1000}s`);
+// Cleanup des caches obsolètes (autres hashs)
+if (existsSync(cacheBase)) {
+  for (const entry of readdirSync(cacheBase)) {
+    if (entry !== srcHash) {
+      try { rmSync(resolve(cacheBase, entry), { recursive: true, force: true }); }
+      catch {}
+    }
+  }
+}
+
+let bundleLocation;
+const t0 = Date.now();
+if (existsSync(sentinel)) {
+  bundleLocation = cacheDir;
+  console.log(`[bundle] cache hit ${srcHash} (skip webpack)`);
+} else {
+  console.log(`[bundle] cache miss ${srcHash} — bundling…`);
+  const fresh = await bundle({
+    entryPoint: resolve(__dirname, 'src/index.jsx'),
+    webpackOverride: (cfg) => cfg,
+  });
+  // Copie atomique vers le cache
+  try {
+    mkdirSync(cacheDir, { recursive: true });
+    cpSync(fresh, cacheDir, { recursive: true });
+    writeFileSync(sentinel, srcHash, 'utf-8');
+    bundleLocation = cacheDir;
+  } catch (e) {
+    // Fallback : utiliser le bundle frais sans cache (pas de blocage)
+    console.warn(`[bundle] cache write failed (${e.message}) — using fresh bundle`);
+    bundleLocation = fresh;
+  }
+  console.log(`[bundle] ok in ${(Date.now() - t0) / 1000}s`);
+}
 
 const composition = await selectComposition({
   serveUrl: bundleLocation,

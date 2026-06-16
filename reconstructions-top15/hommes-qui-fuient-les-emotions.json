@@ -1,0 +1,14 @@
+{
+  "slug": "hommes-qui-fuient-les-emotions",
+  "reveal": "all_at_once",
+  "hand_emoji": false,
+  "duration_s": null,
+  "segments": [
+    { "role": "block", "text": "Il y a tous ces [[hommes]] qui [[fuient les émotions]] de leur compagne." },
+    { "role": "block", "text": "Ce n'est pas par [[manque d'amour]]..." },
+    { "role": "block", "text": "Ce n'est pas qu'ils ne veulent pas entendre..." },
+    { "role": "block", "text": "C'est qu'ils ne le [[peuvent pas]]." },
+    { "role": "block", "text": "Voici pourquoi (+ la [[vraie solution]])" },
+    { "role": "cta", "text": "LISEZ LA [[LÉGENDE]]" }
+  ]
+}

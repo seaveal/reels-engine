@@ -1,6 +1,7 @@
 node_modules/
 out/
 .remotion/
+.bundle-cache/
 public/backgrounds/*.mp4
 references/*.mp4
 references/*.mov
@@ -9,3 +10,5 @@ references/*.MOV
 qa/*.jpg
 *.log
 .DS_Store
+.bak-*/
+*.bak-*

@@ -8,9 +8,9 @@
  */
 import assert from 'node:assert/strict';
 import { normaliseSegments } from '../src/segments.js';
-import { normalisePages } from '../src/pages.js';
-import { parseHighlights, stripHighlights } from '../src/highlight.js';
-import { safeBox, computeDurationSec, computePageHoldSec, computePageHolds } from '../src/constants.js';
+import { normalisePages, SIZE_MUL } from '../src/pages.js';
+import { parseHighlights, stripHighlights, parseInline, stripInline } from '../src/highlight.js';
+import { safeBox, computeDurationSec, computePageHoldSec, computePageHolds, pageCharCount, PAGE_CHARS_PER_SEC } from '../src/constants.js';
 
 let passed = 0;
 let failed = 0;
@@ -125,6 +125,49 @@ test('stripHighlights sans highlight → texte inchangé', () => {
   assert.equal(stripHighlights('rien à voir'), 'rien à voir');
 });
 
+console.log('\n=== parseInline / stripInline (jaune [[..]] + gras **..**) ===');
+
+test('parseInline [[mot]] → span jaune non-gras', () => {
+  const out = parseInline('avant [[mot]] après');
+  assert.deepEqual(out.map((p) => [p.text, p.yellow, p.bold]), [
+    ['avant ', false, false],
+    ['mot', true, false],
+    [' après', false, false],
+  ]);
+});
+
+test('parseInline **mot** → span gras non-jaune', () => {
+  const out = parseInline('un **gras** ici');
+  assert.deepEqual(out.map((p) => [p.text, p.yellow, p.bold]), [
+    ['un ', false, false],
+    ['gras', false, true],
+    [' ici', false, false],
+  ]);
+});
+
+test('parseInline [[**mot**]] → span jaune ET gras (imbriqué)', () => {
+  const out = parseInline('[[**punch**]]');
+  assert.equal(out.length, 1);
+  assert.equal(out[0].text, 'punch');
+  assert.equal(out[0].yellow, true);
+  assert.equal(out[0].bold, true);
+});
+
+test('parseInline **[[mot]]** → jaune ET gras (ordre inverse)', () => {
+  const out = parseInline('**[[punch]]**');
+  assert.equal(out[0].yellow, true);
+  assert.equal(out[0].bold, true);
+});
+
+test('parseInline texte nu → 1 span neutre', () => {
+  const out = parseInline('rien');
+  assert.deepEqual(out, [{ text: 'rien', yellow: false, bold: false }]);
+});
+
+test('stripInline retire [[ ]] et ** (mesure auto-fit)', () => {
+  assert.equal(stripInline('a [[b]] **c** [[**d**]]'), 'a b c d');
+});
+
 console.log('\n=== safeBox ===');
 
 test('safeBox(1080,1920) → x=108 y=326 w=864 h=1171', () => {
@@ -188,10 +231,10 @@ test('page heading line → kind=heading gras', () => {
   assert.equal(out[0].lines[0].bold, true);
 });
 
-test('page cta line → kind=cta régulier', () => {
+test('page cta line → kind=cta, gras par défaut (CTA original = CAPS gras crème)', () => {
   const out = normalisePages([{ lines: [{ text: 'LISEZ LA LÉGENDE', role: 'cta' }] }]);
   assert.equal(out[0].lines[0].kind, 'cta');
-  assert.equal(out[0].lines[0].bold, false);
+  assert.equal(out[0].lines[0].bold, true);
 });
 
 test('page line bold override force le gras', () => {
@@ -213,25 +256,77 @@ test('page role inconnu lève une erreur explicite', () => {
   );
 });
 
-console.log('\n=== computePageHoldSec / computeDurationSec (format long) ===');
+console.log('\n=== normalisePages : size / align / arrow (fidélité visuelle) ===');
 
-test('hold_s explicite override le calcul auto', () => {
+test('défauts par rôle : body = m / left, heading = l / center, cta = s / center', () => {
+  const out = normalisePages([{ lines: [
+    { text: 'corps' },
+    { text: 'HOOK', role: 'heading' },
+    { text: 'CTA', role: 'cta' },
+  ] }]);
+  const [body, head, cta] = out[0].lines;
+  assert.equal(body.sizeMul, SIZE_MUL.m); assert.equal(body.align, 'left');
+  assert.equal(head.sizeMul, SIZE_MUL.l); assert.equal(head.align, 'center');
+  assert.equal(cta.sizeMul, SIZE_MUL.s); assert.equal(cta.align, 'center');
+});
+
+test('cta gras par défaut (couleur crème gérée au rendu)', () => {
+  const out = normalisePages([{ lines: [{ text: 'LISEZ', role: 'cta' }] }]);
+  assert.equal(out[0].lines[0].bold, true);
+});
+
+test('size explicite mappe sur le multiplicateur', () => {
+  const out = normalisePages([{ lines: [{ text: 'x', size: 'xl' }] }]);
+  assert.equal(out[0].lines[0].sizeMul, SIZE_MUL.xl);
+});
+
+test('align explicite (justify) honoré sur le corps', () => {
+  const out = normalisePages([{ lines: [{ text: 'x', align: 'justify' }] }]);
+  assert.equal(out[0].lines[0].align, 'justify');
+});
+
+test('arrow:true propagé sur la page ; absent = false', () => {
+  const out = normalisePages([{ lines: [{ text: 'x' }], arrow: true }, { lines: [{ text: 'y' }] }]);
+  assert.equal(out[0].arrow, true);
+  assert.equal(out[1].arrow, false);
+});
+
+console.log('\n=== pageCharCount / computePageHoldSec (loi de timing char-volume) ===');
+
+test('pageCharCount = caractères visibles (markup retiré, espaces normalisés)', () => {
+  // "Un [[mot]] **gras**" -> "Un mot gras" = 11 chars
+  const n = pageCharCount({ lines: [{ text: 'Un [[mot]] **gras**' }] });
+  assert.equal(n, 'Un mot gras'.length);
+});
+
+test('pageCharCount joint les lignes par un espace', () => {
+  const n = pageCharCount({ lines: [{ text: 'abc' }, { text: 'de' }] });
+  assert.equal(n, 'abc de'.length); // 6
+});
+
+test('hold_s explicite override la loi de timing', () => {
   assert.equal(computePageHoldSec({ lines: [{ text: 'a' }], hold_s: 13 }), 13);
 });
 
-test('hold auto = clamp(4 + 14*1.15, 6, 24) ≈ 20.1 pour 14 lignes', () => {
-  const lines = Array.from({ length: 14 }, () => ({ text: 'x' }));
-  const h = computePageHoldSec({ lines });
-  assert.equal(Math.round(h * 10) / 10, 20.1);
+test('hold auto = chars / 27 (loi dérivée du volume)', () => {
+  // 270 chars utiles -> 270/27 = 10s pile
+  const text = 'x'.repeat(270);
+  const h = computePageHoldSec({ lines: [{ text }] });
+  assert.equal(Math.round(h * 100) / 100, 270 / PAGE_CHARS_PER_SEC);
 });
 
-test('hold auto plancher à 6s (page courte)', () => {
-  assert.equal(computePageHoldSec({ lines: [{ text: 'a' }] }), 6); // 4+1.15=5.15 -> clamp 6
+test('hold auto plancher à 4s (page très courte)', () => {
+  assert.equal(computePageHoldSec({ lines: [{ text: 'ab' }] }), 4); // 2/27<4 -> 4
 });
 
-test('hold auto plafond à 24s (page très dense)', () => {
-  const lines = Array.from({ length: 24 }, () => ({ text: 'x' }));
-  assert.equal(computePageHoldSec({ lines }), 24); // 4+27.6=31.6 -> clamp 24
+test('hold auto plafond à 26s (page très dense)', () => {
+  const text = 'x'.repeat(1000); // 1000/27=37 -> clamp 26
+  assert.equal(computePageHoldSec({ lines: [{ text }] }), 26);
+});
+
+test('hold auto colle aux durées observées (ressentir p1 ~567 chars ≈ 21s)', () => {
+  const h = computePageHoldSec({ lines: [{ text: 'x'.repeat(567) }] });
+  assert.equal(Math.round(h), 21); // original mesuré 21.9s
 });
 
 test('computePageHolds renvoie une durée par page', () => {

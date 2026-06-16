@@ -1,0 +1,13 @@
+{
+  "slug": "femme-blessure-abandon-homme-inaccessible",
+  "reveal": "all_at_once",
+  "hand_emoji": false,
+  "duration_s": null,
+  "segments": [
+    { "role": "block", "text": "Une femme qui n'a pas guéri sa [[blessure d'abandon]] vécue dans l'enfance..." },
+    { "role": "block", "text": "...se retrouvera à chercher sans cesse comment conquérir l'amour d'un [[homme inaccessible]]." },
+    { "role": "block", "text": "Afin que sa [[petite fille intérieure]] puisse réparer la première [[rupture d'amour]]..." },
+    { "role": "block", "text": "Vécue avec son [[papa]]..." },
+    { "role": "cta", "text": "VOICI COMMENT [[BRISER]]" }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "slug": "comportements-homme-traumas-pere",
+  "reveal": "staggered",
+  "hand_emoji": false,
+  "duration_s": null,
+  "segments": [
+    { "role": "block", "text": "Les [[comportements]] d'un homme qui répète les [[traumas intergénérationnels]] de son père..." },
+    { "role": "block", "text": "...et fait du [[mal]] à ceux qu'il aime." },
+    { "role": "cta", "text": "LISEZ LA [[LÉGENDE]]" }
+  ]
+}

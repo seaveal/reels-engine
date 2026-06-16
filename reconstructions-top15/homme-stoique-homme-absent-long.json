@@ -4,25 +4,29 @@
   "duration_s": null,
   "pages": [
     {
+      "arrow": true,
       "lines": [
-        { "text": "Un homme prisonnier de ses [[traumatismes]] détruit son couple sans le vouloir.", "role": "heading" },
-        { "text": "Accès de colères soudains, sur la défensive à chaque remarque, et ce silence froid dès que sa femme ose exprimer un désaccord ou une frustration." },
-        { "text": "Coupé de ses propres émotions, il ne peut pas entendre ce qu'elle dit vraiment, ni voir l'amour sincère qu'elle lui offre." }
+        { "text": "[[**Un homme prisonnier de ses traumatismes d'enfance détruit son couple sans le vouloir.**]]", "align": "justify" },
+        { "text": "Accès de [[colères]] soudains, sur la [[défensive]] à chaque remarque, et ce [[silence froid]] dès que sa femme ose exprimer un désaccord ou une frustration.", "align": "justify" },
+        { "text": "[[Coupé]] de ses propres [[émotions]], il ne peut pas entendre ce qu'elle dit vraiment.", "align": "justify" },
+        { "text": "Il est [[incapable]] de [[voir l'amour]] sincère qu'elle lui offre.", "align": "justify" }
+      ]
+    },
+    {
+      "arrow": true,
+      "lines": [
+        { "text": "Il [[déforme]] les [[paroles]] de sa femme à travers le [[filtre]] de ses [[blessures]] d'enfance non guéries.", "align": "justify" },
+        { "text": "Grandir avec un [[père]] trop [[strict]] et constamment [[critique]] l'a rendu [[hypersensible]], au point que sa [[femme marche]] sur des [[oeufs]], obligée de [[satisfaire]] son besoin incessant de [[reconnaissance]].", "align": "justify" },
+        { "text": "Ce [[vide affectif]] laissé par une [[mère]] émotionnellement [[absente]] l'a poussé à chercher chez sa [[femme]] une [[figure maternelle]].", "align": "justify" }
       ]
     },
     {
       "lines": [
-        { "text": "Il déforme les paroles de sa femme à travers le filtre de ses [[blessures non guéries]]." },
-        { "text": "Grandir avec un père trop strict et constamment critique l'a rendu hypersensible, au point que sa femme marche sur des œufs, obligée de satisfaire son besoin incessant de reconnaissance." },
-        { "text": "Ce vide affectif laissé par une mère émotionnellement absente l'a poussé à chercher chez sa femme une figure maternelle." }
-      ]
-    },
-    {
-      "lines": [
-        { "text": "Mais voilà le problème : il ne sait pas la nourrir émotionnellement en retour. Alors elle s'use à toujours donner, à porter seule le poids d'une relation." },
-        { "text": "Si cet homme choisit de [[guérir]], tout peut changer. Il deviendra calme, solide, et émotionnellement intelligent." },
-        { "text": "Il pourra enfin créer un espace sûr, où elle aussi s'ouvrira. Ensemble, ils bâtiront un amour profond et durable qui élève les deux." },
-        { "text": "LISEZ LA LÉGENDE", "role": "cta" }
+        { "text": "Mais voilà le [[problème]] : il ne sait pas la [[nourrir]] émotionnellement en [[retour]].", "align": "justify" },
+        { "text": "Alors, elle [[s'épuise]]. Elle s'use à toujours [[donner]], à porter seule le poids d'une [[relation]] déséquilibrée..", "align": "justify" },
+        { "text": "Si cet [[homme]] choisit de [[guérir]], tout peut changer. Il deviendra [[calme]], [[solide]], et [[émotionnellement]] intelligent.", "align": "justify" },
+        { "text": "Il pourra enfin [[créer]] un [[espace]] sûr, où [[elle]] aussi s'ouvrira. [[Ensemble]], ils bâtiront un [[Amour profond]] et [[durable]] qui élève les deux.", "align": "justify" },
+        { "text": "LISEZ LA LÉGENDE", "role": "cta", "size": "s", "align": "center" }
       ]
     }
   ]

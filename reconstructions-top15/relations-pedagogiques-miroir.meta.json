@@ -1,0 +1,16 @@
+{
+  "source_reel_id": "18009039605798732",
+  "rank_composite": 4,
+  "composite_score": 30571,
+  "reveal_detected": "staggered",
+  "duration_s_original": 35.967,
+  "permalink": "https://www.instagram.com/reel/DPnrQQODcFi/",
+  "caption_originale": "✋🛑👉Certaines relations vous abîment. Mais en réalité, elles réveillent ce qui est déjà blessé. [...] Commentez « detox5 »",
+  "funnel_keyword_caption": "detox5",
+  "onscreen_cta": "(pas de CTA on-screen explicite — le réel se termine sur le texte ; CTA dérivé de la légende « detox5 » + renvoi légende)",
+  "mp4_corpus_path": "/home/agents/work/corpus-reels-ig/corpus/18009039605798732/18009039605798732.mp4",
+  "mp4_kdrive_path": "ABSENT de kDrive — réel publié le 2025-10-10, postérieur au snapshot d'export kDrive du 2025-05-29. Disponible uniquement dans le corpus local. Vérifié 2026-06-16 (rclone lsf 202510 ne retourne aucun fichier pour cet id).",
+  "format_fit": "borderline — narration parallèle 36s. L'original aligne 7 blocs « Une personne X » ; condensé ici en titre + 6 blocs + cta (8 segments = plafond du schéma). Structure parallèle proche de votre-vie-amoureuse, donc bon candidat typographique, mais c'est une CONDENSATION (1 archétype « paresseuse » omis) et non un calque ligne-à-ligne. Le CTA on-screen est dérivé (l'original ne montre pas de carte CTA finale nette).",
+  "needs_review": true,
+  "review_priority": "Cyrille doit valider la condensation à 6 blocs et le CTA dérivé, OU déclasser ce réel hors test de fidélité strict."
+}

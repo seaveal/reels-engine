@@ -2,30 +2,38 @@ import { useMemo } from 'react';
 import { interpolate, useCurrentFrame } from 'remotion';
 import { PAGE_FADE_SEC, FPS } from './constants.js';
 import { SegmentLine } from './SegmentLine.jsx';
+import { PageArrow } from './PageArrow.jsx';
 import { computeAutoFitFontSize } from './autoFit.js';
+import { stripInline } from './highlight.js';
 
-// Format LONG : une page dense de corps narratif. Lignes serrées (pas de gros gap
-// inter-bloc comme le court) — on modélise la page comme UN bloc de N lignes pour
-// l'auto-fit, avec un gap inter-ligne resserré.
-const PAGE_LINE_GAP_EM = 0.28;
+// Format LONG : page dense de corps narratif. Chaque "line" du JSON = un
+// paragraphe (qui peut wrapper sur plusieurs lignes visuelles). On modélise la
+// page comme UN bloc de N paragraphes pour l'auto-fit, avec :
+//  - un gap INTER-PARAGRAPHE (entre deux entrées `lines`) = l'aération observée
+//    sur les originaux (saut de ligne entre blocs),
+//  - le wrap interne d'un paragraphe géré par line-height (pas de gap ajouté).
+const PAGE_PARA_GAP_EM = 0.55;
 
 /**
- * Rend UNE page du format long : bloc centré H+V dans la safe box, auto-fit sur
- * la page entière, fade in d'un coup (paging). La page est statique ensuite ;
- * son retrait (replace) est géré par le séquençage parent (fenêtre Remotion).
+ * Rend UNE page du format long : bloc aligné en HAUT de la safe box (les
+ * originaux posent le texte sous le handle et le laissent descendre — top, pas
+ * center), auto-fit sur la page entière (taille de base), fade in d'un coup
+ * (paging). Chaque paragraphe honore son `align` et son `sizeMul`.
  *
- * props.page = { id, lines: [{ text, bold, kind }] }  (déjà normalisé)
+ * props.page = { id, lines: [{ text, bold, kind, sizeMul, align }], arrow }
  */
 export const PageStack = ({ page, safe }) => {
   const fontSize = useMemo(
     () => computeAutoFitFontSize({
-      // 1 seul "segment" = toutes les lignes de la page, gap inter-ligne resserré,
-      // aucun gap inter-bloc (block gap 0).
+      // 1 seul "segment" = tous les paragraphes ; gap inter-paragraphe via
+      // blockGapEm ? non : ici chaque paragraphe est une "line" -> on utilise
+      // lineGapEm comme gap inter-paragraphe et blockGapEm 0 (1 seul segment).
       segments: [{ lines: page.lines }],
       maxWidth: safe.width,
       maxHeight: safe.height,
       blockGapEm: 0,
-      lineGapEm: PAGE_LINE_GAP_EM,
+      lineGapEm: PAGE_PARA_GAP_EM,
+      stripFn: stripInline,
     }),
     [page.lines, safe.width, safe.height],
   );
@@ -47,15 +55,23 @@ export const PageStack = ({ page, safe }) => {
         height: safe.height,
         display: 'flex',
         flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: `${PAGE_LINE_GAP_EM * fontSize}px`,
+        alignItems: 'stretch',
+        justifyContent: 'flex-start',
+        gap: `${PAGE_PARA_GAP_EM * fontSize}px`,
         opacity,
       }}
     >
       {page.lines.map((line, li) => (
-        <SegmentLine key={li} {...line} fontSize={fontSize} />
+        <SegmentLine
+          key={li}
+          text={line.text}
+          bold={line.bold}
+          kind={line.kind}
+          align={line.align}
+          fontSize={fontSize * (line.sizeMul ?? 1)}
+        />
       ))}
+      {page.arrow && <PageArrow color="#F9E9DB" />}
     </div>
   );
 };

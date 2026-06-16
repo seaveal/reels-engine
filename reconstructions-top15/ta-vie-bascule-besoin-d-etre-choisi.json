@@ -1,0 +1,12 @@
+{
+  "slug": "ta-vie-bascule-besoin-d-etre-choisi",
+  "reveal": "staggered",
+  "hand_emoji": false,
+  "duration_s": null,
+  "segments": [
+    { "role": "block", "text": "Ta vie entière [[bascule]] lorsque tu réalises que tu n'as pas vraiment envie d'être avec cette personne..." },
+    { "role": "block", "text": "Mais que tu voulais simplement qu'elle te [[désire]]..." },
+    { "role": "block", "text": "Que ta [[blessure d'abandon]] t'a rendu obsédé(e) par le besoin d'être [[choisi(e)]]." },
+    { "role": "cta", "text": "LA SUITE DANS LA [[LÉGENDE]]" }
+  ]
+}

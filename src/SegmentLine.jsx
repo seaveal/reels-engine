@@ -1,37 +1,48 @@
 import { COLORS, FONT_FAMILY } from './constants.js';
-import { parseHighlights } from './highlight.js';
+import { parseInline } from './highlight.js';
 
 /**
- * Une "line" de segment (bloc rendu d'un coup, peut être wrappée en plusieurs
- * lignes visuelles selon la largeur disponible).
+ * Une "line" rendue (bloc, peut wrapper sur plusieurs lignes visuelles selon la
+ * largeur). Style typographique depuis `kind` (title|heading|body|cta|block),
+ * `bold` (graisse de base de la ligne) et `align` (alignement).
  *
- * Le style typographique vient de la prop `kind` (title|heading|body|cta|block)
- * et `bold`. La taille de police est appliquée par le parent (auto-fit).
+ * Couleur / graisse PAR MOT : le texte est parsé par `parseInline` :
+ *   [[mot]] -> jaune #FFFF00 ; **mot** -> gras ; combinables [[**mot**]].
+ * La graisse effective d'un span = base de la ligne (`bold`) OU gras du span.
+ * Le `kind:'cta'` colore la ligne en crème #F9E9DB (couleur des CTA originaux),
+ * sauf les spans jaunes qui restent jaunes.
  *
- * Casse : title/heading reçoivent text-transform: uppercase (la mission l'impose,
- * et le JSON est censé déjà être en CAPITALES mais on garantit).
+ * Casse : title/heading/cta -> uppercase (CAPS, garanti même si JSON déjà capitalisé).
+ *
+ * `align` défaut 'center' (préserve le rendu du FORMAT COURT inchangé). Le format
+ * long passe 'left'/'justify'/'right' explicitement.
  */
-export const SegmentLine = ({ text, bold, kind, fontSize }) => {
-  const pieces = parseHighlights(text);
+export const SegmentLine = ({ text, bold, kind, fontSize, align = 'center' }) => {
+  const pieces = parseInline(text);
   const isUpper = kind === 'title' || kind === 'heading' || kind === 'cta';
+  const baseColor = kind === 'cta' ? COLORS.cream : COLORS.white;
   return (
     <div
       style={{
         fontFamily: FONT_FAMILY,
         fontWeight: bold ? 700 : 400,
         fontSize,
-        color: COLORS.white,
+        color: baseColor,
         lineHeight: 1.08,
-        textAlign: 'center',
+        textAlign: align,
         textTransform: isUpper ? 'uppercase' : 'none',
         letterSpacing: kind === 'title' ? '-0.005em' : 0,
         wordBreak: 'break-word',
+        width: '100%',
       }}
     >
       {pieces.map((p, i) => (
         <span
           key={i}
-          style={{ color: p.highlight ? COLORS.yellow : COLORS.white }}
+          style={{
+            color: p.yellow ? COLORS.yellow : baseColor,
+            fontWeight: (bold || p.bold) ? 700 : 400,
+          }}
         >
           {p.text}
         </span>

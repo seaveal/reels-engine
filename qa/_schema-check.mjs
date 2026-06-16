@@ -33,5 +33,10 @@ all = check('long-reject-no-pages', { slug:'x', layout:'long' }, false) && all;
 all = check('long-reject-empty-page', { slug:'x', layout:'long', pages:[{lines:[]}] }, false) && all;
 all = check('mixed-reject', { slug:'x', layout:'short', reveal:'all_at_once', pages:[{lines:[{text:'a'}]}] }, false) && all;
 all = check('long-reject-bad-role', { slug:'x', layout:'long', pages:[{lines:[{text:'a', role:'title'}]}] }, false) && all;
+// Fidélité visuelle additive : size / align / arrow + markup gras **
+all = check('long-size-align-arrow', { slug:'x', layout:'long', pages:[ { lines:[ {text:'[[**punch**]]', size:'xl', align:'justify'}, {text:'corps **gras** et [[jaune]]', align:'left'} ], arrow:true }, { lines:[{text:'LISEZ LA LÉGENDE', role:'cta', size:'s', align:'center'}] } ] }, true) && all;
+all = check('long-reject-bad-size', { slug:'x', layout:'long', pages:[{lines:[{text:'a', size:'xxl'}]}] }, false) && all;
+all = check('long-reject-bad-align', { slug:'x', layout:'long', pages:[{lines:[{text:'a', align:'middle'}]}] }, false) && all;
+all = check('long-reject-bad-arrow', { slug:'x', layout:'long', pages:[{lines:[{text:'a'}], arrow:'yes'}] }, false) && all;
 console.log(all ? '\nALL SCHEMA CHECKS PASS' : '\nSOME SCHEMA CHECKS FAILED');
 process.exit(all ? 0 : 1);

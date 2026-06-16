@@ -129,7 +129,12 @@
         "hold_s": {
           "type": ["number", "null"],
           "default": null,
-          "description": "Durée d'affichage de la page en secondes. null = auto (proportionnel au nombre de lignes)."
+          "description": "Durée d'affichage de la page en secondes. null = auto = TEMPS DE LECTURE dérivé du volume de texte de la page : clamp(caractères_visibles / 27, 4, 26). Override total si fourni."
+        },
+        "arrow": {
+          "type": "boolean",
+          "default": false,
+          "description": "Si true, affiche la flèche dessinée « → » crème en bas de page (signal « continue / page suivante » des originaux). Typiquement true sur toutes les pages SAUF la dernière (qui porte un role:cta à la place)."
         }
       }
     },
@@ -142,16 +147,24 @@
           "type": "string",
           "minLength": 1,
           "maxLength": 240,
-          "description": "Texte de la ligne. Supporte le surlignage [[mot]] (rendu jaune #FFFF00)."
+          "description": "Texte de la ligne. Markup inline : [[mot]] = jaune #FFFF00 ; **mot** = gras ; combinables/imbriquables [[**mot**]]. Les originaux ont des MOTS jaunes au sein des paragraphes de corps (pas seulement les titres) et parfois une punchline entière jaune+gras."
         },
         "role": {
           "enum": ["heading", "body", "cta"],
           "default": "body",
-          "description": "heading = CAPS + gras (hook). cta = CAPS régulier (renvoi légende). body (défaut) = corps régulier casse d'origine."
+          "description": "heading = CAPS + gras (hook). cta = CAPS + gras, couleur crème #F9E9DB (renvoi légende, centré par défaut). body (défaut) = corps régulier casse d'origine."
         },
         "bold": {
           "type": "boolean",
-          "description": "Override du gras pour la ligne. Défaut : heading = true ; body/cta = false."
+          "description": "Override du gras pour TOUTE la ligne. Défaut : heading = true ; body/cta = false. (Le gras par mot se fait via **mot** dans text.)"
+        },
+        "size": {
+          "enum": ["xl", "l", "m", "s"],
+          "description": "Taille relative de la ligne (multiplie la taille auto-fit de base de la page). xl=1.30 l=1.15 m=1.0 s=0.82. Défaut : heading/cta dérivés du rôle (heading≈l, cta≈s), body = m. Permet titre > corps > CTA observés sur les originaux."
+        },
+        "align": {
+          "enum": ["left", "center", "right", "justify"],
+          "description": "Alignement de la ligne. Défaut : heading/cta = center, body = left. Les originaux varient : corps justifié (réel « stoique ») ou aligné à gauche (réels « ressentir » / liste), titres centrés ou alignés gauche selon le réel."
         }
       }
     }

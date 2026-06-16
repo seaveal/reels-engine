@@ -1,0 +1,17 @@
+{
+  "source_reel_id": "18014274974188341",
+  "covers_also_reel_id": "18314591737196212",
+  "covers_also_note": "Réel 18314591737196212 (rang 11, score 12666, permalink C8RKnvdCQma) = même créatif (texte à l'écran narration identique), seule la ligne CTA finale diffère légèrement. Ce squelette les couvre tous les deux ; le second peut être dérivé en changeant uniquement le segment cta. Pas de fichier JSON séparé créé (créatif quasi-dupliqué, aucune valeur de test additionnelle).",
+  "rank_composite": 3,
+  "composite_score": 40299,
+  "reveal_detected": "staggered",
+  "duration_s_original": 25.6,
+  "permalink": "https://www.instagram.com/reel/C4IBbdQCoLZ/",
+  "caption_originale": "✋✋🛑➡️ L'absence d'un père, qu'elle soit physique ou émotionnelle, inflige à sa fille une plaie [...] commentez « REPLAY »",
+  "funnel_keyword_caption": "REPLAY",
+  "onscreen_cta": "VOICI COMMENT SORTIR RAPIDEMENT DE ÇA",
+  "mp4_corpus_path": "/home/agents/work/corpus-reels-ig/corpus/18014274974188341/18014274974188341.mp4",
+  "mp4_kdrive_path": "kDrive:Migration-GoogleDrive/compte-1/instagram/mes-donnees/instagram-lecorpsnetrichejamais-2025-05-29-VGOuCOWN/media/reels/202403/AQPxysLUd6kfOUz6wTstrFuYp8LwTcZhmk9no95q1c7t6qhhEGhsOvKoHr6RV36LGom5Gz3BZn1D6RvRwjPZcw8vs2r1bBuMDnCimPs_18014274974188341.mp4",
+  "format_fit": "borderline — narration 25.6s condensée en 4 blocs + cta (≤8 segments). Fidélité TYPOGRAPHIQUE seulement : l'original superpose le texte sur vidéo faciale longue, pas sur fond typographique. Le rythme staggered est respecté mais le découpage est une condensation éditoriale, pas un calque ligne-à-ligne.",
+  "needs_review": true
+}

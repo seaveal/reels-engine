@@ -1,0 +1,13 @@
+{
+  "slug": "absence-pere-blessure-fille-replay",
+  "reveal": "staggered",
+  "hand_emoji": false,
+  "duration_s": null,
+  "segments": [
+    { "role": "block", "text": "L'absence d'un [[père]], physique ou émotionnelle, inflige à sa fille une [[plaie]] qui l'empêche d'affirmer un [[cap clair]] dans sa vie." },
+    { "role": "block", "text": "Sa base et son [[identité]] lui semblent vacillantes ; elle peine à trouver sa [[juste place]] dans ce monde..." },
+    { "role": "block", "text": "Elle apprend à se contenter du peu qui lui est offert, croyant que l'[[amour]] et la chaleur humaine sont des [[denrées rares]]." },
+    { "role": "block", "text": "Sans en avoir conscience, elle reste sous l'emprise du [[manque de papa]], qu'elle revit dans ses relations difficiles avec les [[hommes]]..." },
+    { "role": "cta", "text": "VOICI COMMENT [[SORTIR]] RAPIDEMENT DE ÇA" }
+  ]
+}

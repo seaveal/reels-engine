@@ -1,0 +1,16 @@
+{
+  "slug": "relations-pedagogiques-miroir",
+  "reveal": "staggered",
+  "hand_emoji": false,
+  "duration_s": null,
+  "segments": [
+    { "role": "title", "text": "Ces relations que vous pensiez [[TOXIQUES]]... sont en réalité [[PÉDAGOGIQUES]]" },
+    { "role": "block", "text": "Une personne [[agressive]] entre dans votre vie pour vous montrer à quel point vous [[réprimez vos émotions]]." },
+    { "role": "block", "text": "Une personne [[collante]] vous montre à quel point vous avez [[peur de l'intimité]]." },
+    { "role": "block", "text": "Une personne [[absente]] vous montre que vous ne vous [[aimez pas vous-même]]." },
+    { "role": "block", "text": "Une personne [[abusive]] vous montre à quel point vos [[limites sont faibles]]." },
+    { "role": "block", "text": "Une personne [[contrôlante]] vous montre à quel point vous [[fuyez vos responsabilités]]." },
+    { "role": "block", "text": "Elles viennent vous montrer où vous êtes [[déséquilibré]], [[carencé]], ou [[réprimé]]." },
+    { "role": "cta", "text": "LA SUITE DANS LA [[LÉGENDE]]" }
+  ]
+}

@@ -34,6 +34,12 @@ const wrapAndMeasure = ({ text, fontSize, fontWeight, fontFamily, maxWidth }) =>
  *
  * blockGapEm : espace inter-segments en fraction de fontSize.
  * lineGapEm  : espace inter-lines (heading + body même segment).
+ * stripFn    : fonction de retrait du markup avant mesure. Défaut stripHighlights
+ *              (format court : ne connaît que [[ ]]). Le format long passe
+ *              stripInline (retire aussi **gras**).
+ *
+ * Chaque ligne peut porter `sizeMul` (défaut 1) : sa taille effective = fs*sizeMul.
+ * fs (= taille de base de la pile) reste la grandeur recherchée par la recherche.
  */
 export const computeAutoFitFontSize = ({
   segments,
@@ -47,6 +53,7 @@ export const computeAutoFitFontSize = ({
   // par rapport aux corps. Référence : sur quand-il-est-seul.json, le titre
   // tenait à ~210 px (3 lignes) alors que la ref est plus modeste.
   maxSize = 180,
+  stripFn = stripHighlights,
 }) => {
   const totalHeight = (fs) => {
     let H = 0;
@@ -54,10 +61,11 @@ export const computeAutoFitFontSize = ({
       const seg = segments[si];
       for (let li = 0; li < seg.lines.length; li++) {
         const line = seg.lines[li];
-        const text = stripHighlights(line.text);
+        const text = stripFn(line.text);
+        const lineFs = fs * (line.sizeMul ?? 1);
         const m = wrapAndMeasure({
           text,
-          fontSize: fs,
+          fontSize: lineFs,
           fontWeight: line.bold ? 700 : 400,
           fontFamily,
           maxWidth,

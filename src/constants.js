@@ -1,3 +1,5 @@
+import { stripInline } from './highlight.js';
+
 export const WIDTH = 1080;
 export const HEIGHT = 1920;
 export const FPS = 30;
@@ -6,6 +8,10 @@ export const COLORS = {
   yellow: '#FFFF00',
   white: '#FFFFFF',
   black: '#000000',
+  // CTA « LISEZ LA LÉGENDE » des réels longs : crème/pêche chaud, PAS blanc pur.
+  // Mesuré sur les 3 originaux (palettegen) : RGB ≈ (249,233,219) = #F9E9DB.
+  // Même teinte que la flèche dessinée « → » de bas de page.
+  cream: '#F9E9DB',
 };
 
 // Safe zone tunée 2026-05-23 sur références réelles :
@@ -39,12 +45,25 @@ export const HAND_EMOJI_DELAY_AFTER_LAST_SEC = 0.4;
 // Fade d'entrée d'une page (réutilise la sémantique FADE_SEC mais constante dédiée
 // au cas où on veut un timing de page distinct du court).
 export const PAGE_FADE_SEC = 0.4;
-// Durée auto d'affichage d'une page = clamp(BASE + lignes*PER_LINE, MIN, MAX).
-// Calibré sur les timelines des réels longs (~20 s pour ~14 lignes denses).
-export const PAGE_BASE_SEC = 4;
-export const PAGE_PER_LINE_SEC = 1.15;
-export const PAGE_MIN_SEC = 6;
-export const PAGE_MAX_SEC = 24;
+
+// LOI DE TIMING DÉRIVÉE DU CONTENU (calibrée sur les 3 réels originaux).
+// La durée d'affichage d'une page ≈ son TEMPS DE LECTURE, donc proportionnelle
+// au VOLUME DE TEXTE (caractères visibles), PAS au nombre de lignes ni à un fixe.
+//
+// Mesures (scene-change ffmpeg + confirmation visuelle, durée/chars par page) :
+//   stoique  : 11.1s/344  13.1s/392  13.0s/416   -> ~30-32 char/s
+//   verites  : 21.5s/541   6.4s/165               -> ~25-26 char/s
+//   ressentir: 21.9s/567  19.2s/454  16.0s/367    -> ~23-26 char/s
+//   => char/s observé : 22.9 → 32.0, moyenne 27.1 ; mots/s 4.1 → 5.3.
+// Loi retenue (meilleur compromis durée TOTALE, RMSE 1.78 s/page) :
+//   hold = clamp(chars / CHARS_PER_SEC, MIN, MAX)   sans base additive
+//   (une base par page se compose avec le nb de pages et gonfle les totaux).
+// Reconstitution des durées totales : stoique +15 %, verites -6 %, ressentir -10 %.
+// (Le réel justifié « stoique » lit plus vite ~31 char/s ; aucune loi linéaire
+//  unique ne colle les 3 à quelques % — surchargeable par page via hold_s.)
+export const PAGE_CHARS_PER_SEC = 27;
+export const PAGE_MIN_SEC = 4;
+export const PAGE_MAX_SEC = 26;
 
 export const safeBox = (width, height) => ({
   x: Math.round(SAFE.left * width),
@@ -53,11 +72,19 @@ export const safeBox = (width, height) => ({
   height: Math.round(height * (1 - SAFE.top - SAFE.bottom)),
 });
 
-// Durée auto d'une page du format long, fonction du nombre de lignes affichées.
+// Volume de texte VISIBLE d'une page = nombre de caractères (marqueurs [[ ]] / **
+// retirés), espaces normalisés. Sert à la loi de timing (temps de lecture).
+export const pageCharCount = (page) => {
+  const lines = (page && page.lines) ? page.lines : [];
+  const txt = lines.map((l) => stripInline(l.text || '')).join(' ').replace(/\s+/g, ' ').trim();
+  return txt.length;
+};
+
+// Durée auto d'une page du format long = TEMPS DE LECTURE, dérivé du volume de
+// texte (caractères). hold_s explicite par page = override total (prime).
 export const computePageHoldSec = (page) => {
   if (page && page.hold_s != null) return page.hold_s;
-  const n = (page && page.lines ? page.lines.length : 0);
-  const auto = PAGE_BASE_SEC + n * PAGE_PER_LINE_SEC;
+  const auto = pageCharCount(page) / PAGE_CHARS_PER_SEC;
   return Math.min(PAGE_MAX_SEC, Math.max(PAGE_MIN_SEC, auto));
 };
 
