@@ -1,0 +1,35 @@
+{
+  "slug": "homme-ne-sait-pas-ressentir-long",
+  "layout": "long",
+  "duration_s": null,
+  "pages": [
+    {
+      "lines": [
+        { "text": "Un homme qui ne sait pas [[ressentir]] ne sait pas aimer. Il finira toujours par perdre ce qui comptait le plus pour lui.", "role": "heading" },
+        { "text": "Pourquoi ? Parce qu'il vit dans sa tête. Parce qu'il intellectualise tout et veut avoir raison." },
+        { "text": "Parce qu'il argumente au lieu d'écouter, qu'il analyse au lieu de ressentir." },
+        { "text": "Elle, elle veut juste être en lien. Mais il ne sait pas ce que cela signifie." },
+        { "text": "Enfant, il n'a pas reçu beaucoup de tendresse, physique ou verbale. Ses parents étaient stricts, distants." },
+        { "text": "Alors il a appris que pour être aimé, il doit être parfait, performant, et gagner beaucoup." }
+      ]
+    },
+    {
+      "lines": [
+        { "text": "Chaque fois qu'elle exprime un besoin, il entend une critique. Il se referme, se justifie, se protège. Et sans le savoir, il l'éloigne encore plus." },
+        { "text": "Lui et elle parlent deux langues différentes. Elle parle avec son cœur. Lui, avec sa logique." },
+        { "text": "Elle veut une connexion, il veut des explications. Elle exprime un manque, il y voit un reproche. Elle tend la main, il se replie sur lui-même." },
+        { "text": "Il croit qu'elle est trop émotive. Elle croit qu'il ne ressent rien." }
+      ]
+    },
+    {
+      "lines": [
+        { "text": "Il croit qu'elle exagère. Elle croit qu'il ne la voit pas." },
+        { "text": "Il croit qu'elle lui en veut. Elle croit qu'il ne l'aime pas comme elle en a besoin." },
+        { "text": "Ils ont tous les deux tort." },
+        { "text": "Et puis un matin, il se réveille. Elle est encore là... mais plus vraiment. Elle arrête de demander..." },
+        { "text": "Mais si lui ne comprend pas... alors c'est bien elle qui finira par [[partir]]." },
+        { "text": "LISEZ LA LÉGENDE", "role": "cta" }
+      ]
+    }
+  ]
+}

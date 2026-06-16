@@ -1,0 +1,32 @@
+{
+  "slug": "12-verites-sur-les-gens-long",
+  "layout": "long",
+  "duration_s": null,
+  "pages": [
+    {
+      "lines": [
+        { "text": "12 VÉRITÉS DIFFICILES À ACCEPTER... MAIS QUI VOUS OUVRENT LES YEUX SUR LES GENS", "role": "heading" },
+        { "text": "1. Les plus effrayés attaquent." },
+        { "text": "2. Les plus superficiels parlent le plus." },
+        { "text": "3. Les plus insatisfaits sont envieux." },
+        { "text": "4. Les plus fragiles paraissent arrogants." },
+        { "text": "5. Les plus perdus portent des masques." },
+        { "text": "6. Les plus forts sont bienveillants." },
+        { "text": "7. Les plus intelligents écoutent davantage." },
+        { "text": "8. Les plus riches restent simples." },
+        { "text": "9. Les plus heureux ont besoin de peu." },
+        { "text": "10. Les plus sages restent calmes." },
+        { "text": "11. Les plus grands sont discrets." },
+        { "text": "12. Les plus loyaux savent patienter." }
+      ]
+    },
+    {
+      "lines": [
+        { "text": "Vous voulez connaître les gens ?", "role": "heading" },
+        { "text": "Regardez comment ils traitent ceux qui n'ont rien à leur [[offrir]]." },
+        { "text": "Les vrais voient sans juger, aiment sans attentes." },
+        { "text": "LISEZ LA LÉGENDE", "role": "cta" }
+      ]
+    }
+  ]
+}
