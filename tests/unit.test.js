@@ -11,6 +11,7 @@ import { normaliseSegments } from '../src/segments.js';
 import { normalisePages, SIZE_MUL } from '../src/pages.js';
 import { parseHighlights, stripHighlights, parseInline, stripInline } from '../src/highlight.js';
 import { safeBox, safeBoxLong, SAFE_LONG, ICON_SAFE_RIGHT, computeDurationSec, computeDurationFrames, computePageHoldSec, computePageHolds, computePageHoldFrames, pageCharCount, PAGE_CHARS_PER_SEC, FPS } from '../src/constants.js';
+import { normaliseTypography, NNBSP, WORD_SPLIT_RE } from '../src/typography.js';
 
 let passed = 0;
 let failed = 0;
@@ -479,6 +480,52 @@ test('long : duration_s global prime sur la somme des frames', () => {
 test('NON-RÉGRESSION court : computeDurationFrames = round(durée*FPS)', () => {
   assert.equal(computeDurationFrames({ reveal: 'all_at_once', segments: [1, 2] }), Math.round(10 * FPS));
   assert.equal(computeDurationFrames({ reveal: 'staggered', segments: [1, 2, 3, 4] }), Math.round(7.5 * FPS));
+});
+
+// ===== v5 : normalisation typographique (anti ponctuation orpheline) =====
+test('typo : fine insécable insérée avant ? ! ; : (espace sécable)', () => {
+  assert.equal(normaliseTypography('les gens ?'), `les gens${NNBSP}?`);
+  assert.equal(normaliseTypography('vraiment !'), `vraiment${NNBSP}!`);
+  assert.equal(normaliseTypography('voilà : oui'), `voilà${NNBSP}: oui`);
+  assert.equal(normaliseTypography('attends ; puis'), `attends${NNBSP}; puis`);
+});
+
+test('typo : ponctuation double collée au mot reçoit aussi la fine insécable', () => {
+  assert.equal(normaliseTypography('Pourquoi?'), `Pourquoi${NNBSP}?`);
+});
+
+test('typo : aucun « mot » purement ponctuation après normalisation', () => {
+  const out = normaliseTypography('Vous voulez connaître les gens ?');
+  assert.ok(!/ [?!;:]/.test(out), 'plus d\'espace sécable avant la ponctuation double');
+  const words = out.split(WORD_SPLIT_RE);
+  assert.ok(words.every((w) => !/^[?!;:.,…]+$/.test(w)), 'aucun mot purement ponctuation');
+});
+
+test('typo : idempotent', () => {
+  const once = normaliseTypography('les gens ?');
+  assert.equal(normaliseTypography(once), once);
+});
+
+test('typo : markup [[ ]] ** préservé', () => {
+  assert.equal(
+    normaliseTypography('[[**Vous voulez connaître les gens ?**]]'),
+    `[[**Vous voulez connaître les gens${NNBSP}?**]]`,
+  );
+});
+
+test('typo : WORD_SPLIT_RE ne coupe pas sur la fine insécable', () => {
+  assert.deepEqual(`a${NNBSP}?`.split(WORD_SPLIT_RE), [`a${NNBSP}?`]);
+  assert.deepEqual('a b'.split(WORD_SPLIT_RE), ['a', 'b']);
+});
+
+test('typo : normalisePages applique la normalisation au text rendu', () => {
+  const [page] = normalisePages([{ lines: [{ text: 'les gens ?' }] }]);
+  assert.equal(page.lines[0].text, `les gens${NNBSP}?`);
+});
+
+test('NON-RÉGRESSION : texte sans ponctuation double inchangé', () => {
+  assert.equal(normaliseTypography('Les vrais voient sans juger.'), 'Les vrais voient sans juger.');
+  assert.equal(normaliseTypography('un mot, deux mots'), 'un mot, deux mots');
 });
 
 console.log(`\n\nRésultat : ${passed} OK / ${failed} fail / ${passed + failed} total`);

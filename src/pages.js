@@ -39,6 +39,8 @@
  * ADDITIF : ne touche pas segments.js (format court). Les JSON longs SANS ces 4
  * attributs restent valides (défauts sensés identiques au comportement v3).
  */
+import { normaliseTypography } from './typography.js';
+
 const ROLE_TO_KIND = { heading: 'heading', cta: 'cta', body: 'block' };
 const DEFAULT_BOLD = { heading: true, cta: true, body: false };
 const DEFAULT_SIZE = { heading: 'l', cta: 's', body: 'm' };
@@ -79,7 +81,10 @@ export const normalisePages = (pages) => pages.map((page, pi) => {
     const spaceAfter = (line.space_after != null && Number.isFinite(line.space_after) && line.space_after >= 0)
       ? line.space_after
       : null;
-    return { text: line.text, bold, kind, sizeMul, letterSpacing, spaceAfter, align, color };
+    // v5 — normalisation typographique FR (fine insécable avant `? ! ; :`,
+    // liaison des ponctuations orphelines) : aucune ponctuation seule sur une
+    // ligne. Appliquée AVANT parsing markup (render) ET mesure (auto-fit).
+    return { text: normaliseTypography(line.text), bold, kind, sizeMul, letterSpacing, spaceAfter, align, color };
   });
   return { id: pi, lines, arrow: page.arrow === true };
 });

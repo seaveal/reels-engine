@@ -1,6 +1,7 @@
 import { measureText } from '@remotion/layout-utils';
 import { FONT_FAMILY } from './constants.js';
 import { stripHighlights } from './highlight.js';
+import { WORD_SPLIT_RE } from './typography.js';
 
 const LINE_HEIGHT = 1.08;
 
@@ -14,7 +15,10 @@ const LINE_HEIGHT = 1.08;
  * espacé. Conservateur : utilise la longueur de la chaîne d'essai.
  */
 const wrapAndMeasure = ({ text, fontSize, fontWeight, fontFamily, maxWidth, letterSpacingEm = 0 }) => {
-  const words = text.split(/\s+/).filter(Boolean);
+  // v5 — découpe sur espaces SÉCABLES seulement : les insécables (fine insécable
+  // U+202F, nbsp, word-joiner) ne cassent pas un mot → mesure du wrap cohérente
+  // avec le rendu Chromium (la ponctuation collée par typography.js ne déborde pas).
+  const words = text.split(WORD_SPLIT_RE).filter(Boolean);
   if (words.length === 0) return { lines: 0, height: 0 };
   const lsPx = letterSpacingEm * fontSize;
   const widthOf = (s) => {
