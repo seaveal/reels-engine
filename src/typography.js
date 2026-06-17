@@ -46,9 +46,23 @@ export const normaliseTypography = (input) => {
   if (input == null) return input;
   let s = String(input);
 
-  // 1) Ponctuations doubles `? ! ; :` : remplacer l'espace sécable qui précède
-  //    par une fine insécable. (Si déjà NNBSP/NBSP, on n'y touche pas.)
-  s = s.replace(new RegExp(`${BREAKING_SPACE}+([?!;:])`, 'g'), `${NNBSP}$1`);
+  // 0) COLLAPSE des espaces (fix « trous » v6) : toute suite d'espaces — sécables
+  //    OU insécables fines/nbsp/word-joiner mélangées — est réduite à UN SEUL
+  //    caractère. Sinon « mot  ? » (double espace source) ou « mot ⟨NNBSP⟩? » déjà
+  //    normalisé + espace sécable rémanente => deux caractères d'espacement = trou
+  //    visible. On préserve la nature insécable : si la suite CONTIENT une fine
+  //    insécable, le caractère retenu est U+202F ; sinon une espace sécable simple.
+  //    (Le word-joiner U+2060 de largeur nulle ne crée pas de trou ; on le laisse
+  //    seulement quand il est SEUL — sinon il est absorbé par le collapse.)
+  const SPACE_RUN = '[ \\t\\n\\r\\f\\v\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u2060\\u3000]';
+  s = s.replace(new RegExp(`${SPACE_RUN}{2,}`, 'g'), (run) =>
+    / | |⁠/.test(run) ? NNBSP : ' ');
+
+  // 1) Ponctuations doubles `? ! ; :` : remplacer l'espace (sécable OU fine
+  //    insécable déjà posée par une passe antérieure) qui précède par une fine
+  //    insécable UNIQUE. On absorbe aussi U+202F/U+00A0 pour rester idempotent
+  //    et ne jamais laisser « espace + insécable » devant le signe.
+  s = s.replace(new RegExp(`[${'\\u202f\\u00a0'}${BREAKING_SPACE.slice(1, -1)}]+([?!;:])`, 'g'), `${NNBSP}$1`);
 
   // 2) Ponctuation double SANS espace devant (ex. « gens? ») : insérer la fine
   //    insécable pour respecter la typo FR ET éviter l'orphelin. On évite les

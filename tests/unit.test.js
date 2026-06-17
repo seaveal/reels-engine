@@ -506,6 +506,24 @@ test('typo : idempotent', () => {
   assert.equal(normaliseTypography(once), once);
 });
 
+test('typo v6 : espaces multiples sécables collapsés en un seul (anti-trou)', () => {
+  assert.equal(normaliseTypography('mot   plusieurs   espaces'), 'mot plusieurs espaces');
+  assert.equal(normaliseTypography('double  espace'), 'double espace');
+});
+
+test('typo v6 : double espace avant ponctuation double → une seule fine insécable', () => {
+  assert.equal(normaliseTypography('mot  ?'), `mot${NNBSP}?`);
+  // espace sécable rémanente + fine insécable déjà posée : un seul caractère final
+  assert.equal(normaliseTypography(`espace puis ${NNBSP}?`), `espace puis${NNBSP}?`);
+});
+
+test('typo v6 : suite mixte contenant une insécable → conserve l\'insécable (pas de trou)', () => {
+  // un NNBSP entouré d'espaces sécables doit rester UN seul NNBSP
+  const out = normaliseTypography(`a ${NNBSP} b`);
+  assert.equal(out, `a${NNBSP}b`);
+  assert.ok(!/[   ⁠]{2,}/.test(out), 'aucune suite de 2+ espaces');
+});
+
 test('typo : markup [[ ]] ** préservé', () => {
   assert.equal(
     normaliseTypography('[[**Vous voulez connaître les gens ?**]]'),
