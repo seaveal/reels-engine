@@ -27,24 +27,25 @@ export const SAFE = {
   bottom: 0.22,
 };
 
-// --- Format LONG : SAFE zone MESURÉE sur les 3 réels originaux (v3, 2026-06-16) ---
-// Mesures (bbox du bloc de texte, proportions de 720x1280 ; handle exclu) :
-//   marge gauche  : stoique 0.119-0.133 · verites 0.111-0.126 · ressentir 0.101-0.118
-//   marge droite  : stoique 0.103-0.136 · verites 0.094-0.125 · ressentir 0.074-0.115
+// --- Format LONG : SAFE zone MESURÉE sur les 3 réels originaux (v4, 2026-06-17) ---
+// Re-mesure au pixel des bords gauche/droit du bloc de texte (PIL, bandes de lignes,
+// handle exclu), proportions de 720x1280 :
+//   marge gauche (body) : stoique 0.122 · verites 0.111 · ressentir 0.101-0.103
+//   bord droit (body)   : stoique 0.861 · verites 0.904 · ressentir 0.903
 //   début contenu : ~0.155-0.16 sous le handle (handle @ ~0.11)
-//   fin contenu   : pages denses à ~0.84 (marge basse ~0.16) ; pages CTA plus haut
-//   largeur texte : 0.74 → 0.82 (ressentir le plus large)
-// Objectif Cyrille « occuper l'espace au max tout en restant lisible » + hors UI IG :
-//   left  0.09  (≈ marge gauche observée, on gagne un peu de largeur),
-//   right 0.11  (texte util ~0.89 ; marge droite > gauche pour amorcer la garde
-//               icônes IG côté droit. Largeur util = 0.80, = largeur médiane des
-//               originaux 0.74-0.82),
-//   top   0.155 (le texte démarre juste sous le handle, gagne du vertical vs 0.17),
+//   fin contenu   : pages denses à ~0.84 (marge basse ~0.16)
+// v3 avait left=0.09 : ⚠️ marge gauche RABOTÉE (regen body L≈0.091 vs orig médiane
+// ~0.111). Cyrille : « restaure une marge gauche cohérente, non rabotée ». v4 :
+//   left  0.11  (= MÉDIANE des marges gauches originales, non rabotée),
+//   right 0.10  (bord droit util ~0.90 = médiane des bords droits originaux),
+//   top   0.155 (le texte démarre juste sous le handle),
 //   bottom 0.16 (les pages denses des originaux descendent à ~0.84).
+// Largeur util = 0.79 (médiane des largeurs originales 0.74-0.80). Titre et corps
+// partagent EXACTEMENT cette même boîte (safeBoxLong) → même grille G/D.
 // Tout en PROPORTIONS → responsive : tient identique sur toute taille de téléphone.
 export const SAFE_LONG = {
-  left: 0.09,
-  right: 0.11,
+  left: 0.11,
+  right: 0.10,
   top: 0.155,
   bottom: 0.16,
 };
@@ -141,6 +142,17 @@ export const computePageHoldSec = (page) => {
 export const computePageHolds = (spec) =>
   (spec.pages ?? []).map((p) => computePageHoldSec(p));
 
+// FIX FIN (v4, 2026-06-17) — DERNIÈRE PAGE TENUE JUSQU'À LA DERNIÈRE FRAME.
+// Bug v3 : la durée de composition = round(total_sec * FPS) tandis que chaque
+// Series.Sequence = round(hold_sec * FPS). Quand la somme des frames arrondies par
+// page est < round(total*FPS) (ex. ressentir : 1559 vs 1560), la ou les frames de
+// fin n'ont AUCUNE Series.Sequence active → écran VIDE (fond + handle seul) en fin
+// de réel. Fix : la composition dure EXACTEMENT la somme des frames de page. Ainsi
+// la dernière page occupe la dernière frame, plus de queue vide. Les durées par page
+// SONT les mêmes (loi de timing v2 inchangée) — seul l'arrondi total est aligné.
+export const computePageHoldFrames = (spec) =>
+  computePageHolds(spec).map((h) => Math.max(1, Math.round(h * FPS)));
+
 export const computeDurationSec = (spec) => {
   if (spec.duration_s != null) return spec.duration_s;
   // FORMAT LONG (paging) : somme des durées de page.
@@ -155,4 +167,15 @@ export const computeDurationSec = (spec) => {
     return STAGGER_LEAD_IN_SEC + STAGGER_GAP_SEC * Math.max(0, n - 1) + FADE_SEC + STAGGER_TAIL_SEC;
   }
   return ALL_AT_ONCE_DELAY_SEC + FADE_SEC + ALL_AT_ONCE_TAIL_SEC;
+};
+
+// Durée de composition EN FRAMES. FORMAT LONG : somme exacte des frames de page
+// (= somme des durations des Series.Sequence) → pas de frame de fin orpheline.
+// duration_s explicite (long ou court) prime. Court : dérivé de computeDurationSec.
+export const computeDurationFrames = (spec) => {
+  if (spec.duration_s == null && spec.layout === 'long') {
+    const frames = computePageHoldFrames(spec).reduce((a, b) => a + b, 0);
+    return Math.max(1, frames);
+  }
+  return Math.max(1, Math.round(computeDurationSec(spec) * FPS));
 };

@@ -23,12 +23,18 @@ import { parseInline } from './highlight.js';
  */
 const NAMED_COLOR = { white: COLORS.white, yellow: COLORS.yellow, cream: COLORS.cream };
 
-export const SegmentLine = ({ text, bold, kind, fontSize, align = 'center', color }) => {
+export const SegmentLine = ({ text, bold, kind, fontSize, align = 'center', color, letterSpacing = null, marginBottom = 0 }) => {
   const pieces = parseInline(text);
   const isUpper = kind === 'title' || kind === 'heading' || kind === 'cta';
   const baseColor = color != null
     ? (NAMED_COLOR[color] ?? COLORS.white)
     : (kind === 'cta' ? COLORS.cream : COLORS.white);
+  // letterSpacing (v4, format long, par paragraphe) : si fourni explicitement, il
+  // prime (en em). Sinon, on conserve le tracking LEGACY : -0.005em pour le titre du
+  // format COURT (kind:'title'), 0 ailleurs → rendu court strictement inchangé.
+  const resolvedLetterSpacing = letterSpacing != null
+    ? `${letterSpacing}em`
+    : (kind === 'title' ? '-0.005em' : 0);
   return (
     <div
       style={{
@@ -39,9 +45,10 @@ export const SegmentLine = ({ text, bold, kind, fontSize, align = 'center', colo
         lineHeight: 1.08,
         textAlign: align,
         textTransform: isUpper ? 'uppercase' : 'none',
-        letterSpacing: kind === 'title' ? '-0.005em' : 0,
+        letterSpacing: resolvedLetterSpacing,
         wordBreak: 'break-word',
         width: '100%',
+        marginBottom,
       }}
     >
       {pieces.map((p, i) => (

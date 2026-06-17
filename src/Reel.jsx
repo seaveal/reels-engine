@@ -3,7 +3,7 @@ import { Background } from './Background.jsx';
 import { TextStack } from './TextStack.jsx';
 import { PageStack } from './PageStack.jsx';
 import { HandEmoji } from './HandEmoji.jsx';
-import { safeBox, safeBoxLong, COLORS, STAGGER_LEAD_IN_SEC, STAGGER_GAP_SEC, ALL_AT_ONCE_DELAY_SEC, FPS, FADE_SEC, HAND_EMOJI_DELAY_AFTER_LAST_SEC, computePageHolds } from './constants.js';
+import { safeBox, safeBoxLong, COLORS, STAGGER_LEAD_IN_SEC, STAGGER_GAP_SEC, ALL_AT_ONCE_DELAY_SEC, FPS, FADE_SEC, HAND_EMOJI_DELAY_AFTER_LAST_SEC, computePageHoldFrames } from './constants.js';
 import { normaliseSegments } from './segments.js';
 import { normalisePages } from './pages.js';
 
@@ -45,7 +45,9 @@ export const Reel = (props) => {
     // distincte du court → on n'altère pas le rendu court (non-régression).
     const safeLong = safeBoxLong(width, height);
     const pages = normalisePages(props.pages ?? []);
-    const holds = computePageHolds(props);
+    // v4 : frames par page = EXACTEMENT ce que somme computeDurationFrames pour la
+    // composition → la dernière page tient jusqu'à la dernière frame (pas de queue vide).
+    const holdFrames = computePageHoldFrames(props);
     return (
       <AbsoluteFill style={{ backgroundColor: COLORS.black }}>
         <style dangerouslySetInnerHTML={{ __html: OSWALD_FONT_FACE }} />
@@ -54,7 +56,7 @@ export const Reel = (props) => {
           {pages.map((page, i) => (
             <Series.Sequence
               key={page.id}
-              durationInFrames={Math.max(1, Math.round((holds[i] ?? 0) * FPS))}
+              durationInFrames={holdFrames[i] ?? 1}
             >
               <PageStack page={page} safe={safeLong} />
             </Series.Sequence>

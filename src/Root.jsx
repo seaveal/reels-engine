@@ -1,5 +1,5 @@
 import { Composition } from 'remotion';
-import { FPS, HEIGHT, WIDTH, computeDurationSec } from './constants.js';
+import { FPS, HEIGHT, WIDTH, computeDurationFrames } from './constants.js';
 import { Reel } from './Reel.jsx';
 
 export const RemotionRoot = () => (
@@ -21,8 +21,9 @@ export const RemotionRoot = () => (
       ],
     }}
     calculateMetadata={({ props }) => {
-      const sec = computeDurationSec(props);
-      return { durationInFrames: Math.max(1, Math.round(sec * FPS)) };
+      // v4 : frames exactes (= somme des frames de page pour le long) → la dernière
+      // page tient jusqu'à la dernière frame (plus d'écran vide en fin de réel).
+      return { durationInFrames: computeDurationFrames(props) };
     }}
   />
 );

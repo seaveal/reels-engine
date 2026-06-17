@@ -160,7 +160,17 @@
         },
         "size": {
           "enum": ["xl", "l", "m", "s"],
-          "description": "Taille relative de la ligne (multiplie la taille auto-fit de base de la page). xl=1.30 l=1.15 m=1.0 s=0.82. Défaut : heading/cta dérivés du rôle (heading≈l, cta≈s), body = m. Permet titre > corps > CTA observés sur les originaux."
+          "description": "Taille relative du PARAGRAPHE (multiplie la taille auto-fit de base de la page). xl=1.30 l=1.15 m=1.0 s=0.82. Défaut : heading/cta dérivés du rôle (heading≈l, cta≈s), body = m. Permet titre > corps > CTA observés sur les originaux."
+        },
+        "letter_spacing": {
+          "type": ["number", "null"],
+          "default": null,
+          "description": "(v4) Espacement des lettres (tracking) du PARAGRAPHE, en em. Ex : 0.02 = +2 %, -0.01 = serré, 0 = normal. null/absent = défaut (0 ; tracking interne inchangé). Honoré au rendu ET dans la mesure d'auto-fit (le wrap reste correct)."
+        },
+        "space_after": {
+          "type": ["number", "null"],
+          "default": null,
+          "description": "(v4) Espacement APRÈS le paragraphe (gap vertical avant le suivant), en em de la taille de base de page. >=0. null/absent = défaut global (≈0.55 em). Resserrer une liste (ex. verites) ou aérer une punchline. Le dernier paragraphe d'une page ignore son space_after."
         },
         "align": {
           "enum": ["left", "center", "right", "justify"],

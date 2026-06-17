@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { interpolate, useCurrentFrame } from 'remotion';
 import { PAGE_FADE_SEC, FPS } from './constants.js';
+import { DEFAULT_SPACE_AFTER_EM } from './pages.js';
 import { SegmentLine } from './SegmentLine.jsx';
 import { PageArrow } from './PageArrow.jsx';
 import { computeAutoFitFontSize } from './autoFit.js';
@@ -9,10 +10,11 @@ import { stripInline } from './highlight.js';
 // Format LONG : page dense de corps narratif. Chaque "line" du JSON = un
 // paragraphe (qui peut wrapper sur plusieurs lignes visuelles). On modélise la
 // page comme UN bloc de N paragraphes pour l'auto-fit, avec :
-//  - un gap INTER-PARAGRAPHE (entre deux entrées `lines`) = l'aération observée
-//    sur les originaux (saut de ligne entre blocs),
+//  - un gap INTER-PARAGRAPHE PAR PARAGRAPHE (v4) : chaque paragraphe porte son
+//    `spaceAfter` (em) ; null = défaut DEFAULT_SPACE_AFTER_EM. Le dernier paragraphe
+//    n'ajoute pas de gap. Permet de resserrer une liste / aérer une punchline,
+//    fidèlement aux originaux.
 //  - le wrap interne d'un paragraphe géré par line-height (pas de gap ajouté).
-const PAGE_PARA_GAP_EM = 0.55;
 
 // Bande réservée à la flèche « → » de bas de page (svg + padding) en fraction de
 // la safe height. Quand arrow=true, on retire cette bande de la hauteur d'auto-fit
@@ -36,16 +38,24 @@ export const PageStack = ({ page, safe }) => {
   const arrowBand = page.arrow ? Math.round(safe.height * PAGE_ARROW_BAND_RATIO) : 0;
   const textHeight = safe.height - arrowBand;
 
+  // Gap (em) APRÈS chaque paragraphe (sauf le dernier) : space_after explicite ou
+  // défaut global. Sert à l'auto-fit (réserve la hauteur) ET au rendu (margin-bottom).
+  const gapAfterEm = page.lines.map((line, li) =>
+    li === page.lines.length - 1
+      ? 0
+      : (line.spaceAfter != null ? line.spaceAfter : DEFAULT_SPACE_AFTER_EM),
+  );
+
   const fontSize = useMemo(
     () => computeAutoFitFontSize({
-      // 1 seul "segment" = tous les paragraphes ; gap inter-paragraphe via
-      // blockGapEm ? non : ici chaque paragraphe est une "line" -> on utilise
-      // lineGapEm comme gap inter-paragraphe et blockGapEm 0 (1 seul segment).
+      // 1 seul "segment" = tous les paragraphes ; le gap inter-paragraphe est
+      // désormais VARIABLE par paragraphe (gapAfterEm) → passé via perLineGapEm.
       segments: [{ lines: page.lines }],
       maxWidth: safe.width,
       maxHeight: textHeight,
       blockGapEm: 0,
-      lineGapEm: PAGE_PARA_GAP_EM,
+      lineGapEm: DEFAULT_SPACE_AFTER_EM,
+      perLineGapEm: [gapAfterEm],
       stripFn: stripInline,
     }),
     [page.lines, safe.width, textHeight],
@@ -79,7 +89,6 @@ export const PageStack = ({ page, safe }) => {
           flexDirection: 'column',
           alignItems: 'stretch',
           justifyContent: 'flex-start',
-          gap: `${PAGE_PARA_GAP_EM * fontSize}px`,
           height: textHeight,
         }}
       >
@@ -91,7 +100,9 @@ export const PageStack = ({ page, safe }) => {
             kind={line.kind}
             align={line.align}
             color={line.color}
+            letterSpacing={line.letterSpacing}
             fontSize={fontSize * (line.sizeMul ?? 1)}
+            marginBottom={gapAfterEm[li] * fontSize}
           />
         ))}
       </div>

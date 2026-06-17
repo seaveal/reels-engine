@@ -10,7 +10,7 @@ import assert from 'node:assert/strict';
 import { normaliseSegments } from '../src/segments.js';
 import { normalisePages, SIZE_MUL } from '../src/pages.js';
 import { parseHighlights, stripHighlights, parseInline, stripInline } from '../src/highlight.js';
-import { safeBox, safeBoxLong, SAFE_LONG, ICON_SAFE_RIGHT, computeDurationSec, computePageHoldSec, computePageHolds, pageCharCount, PAGE_CHARS_PER_SEC } from '../src/constants.js';
+import { safeBox, safeBoxLong, SAFE_LONG, ICON_SAFE_RIGHT, computeDurationSec, computeDurationFrames, computePageHoldSec, computePageHolds, computePageHoldFrames, pageCharCount, PAGE_CHARS_PER_SEC, FPS } from '../src/constants.js';
 
 let passed = 0;
 let failed = 0;
@@ -188,12 +188,14 @@ test('safeBox proportionnel pour 540×960', () => {
 
 console.log('\n=== safeBoxLong (format long : marges mesurées + safe icônes IG) ===');
 
-test('safeBoxLong = marges SAFE_LONG mesurées (left 0.09 / right 0.11 / top 0.155 / bottom 0.16)', () => {
+test('safeBoxLong = marges SAFE_LONG v4 (left 0.11 non rabotée / right 0.10 / top 0.155 / bottom 0.16)', () => {
   const sb = safeBoxLong(1080, 1920);
-  assert.equal(sb.x, Math.round(0.09 * 1080));      // 97
-  assert.equal(sb.y, Math.round(0.155 * 1920));     // 298
-  assert.equal(sb.width, Math.round(1080 * (1 - 0.09 - 0.11)));  // 864
+  assert.equal(sb.x, Math.round(SAFE_LONG.left * 1080));   // 0.11 -> 119
+  assert.equal(sb.y, Math.round(0.155 * 1920));            // 298
+  assert.equal(sb.width, Math.round(1080 * (1 - SAFE_LONG.left - SAFE_LONG.right))); // 0.79 -> 853
   assert.equal(sb.height, Math.round(1920 * (1 - 0.155 - 0.16))); // 1315
+  // marge gauche restaurée à la médiane des originaux (~0.11), non plus 0.09 rabotée
+  assert.ok(SAFE_LONG.left >= 0.105);
 });
 
 test('safeBoxLong expose la garde icônes IG (right + moitié basse)', () => {
@@ -204,7 +206,7 @@ test('safeBoxLong expose la garde icônes IG (right + moitié basse)', () => {
 
 test('safeBoxLong responsive (proportions) pour 540×960', () => {
   const sb = safeBoxLong(540, 960);
-  assert.equal(sb.x, Math.round(0.09 * 540));
+  assert.equal(sb.x, Math.round(SAFE_LONG.left * 540));
   assert.equal(sb.width, Math.round(540 * (1 - SAFE_LONG.left - SAFE_LONG.right)));
 });
 
@@ -350,6 +352,48 @@ test('color inconnue lève une erreur explicite', () => {
   );
 });
 
+console.log('\n=== normalisePages : style PAR PARAGRAPHE v4 (letter_spacing / space_after) ===');
+
+test('défauts v4 : letterSpacing=null, spaceAfter=null (rétrocompat, comportement v3)', () => {
+  const out = normalisePages([{ lines: [{ text: 'corps' }] }]);
+  assert.equal(out[0].lines[0].letterSpacing, null);
+  assert.equal(out[0].lines[0].spaceAfter, null);
+});
+
+test('letter_spacing numérique honoré (positif et négatif)', () => {
+  const out = normalisePages([{ lines: [
+    { text: 'a', letter_spacing: 0.02 },
+    { text: 'b', letter_spacing: -0.01 },
+  ] }]);
+  assert.equal(out[0].lines[0].letterSpacing, 0.02);
+  assert.equal(out[0].lines[1].letterSpacing, -0.01);
+});
+
+test('letter_spacing non-numérique ignoré → null (défaut robuste)', () => {
+  const out = normalisePages([{ lines: [{ text: 'a', letter_spacing: 'wide' }] }]);
+  assert.equal(out[0].lines[0].letterSpacing, null);
+});
+
+test('space_after numérique >=0 honoré (0 inclus)', () => {
+  const out = normalisePages([{ lines: [
+    { text: 'a', space_after: 0.3 },
+    { text: 'b', space_after: 0 },
+  ] }]);
+  assert.equal(out[0].lines[0].spaceAfter, 0.3);
+  assert.equal(out[0].lines[1].spaceAfter, 0);
+});
+
+test('space_after négatif ignoré → null (gap par défaut)', () => {
+  const out = normalisePages([{ lines: [{ text: 'a', space_after: -1 }] }]);
+  assert.equal(out[0].lines[0].spaceAfter, null);
+});
+
+test('size+bold restent des attributs paragraphe (acquis v3 conservé)', () => {
+  const out = normalisePages([{ lines: [{ text: 'x', size: 'xl', bold: true }] }]);
+  assert.equal(out[0].lines[0].sizeMul, SIZE_MUL.xl);
+  assert.equal(out[0].lines[0].bold, true);
+});
+
 console.log('\n=== pageCharCount / computePageHoldSec (loi de timing char-volume) ===');
 
 test('pageCharCount = caractères visibles (markup retiré, espaces normalisés)', () => {
@@ -408,6 +452,33 @@ test('NON-RÉGRESSION court : computeDurationSec sans layout = comportement hist
   assert.equal(computeDurationSec({ reveal: 'all_at_once', segments: [1, 2] }), 10);
   // staggered 4 segments = 7.5s (inchangé)
   assert.equal(computeDurationSec({ reveal: 'staggered', segments: [1, 2, 3, 4] }), 7.5);
+});
+
+console.log('\n=== computeDurationFrames (FIX FIN : dernière page jusqu\'à la dernière frame) ===');
+
+test('long : durée composition = SOMME EXACTE des frames de page (pas de frame orpheline)', () => {
+  // Cas reproduisant le bug ressentir : holds dont la somme arrondie par page < round(total*FPS).
+  const spec = { layout: 'long', pages: [
+    { lines: [{ text: 'a' }], hold_s: 21.148 },
+    { lines: [{ text: 'b' }], hold_s: 17.111 },
+    { lines: [{ text: 'c' }], hold_s: 13.741 },
+  ] };
+  const perPage = computePageHoldFrames(spec); // [634, 513, 412]
+  const sum = perPage.reduce((a, b) => a + b, 0); // 1559
+  assert.equal(computeDurationFrames(spec), sum);
+  // v3 buggé : round(52.0*30)=1560 > 1559 → 1 frame vide. v4 : 1559 (pas de queue vide).
+  assert.equal(sum, 1559);
+  assert.notEqual(sum, Math.round(52.0 * FPS));
+});
+
+test('long : duration_s global prime sur la somme des frames', () => {
+  const d = computeDurationFrames({ layout: 'long', duration_s: 40, pages: [{ lines: [{ text: 'a' }], hold_s: 10 }] });
+  assert.equal(d, Math.round(40 * FPS));
+});
+
+test('NON-RÉGRESSION court : computeDurationFrames = round(durée*FPS)', () => {
+  assert.equal(computeDurationFrames({ reveal: 'all_at_once', segments: [1, 2] }), Math.round(10 * FPS));
+  assert.equal(computeDurationFrames({ reveal: 'staggered', segments: [1, 2, 3, 4] }), Math.round(7.5 * FPS));
 });
 
 console.log(`\n\nRésultat : ${passed} OK / ${failed} fail / ${passed + failed} total`);

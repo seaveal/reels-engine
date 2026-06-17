@@ -41,5 +41,10 @@ all = check('long-reject-bad-arrow', { slug:'x', layout:'long', pages:[{lines:[{
 // Couleur de ligne (titre full-jaune) : valeurs valides + rejet
 all = check('long-color-yellow-title', { slug:'x', layout:'long', pages:[{lines:[{text:'TITRE FULL JAUNE', role:'heading', color:'yellow'}, {text:'corps', color:'white'}]}] }, true) && all;
 all = check('long-reject-bad-color', { slug:'x', layout:'long', pages:[{lines:[{text:'a', color:'rouge'}]}] }, false) && all;
+// v4 — style par paragraphe : letter_spacing + space_after (additifs)
+all = check('long-para-letter-spacing-space-after', { slug:'x', layout:'long', pages:[{lines:[ {text:'paragraphe un', letter_spacing:0.02, space_after:0.3}, {text:'paragraphe deux', letter_spacing:-0.01} ]}] }, true) && all;
+all = check('long-para-space-after-zero', { slug:'x', layout:'long', pages:[{lines:[ {text:'a', space_after:0}, {text:'b'} ]}] }, true) && all;
+all = check('long-reject-letter-spacing-string', { slug:'x', layout:'long', pages:[{lines:[{text:'a', letter_spacing:'wide'}]}] }, false) && all;
+all = check('long-reject-space-after-string', { slug:'x', layout:'long', pages:[{lines:[{text:'a', space_after:'big'}]}] }, false) && all;
 console.log(all ? '\nALL SCHEMA CHECKS PASS' : '\nSOME SCHEMA CHECKS FAILED');
 process.exit(all ? 0 : 1);
