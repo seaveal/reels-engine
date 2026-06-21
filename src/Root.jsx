@@ -2,6 +2,7 @@ import { Composition } from 'remotion';
 import { FPS, HEIGHT, WIDTH, computeDurationFrames } from './constants.js';
 import { Reel } from './Reel.jsx';
 import { Carte } from './Carte.jsx';
+import { Couverture } from './Couverture.jsx';
 
 export const RemotionRoot = () => (
   <>
@@ -36,7 +37,22 @@ export const RemotionRoot = () => (
       fps={FPS}
       width={1080}
       height={1080}
-      defaultProps={{ text: 'EXEMPLE DE [[CARTE]]', handle: '@lecorpsnetrichejamais' }}
+      defaultProps={{ text: 'EXEMPLE DE [[CARTE]]', handle: '@CyrilleNovou' }}
+    />
+    {/* Couverture de Reel IG (still PNG 1080×1920) — charte « L'Écho Incarné ». */}
+    <Composition
+      id="Couverture"
+      component={Couverture}
+      durationInFrames={1}
+      fps={FPS}
+      width={1080}
+      height={1920}
+      defaultProps={{
+        eyebrow: 'DÉPENDANCE AFFECTIVE',
+        hook: 'En amour, vous rejouez le même [[scénario]]',
+        signature: 'Cyrille Novou',
+        safezone: false,
+      }}
     />
   </>
 );
