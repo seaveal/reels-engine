@@ -73,8 +73,8 @@
         "pages": {
           "type": "array",
           "minItems": 1,
-          "maxItems": 12,
-          "description": "Suite de pages affichées l'une après l'autre (replace). 1 à 12 pages.",
+          "maxItems": 24,
+          "description": "Suite de pages affichées l'une après l'autre (replace). 1 à 24 pages (relevé de 12 à 24 le 2026-06-22 pour les réels longs anti-troncature).",
           "items": { "$ref": "#/$defs/page" }
         }
       }
