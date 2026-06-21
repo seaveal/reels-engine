@@ -1,14 +1,69 @@
 {
   "slug": "hommes-qui-fuient-les-emotions",
-  "reveal": "all_at_once",
-  "hand_emoji": false,
+  "layout": "long",
   "duration_s": null,
-  "segments": [
-    { "role": "block", "text": "Il y a tous ces [[hommes]] qui [[fuient les émotions]] de leur compagne." },
-    { "role": "block", "text": "Ce n'est pas par [[manque d'amour]]..." },
-    { "role": "block", "text": "Ce n'est pas qu'ils ne veulent pas entendre..." },
-    { "role": "block", "text": "C'est qu'ils ne le [[peuvent pas]]." },
-    { "role": "block", "text": "Voici pourquoi (+ la [[vraie solution]])" },
-    { "role": "cta", "text": "LISEZ LA [[LÉGENDE]]" }
+  "pages": [
+    {
+      "arrow": true,
+      "lines": [
+        { "text": "Il y a tous ces [[hommes]] qui [[fuient les émotions]] de leur compagne.", "role": "heading", "color": "white", "size": "l", "align": "center" },
+        { "text": "Ce n'est pas par [[manque d'amour]]...", "align": "left" },
+        { "text": "Ce n'est pas qu'ils ne [[veulent pas entendre]]...", "align": "left" },
+        { "text": "C'est qu'ils ne le [[peuvent pas]].", "align": "left" }
+      ]
+    },
+    {
+      "arrow": true,
+      "lines": [
+        { "text": "Vous êtes en face de lui. Vous [[pleurez]]. Vous [[tremblez]]. Vous essayez de mettre des [[mots]] sur ce qui vous traverse.", "align": "left" },
+        { "text": "Et lui, il regarde son [[téléphone]]. Ou il vous coupe avec une [[solution]]. Ou il sort [[fumer]].", "align": "left" },
+        { "text": "Vous repartez [[persuadée]] qu'il ne vous [[aime pas assez]]. Vous vous [[trompez]].", "align": "left" }
+      ]
+    },
+    {
+      "arrow": true,
+      "lines": [
+        { "text": "Cet homme ne fuit pas vos [[émotions]] par manque d'amour.", "align": "left" },
+        { "text": "Il les fuit parce que son [[corps]] a appris, très [[tôt]], à se [[couper]] pour [[survivre]].", "align": "left" }
+      ]
+    },
+    {
+      "arrow": true,
+      "lines": [
+        { "text": "Une [[mère]] qui pleurait sans qu'on puisse la consoler. Un [[père]] qui claquait les portes et qu'il fallait apaiser.", "align": "left" },
+        { "text": "Une [[enfance]] où [[ressentir = danger]].", "align": "left" },
+        { "text": "Alors son [[système nerveux]] a fait son travail. Il a [[fermé la vanne]]. Il a anesthésié.", "align": "left" }
+      ]
+    },
+    {
+      "arrow": true,
+      "lines": [
+        { "text": "Au moment où vous [[pleurez]], son [[rythme cardiaque]] s'effondre, sa [[gorge se ferme]], son [[cerveau]] passe en mode [[survie]].", "align": "left" },
+        { "text": "Avant qu'il ait le temps de [[choisir]], son corps a déjà décidé. [[Fuir]]. S'éteindre. [[Couper]].", "align": "left" }
+      ]
+    },
+    {
+      "arrow": true,
+      "lines": [
+        { "text": "Ce n'est pas qu'il ne [[veut pas]] vous entendre.", "align": "left" },
+        { "text": "C'est qu'il ne le [[peut pas]].", "align": "left" },
+        { "text": "Tant que vous croyez que c'est une question de [[volonté]], vous allez vous [[épuiser]] à demander, supplier, expliquer.", "align": "left" }
+      ]
+    },
+    {
+      "arrow": true,
+      "lines": [
+        { "text": "La vérité que personne ne lui a jamais dite : ce [[verrou]] n'est pas dans sa [[tête]]. Il est dans son [[corps]].", "align": "left" },
+        { "text": "Et la [[tête]] ne peut pas [[défaire]] ce que le corps a installé pour survivre.", "align": "left" },
+        { "text": "Le [[corps répare]] ce que la [[parole]] ne fait que [[comprendre]].", "align": "left" }
+      ]
+    },
+    {
+      "lines": [
+        { "text": "Voici pourquoi", "align": "left" },
+        { "text": "(+ la [[vraie solution]])", "align": "left" },
+        { "text": "LISEZ LA LÉGENDE", "role": "cta", "size": "s", "align": "center" }
+      ]
+    }
   ]
 }

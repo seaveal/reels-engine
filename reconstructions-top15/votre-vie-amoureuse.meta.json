@@ -11,5 +11,7 @@
   "mp4_corpus_path": "/home/agents/work/corpus-reels-ig/corpus/18021933227377822/18021933227377822.mp4",
   "mp4_kdrive_path": "kDrive:Migration-GoogleDrive/compte-1/instagram/mes-donnees/instagram-lecorpsnetrichejamais-2025-05-29-VGOuCOWN/media/reels/202409/AQMeMXJnguEzTfX9lzujeIShEARpVoWyV5tFLO8v2TRKB8IFc2najL2rz0Sj94s5f430MJwz3mqgUaiLbZDxBfd_s_RKJw8V5Js_18021933227377822.mp4",
   "format_fit": "engine-native (title + heading/body blocks + cta) — correspond à l'exemple examples/votre-vie-amoureuse.json",
-  "needs_review": true
+  "needs_review": true,
+  "genre": "non-genre",
+  "funnel_keyword": "SOUVERAINETÉ"
 }

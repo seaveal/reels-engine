@@ -1,16 +1,44 @@
 {
   "slug": "relations-pedagogiques-miroir",
-  "reveal": "staggered",
-  "hand_emoji": false,
+  "layout": "long",
   "duration_s": null,
-  "segments": [
-    { "role": "title", "text": "Ces relations que vous pensiez [[TOXIQUES]]... sont en réalité [[PÉDAGOGIQUES]]" },
-    { "role": "block", "text": "Une personne [[agressive]] entre dans votre vie pour vous montrer à quel point vous [[réprimez vos émotions]]." },
-    { "role": "block", "text": "Une personne [[collante]] vous montre à quel point vous avez [[peur de l'intimité]]." },
-    { "role": "block", "text": "Une personne [[absente]] vous montre que vous ne vous [[aimez pas vous-même]]." },
-    { "role": "block", "text": "Une personne [[abusive]] vous montre à quel point vos [[limites sont faibles]]." },
-    { "role": "block", "text": "Une personne [[contrôlante]] vous montre à quel point vous [[fuyez vos responsabilités]]." },
-    { "role": "block", "text": "Elles viennent vous montrer où vous êtes [[déséquilibré]], [[carencé]], ou [[réprimé]]." },
-    { "role": "cta", "text": "LA SUITE DANS LA [[LÉGENDE]]" }
+  "pages": [
+    {
+      "arrow": true,
+      "lines": [
+        { "text": "Ces relations que vous pensiez [[toxiques]] sont en réalité [[pédagogiques]]", "role": "heading", "color": "white", "size": "l", "align": "center", "space_after": 0.6 },
+        { "text": "Une personne [[agressive]] et émotionnellement réactive entre dans votre vie pour vous montrer à quel point vous [[réprimez vos propres émotions]].", "align": "left" },
+        { "text": "Une personne [[collante]] et dépendante entre dans votre vie pour vous montrer à quel point vous avez [[peur de l'intimité]].", "align": "left" }
+      ]
+    },
+    {
+      "arrow": true,
+      "lines": [
+        { "text": "Une personne émotionnellement [[absente]] vous montre que vous ne vous [[aimez pas vous-même]].", "align": "left" },
+        { "text": "Une personne [[abusive]] entre dans votre vie pour vous montrer à quel point vos [[limites sont faibles]].", "align": "left" },
+        { "text": "Une personne toujours dans la [[confrontation]] vient vous montrer combien vous [[évitez les conflits]].", "align": "left" }
+      ]
+    },
+    {
+      "arrow": true,
+      "lines": [
+        { "text": "Une personne [[contrôlante]] apparaît dans votre vie pour vous montrer à quel point vous [[fuyez vos responsabilités]].", "align": "left" },
+        { "text": "Une personne [[paresseuse]] entre dans votre vie pour vous montrer à quel point vous vous [[surmenez]] et êtes [[incapable de vous détendre]].", "align": "left" }
+      ]
+    },
+    {
+      "arrow": true,
+      "lines": [
+        { "text": "Vous voyez, les personnes qui vous [[activent émotionnellement]] viennent dans votre vie pour vous montrer où vous êtes [[déséquilibré]], [[carencé]], ou [[réprimé]].", "align": "left" },
+        { "text": "Vous pouvez les [[blâmer]] et ainsi vous condamner à revivre les [[mêmes dynamiques]] encore et encore...", "align": "left" }
+      ]
+    },
+    {
+      "lines": [
+        { "text": "Ou vous pouvez les [[remercier]].", "align": "left", "space_after": 0.5 },
+        { "text": "De vous avoir [[révélé]] une partie de [[vous-même]].", "align": "left" },
+        { "text": "LISEZ LA LÉGENDE", "role": "cta", "size": "s", "align": "center" }
+      ]
+    }
   ]
 }

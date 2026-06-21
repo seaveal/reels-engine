@@ -1,12 +1,29 @@
 {
   "slug": "ta-vie-bascule-besoin-d-etre-choisi",
-  "reveal": "staggered",
-  "hand_emoji": false,
+  "layout": "long",
   "duration_s": null,
-  "segments": [
-    { "role": "block", "text": "Ta vie entière [[bascule]] lorsque tu réalises que tu n'as pas vraiment envie d'être avec cette personne..." },
-    { "role": "block", "text": "Mais que tu voulais simplement qu'elle te [[désire]]..." },
-    { "role": "block", "text": "Que ta [[blessure d'abandon]] t'a rendu obsédé(e) par le besoin d'être [[choisi(e)]]." },
-    { "role": "cta", "text": "LA SUITE DANS LA [[LÉGENDE]]" }
+  "pages": [
+    {
+      "arrow": true,
+      "lines": [
+        { "text": "Ta vie entière [[bascule]]", "role": "heading", "color": "white", "size": "l", "align": "center" },
+        { "text": "lorsque tu réalises que tu n'avais pas vraiment [[envie d'être]] avec cette personne...", "align": "left" }
+      ]
+    },
+    {
+      "lines": [
+        { "text": "... Mais que tu voulais [[simplement]] qu'elle te [[désire]].", "align": "left" }
+      ]
+    },
+    {
+      "lines": [
+        { "text": "... Parce que ta [[blessure d'abandon]] t'a rendu(e) [[obsédé(e)]] par le besoin d'être [[choisi(e)]].", "align": "left" }
+      ]
+    },
+    {
+      "lines": [
+        { "text": "LA SUITE DANS LA LÉGENDE", "role": "cta", "size": "s", "align": "center" }
+      ]
+    }
   ]
 }

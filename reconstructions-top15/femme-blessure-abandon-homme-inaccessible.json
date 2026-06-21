@@ -1,13 +1,34 @@
 {
   "slug": "femme-blessure-abandon-homme-inaccessible",
-  "reveal": "all_at_once",
-  "hand_emoji": false,
+  "layout": "long",
   "duration_s": null,
-  "segments": [
-    { "role": "block", "text": "Une femme qui n'a pas guéri sa [[blessure d'abandon]] vécue dans l'enfance..." },
-    { "role": "block", "text": "...se retrouvera à chercher sans cesse comment conquérir l'amour d'un [[homme inaccessible]]." },
-    { "role": "block", "text": "Afin que sa [[petite fille intérieure]] puisse réparer la première [[rupture d'amour]]..." },
-    { "role": "block", "text": "Vécue avec son [[papa]]..." },
-    { "role": "cta", "text": "VOICI COMMENT [[BRISER]]" }
+  "pages": [
+    {
+      "arrow": true,
+      "lines": [
+        { "text": "Une femme qui n'a pas [[réparé]] sa [[blessure d'abandon]]", "role": "heading", "color": "white", "size": "l", "align": "center" },
+        { "text": "vécue dans l'enfance...", "align": "left" }
+      ]
+    },
+    {
+      "lines": [
+        { "text": "... se retrouvera à chercher sans cesse comment [[conquérir l'amour]] d'un [[homme inaccessible]].", "align": "left" }
+      ]
+    },
+    {
+      "lines": [
+        { "text": "... Afin que sa [[petite fille intérieure]] puisse [[réparer]] la première [[rupture d'amour]].", "align": "left" }
+      ]
+    },
+    {
+      "lines": [
+        { "text": "... Vécue avec son [[papa]]...", "align": "left" }
+      ]
+    },
+    {
+      "lines": [
+        { "text": "VOICI COMMENT [[BRISER LE CYCLE]]", "align": "left" }
+      ]
+    }
   ]
 }

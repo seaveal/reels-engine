@@ -12,5 +12,7 @@
   "mp4_kdrive_path": "ABSENT de kDrive — réel publié le 2025-10-10, postérieur au snapshot d'export kDrive du 2025-05-29. Disponible uniquement dans le corpus local. Vérifié 2026-06-16 (rclone lsf 202510 ne retourne aucun fichier pour cet id).",
   "format_fit": "borderline — narration parallèle 36s. L'original aligne 7 blocs « Une personne X » ; condensé ici en titre + 6 blocs + cta (8 segments = plafond du schéma). Structure parallèle proche de votre-vie-amoureuse, donc bon candidat typographique, mais c'est une CONDENSATION (1 archétype « paresseuse » omis) et non un calque ligne-à-ligne. Le CTA on-screen est dérivé (l'original ne montre pas de carte CTA finale nette).",
   "needs_review": true,
-  "review_priority": "Cyrille doit valider la condensation à 6 blocs et le CTA dérivé, OU déclasser ce réel hors test de fidélité strict."
+  "review_priority": "Cyrille doit valider la condensation à 6 blocs et le CTA dérivé, OU déclasser ce réel hors test de fidélité strict.",
+  "genre": "non-genre",
+  "funnel_keyword": "SOUVERAINETÉ"
 }
