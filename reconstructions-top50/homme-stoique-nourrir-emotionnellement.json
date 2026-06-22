@@ -6,36 +6,27 @@
     {
       "arrow": true,
       "lines": [
-        { "text": "Pourquoi l'homme [[stoïque]] devient l'homme [[absent]]", "role": "heading", "color": "white", "size": "l", "align": "center" },
-        { "text": "qu'elle ne peut plus supporter", "role": "heading", "color": "white", "size": "l", "align": "center" }
+        { "text": "Un homme prisonnier de ses [[blessures]] d'enfance détruit son couple sans le vouloir.", "align": "left", "space_after": 0.7 },
+        { "text": "Accès de [[colères]] soudains, sur la [[défensive]] à chaque remarque, et ce [[silence froid]] dès que sa femme ose exprimer un désaccord ou une frustration.", "align": "left", "space_after": 0.7 },
+        { "text": "Coupé de ses propres [[émotions]], il ne peut pas entendre ce qu'elle dit vraiment.", "align": "left", "space_after": 0.7 },
+        { "text": "Il est [[incapable]] de [[voir l'amour]] sincère qu'elle lui offre.", "align": "left" }
+      ]
+    },
+    {
+      "arrow": true,
+      "lines": [
+        { "text": "Il [[déforme]] les [[paroles]] de sa femme à travers le [[filtre]] de ses [[blessures]] d'enfance non réparées.", "align": "left", "space_after": 0.7 },
+        { "text": "Grandir avec un [[père]] trop [[strict]] et constamment [[critique]] l'a rendu [[hypersensible]], au point que sa [[femme marche]] sur des [[œufs]], obligée de [[satisfaire]] son besoin incessant de [[reconnaissance]].", "align": "left", "space_after": 0.7 },
+        { "text": "Ce [[vide affectif]] laissé par une [[mère]] émotionnellement [[absente]] l'a poussé à chercher chez sa femme une [[figure maternelle]].", "align": "left" }
       ]
     },
     {
       "lines": [
-        { "text": "Mais voilà le [[problème]] : il ne sait pas la [[nourrir émotionnellement]] en retour.", "align": "left" }
-      ]
-    },
-    {
-      "lines": [
-        { "text": "Alors, elle s'épuise.", "align": "left" },
-        { "text": "Elle s'use à toujours [[donner]], à [[soutenir seule]] une [[relation déséquilibrée]].", "align": "left" }
-      ]
-    },
-    {
-      "lines": [
-        { "text": "Si cet homme choisit de [[réparer]] ce nœud, tout peut changer.", "align": "left" },
-        { "text": "Il deviendra [[calme]], [[solide]], et [[émotionnellement intelligent]].", "align": "left" }
-      ]
-    },
-    {
-      "lines": [
-        { "text": "Il pourra enfin créer un [[espace sûr]], où elle aussi s'ouvrira.", "align": "left" },
-        { "text": "Ensemble, ils bâtiront un [[Amour profond]] et durable qui élève les deux.", "align": "left" }
-      ]
-    },
-    {
-      "lines": [
-        { "text": "LISEZ LA [[LÉGENDE]]", "align": "left" }
+        { "text": "Mais voilà le [[problème]] : il ne sait pas la [[nourrir émotionnellement]] en retour.", "align": "left", "space_after": 0.7 },
+        { "text": "Alors, elle [[s'épuise]]. Elle s'use à toujours [[donner]], à porter seule le poids d'une [[relation déséquilibrée]].", "align": "left", "space_after": 0.7 },
+        { "text": "Si cet [[homme]] choisit de [[réparer]], tout peut changer. Il deviendra [[calme]], [[solide]], et [[émotionnellement intelligent]].", "align": "left", "space_after": 0.7 },
+        { "text": "Il pourra enfin [[créer un espace sûr]], où elle aussi [[s'ouvrira]]. Ensemble, ils bâtiront un [[Amour profond]] et durable qui élève les deux.", "align": "left", "space_after": 0.9 },
+        { "text": "LISEZ LA LÉGENDE", "role": "cta", "align": "center" }
       ]
     }
   ]
