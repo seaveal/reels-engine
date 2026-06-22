@@ -78,7 +78,9 @@ export const Reel = (props) => {
 
   const handBand = props.hand_emoji ? Math.round(safe.height * HAND_BAND_RATIO) : 0;
   const legendBand = ctaText ? Math.round(safe.height * LEGEND_BAND_RATIO) : 0;
-  const textSafe = { ...safe, height: safe.height - handBand - legendBand };
+  // Espace VIDE garanti entre le corps et le footer légende (sinon le texte colle au CTA).
+  const legendGap = ctaText ? Math.round(safe.height * 0.06) : 0;
+  const textSafe = { ...safe, height: safe.height - handBand - legendBand - legendGap };
   const handZone = props.hand_emoji
     ? { x: safe.x, y: safe.y + safe.height - handBand, width: safe.width, height: handBand }
     : null;
