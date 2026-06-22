@@ -1,80 +1,57 @@
 {
   "slug": "petite-fille-prise-dans-les-bras",
-  "layout": "long",
+  "layout": "list",
   "duration_s": null,
   "pages": [
     {
-      "arrow": true,
-      "lines": [
-        { "text": "La [[petite fille]] voulait être [[prise dans les bras]].", "role": "heading", "color": "white", "size": "l", "align": "center" }
+      "number": "6",
+      "blocks": [
+        "[[LEÇONS TOXIQUES]] QU’UNE [[PETITE FILLE]] ABANDONNÉE PAR SON [[PÈRE]] APPREND…",
+        "… ET QUE LA [[FEMME]] QU’ELLE EST DEVENUE APPLIQUE ENCORE À LA LETTRE…"
       ]
     },
     {
-      "lines": [
-        { "text": "La [[femme]] qu'elle est devenue finit [[toujours]] dans les bras de ceux qui ne savent pas comment l'[[aimer]].", "align": "left" }
+      "number": "1",
+      "blocks": [
+        "LA PETITE FILLE A [[CRU]] QUE L’[[AMOUR]] SE [[MÉRITE]].",
+        "LA [[FEMME]] S’ÉPUISE À [[PROUVER]] QU’ELLE VAUT LA PEINE D’ÊTRE AIMÉE."
       ]
     },
     {
-      "lines": [
-        { "text": "Le [[rejet]] que vous ressentez n'a rien à voir avec aujourd'hui.", "align": "left" },
-        { "text": "Il a tout à voir avec [[hier]].", "align": "left" }
+      "number": "2",
+      "blocks": [
+        "LA PETITE FILLE S’EST [[HABITUÉE]] À L’[[ABSENCE]] DE SON PÈRE.",
+        "LA [[FEMME]] ATTIRE DES HOMMES QUI LA LAISSENT TOUJOURS EN [[SECOND PLAN]]."
       ]
     },
     {
-      "lines": [
-        { "text": "Avec cette [[enfant]] qui a attendu un [[« je t'aime »]] qui n'est jamais venu.", "align": "left" }
+      "number": "3",
+      "blocks": [
+        "LA [[PETITE FILLE]] VOULAIT ÊTRE [[VUE]].",
+        "LA [[FEMME]] SE CONTENTE D’ÊTRE [[TOLÉRÉE]]."
       ]
     },
     {
-      "lines": [
-        { "text": "Elle a cru que l'[[amour se méritait]].", "align": "left" },
-        { "text": "Alors elle a appris à donner, à prouver, à [[supplier en silence]].", "align": "left" }
+      "number": "4",
+      "blocks": [
+        "LA PETITE FILLE RÊVAIT D’UN [[AMOUR STABLE]].",
+        "LA [[FEMME]] CONFOND [[ATTACHEMENT]] ET [[DÉPENDANCE]]."
       ]
     },
     {
-      "lines": [
-        { "text": "Elle s'est habituée à l'[[absence]].", "align": "left" },
-        { "text": "Aujourd'hui, vous attirez des hommes qui vous laissent toujours en [[second plan]]. Parce que c'est [[familier]].", "align": "left" }
+      "number": "5",
+      "blocks": [
+        "LA PETITE FILLE A APPRIS À [[SOURIRE]] MÊME QUAND ÇA FAIT MAL.",
+        "LA [[FEMME]] PORTE CE [[MASQUE]] À LA PERFECTION."
       ]
     },
     {
-      "lines": [
-        { "text": "Elle voulait être [[vue]]. Pas tolérée. Pas supportée. Vue. Reconnue. [[Choisie]].", "align": "left" },
-        { "text": "Aujourd'hui, vous acceptez des relations où vous vous sentez [[transparente]].", "align": "left" }
-      ]
-    },
-    {
-      "lines": [
-        { "text": "Elle a appris à [[sourire]] même quand ça fait mal.", "align": "left" },
-        { "text": "Parce que pleurer, c'était déranger. Alors elle a mis un [[masque]] que vous portez à la perfection.", "align": "left" }
-      ]
-    },
-    {
-      "lines": [
-        { "text": "Ce n'est pas vous.", "align": "left" },
-        { "text": "Ce sont les [[mémoires émotionnelles]] de votre corps qui rejouent un scénario inscrit dans l'[[enfance]].", "align": "left" }
-      ]
-    },
-    {
-      "lines": [
-        { "text": "Le [[rejet]] que vous ressentez, c'est celui de la [[petite fille]] que vous étiez.", "align": "left" }
-      ]
-    },
-    {
-      "lines": [
-        { "text": "Mais il y a une [[bonne nouvelle]].", "align": "left" },
-        { "text": "Vous pouvez [[libérer]] cette mémoire. Vous pouvez [[reprogrammer]] votre corps pour qu'il cesse de revivre l'abandon.", "align": "left" }
-      ]
-    },
-    {
-      "lines": [
-        { "text": "C'est [[possible]].", "align": "left" }
-      ]
-    },
-    {
-      "lines": [
-        { "text": "LISEZ LA [[LÉGENDE]]", "role": "heading", "color": "white", "size": "l", "align": "center" }
-      ]
+      "number": "6",
+      "blocks": [
+        "LA [[PETITE FILLE]] VOULAIT ÊTRE [[PRISE]] DANS LES BRAS.",
+        "LA [[FEMME]] FINIT TOUJOURS DANS LES [[BRAS]] DE CEUX QUI NE [[SAVENT PAS]] COMMENT L’[[AIMER]]."
+      ],
+      "footer": "LISEZ LA LÉGENDE"
     }
   ]
 }

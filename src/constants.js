@@ -134,6 +134,12 @@ export const safeBoxLong = (width, height) => ({
 // Volume de texte VISIBLE d'une page = nombre de caractères (marqueurs [[ ]] / **
 // retirés), espaces normalisés. Sert à la loi de timing (temps de lecture).
 export const pageCharCount = (page) => {
+  if (page && Array.isArray(page.blocks)) {
+    // FORMAT LIST (numéroté/antithèse) : volume = numéro + blocs.
+    const parts = [page.number || '', ...page.blocks, page.footer || ''];
+    const txt = parts.map((t) => stripInline(t || '')).join(' ').replace(/\s+/g, ' ').trim();
+    return txt.length;
+  }
   const lines = (page && page.lines) ? page.lines : [];
   const txt = lines.map((l) => stripInline(l.text || '')).join(' ').replace(/\s+/g, ' ').trim();
   return txt.length;
@@ -165,8 +171,8 @@ export const computePageHoldFrames = (spec) =>
 
 export const computeDurationSec = (spec) => {
   if (spec.duration_s != null) return spec.duration_s;
-  // FORMAT LONG (paging) : somme des durées de page.
-  if (spec.layout === 'long') {
+  // FORMAT LONG / LIST (paging) : somme des durées de page.
+  if (spec.layout === 'long' || spec.layout === 'list') {
     const holds = computePageHolds(spec);
     const total = holds.reduce((a, b) => a + b, 0);
     return total > 0 ? total : PAGE_MIN_SEC;
@@ -183,7 +189,7 @@ export const computeDurationSec = (spec) => {
 // (= somme des durations des Series.Sequence) → pas de frame de fin orpheline.
 // duration_s explicite (long ou court) prime. Court : dérivé de computeDurationSec.
 export const computeDurationFrames = (spec) => {
-  if (spec.duration_s == null && spec.layout === 'long') {
+  if (spec.duration_s == null && (spec.layout === 'long' || spec.layout === 'list')) {
     const frames = computePageHoldFrames(spec).reduce((a, b) => a + b, 0);
     return Math.max(1, frames);
   }

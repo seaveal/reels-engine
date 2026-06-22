@@ -2,6 +2,7 @@ import { AbsoluteFill, Series, useVideoConfig, staticFile } from 'remotion';
 import { Background } from './Background.jsx';
 import { TextStack } from './TextStack.jsx';
 import { PageStack } from './PageStack.jsx';
+import { ListPage } from './ListPage.jsx';
 import { HandEmoji } from './HandEmoji.jsx';
 import { LegendCta } from './LegendCta.jsx';
 import { safeBox, safeBoxLong, COLORS, STAGGER_LEAD_IN_SEC, STAGGER_GAP_SEC, ALL_AT_ONCE_DELAY_SEC, FPS, FADE_SEC, HAND_EMOJI_DELAY_AFTER_LAST_SEC, computePageHoldFrames, CAPTION_TAP_X, CAPTION_TAP_Y } from './constants.js';
@@ -43,6 +44,26 @@ export const Reel = (props) => {
   // FORMAT LONG (layout:"long") — paging / replace. Chaque page occupe sa propre
   // fenêtre temporelle (Series) ; la page suivante remplace la précédente.
   // ADDITIF : le format court (ci-dessous) reste strictement inchangé.
+  if (props.layout === 'list') {
+    // FORMAT LIST (liste numérotée / antithèse). Pages = { number, blocks[], footer? }.
+    const safeLong = safeBoxLong(width, height);
+    const pages = props.pages ?? [];
+    const holdFrames = computePageHoldFrames(props);
+    return (
+      <AbsoluteFill style={{ backgroundColor: COLORS.black }}>
+        <style dangerouslySetInnerHTML={{ __html: OSWALD_FONT_FACE }} />
+        <Background name={props.background} />
+        <Series>
+          {pages.map((page, i) => (
+            <Series.Sequence key={i} durationInFrames={holdFrames[i] ?? 1}>
+              <ListPage page={page} safe={safeLong} width={width} height={height} />
+            </Series.Sequence>
+          ))}
+        </Series>
+      </AbsoluteFill>
+    );
+  }
+
   if (props.layout === 'long') {
     // Le format long utilise sa PROPRE safe box (marges mesurées sur originaux),
     // distincte du court → on n'altère pas le rendu court (non-régression).
