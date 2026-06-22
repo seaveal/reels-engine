@@ -3,6 +3,7 @@ import { Background } from './Background.jsx';
 import { TextStack } from './TextStack.jsx';
 import { PageStack } from './PageStack.jsx';
 import { HandEmoji } from './HandEmoji.jsx';
+import { LegendCta } from './LegendCta.jsx';
 import { safeBox, safeBoxLong, COLORS, STAGGER_LEAD_IN_SEC, STAGGER_GAP_SEC, ALL_AT_ONCE_DELAY_SEC, FPS, FADE_SEC, HAND_EMOJI_DELAY_AFTER_LAST_SEC, computePageHoldFrames } from './constants.js';
 import { normaliseSegments } from './segments.js';
 import { normalisePages } from './pages.js';
@@ -32,6 +33,8 @@ const OSWALD_FONT_FACE = `
 // en bas de la safe box pour l'emoji 👆, et on rétrécit la zone texte d'autant.
 // Garantit qu'aucun glyphe (ni texte ni emoji) ne sort de la safe box.
 const HAND_BAND_RATIO = 0.16;
+// Bande basse réservée au footer « lisez la légende » + flèche animée vers la légende.
+const LEGEND_BAND_RATIO = 0.18;
 
 export const Reel = (props) => {
   const { width, height } = useVideoConfig();
@@ -66,16 +69,24 @@ export const Reel = (props) => {
     );
   }
 
-  // FORMAT COURT (historique, inchangé).
-  const segments = normaliseSegments(props.segments ?? []);
+  // FORMAT COURT. Le CTA « lisez la légende » n'est PLUS dans le bloc auto-fit
+  // (sinon taille énorme) : il devient un footer dédié (petit) + flèche animée vers la légende.
+  const allSegments = normaliseSegments(props.segments ?? []);
+  const ctaSeg = allSegments.find((s) => s.role === 'cta');
+  const segments = allSegments.filter((s) => s.role !== 'cta');
+  const ctaText = ctaSeg ? ctaSeg.lines.map((l) => l.text).join(' ') : '';
 
   const handBand = props.hand_emoji ? Math.round(safe.height * HAND_BAND_RATIO) : 0;
-  const textSafe = { ...safe, height: safe.height - handBand };
+  const legendBand = ctaText ? Math.round(safe.height * LEGEND_BAND_RATIO) : 0;
+  const textSafe = { ...safe, height: safe.height - handBand - legendBand };
   const handZone = props.hand_emoji
     ? { x: safe.x, y: safe.y + safe.height - handBand, width: safe.width, height: handBand }
     : null;
+  const legendZone = ctaText
+    ? { x: safe.x, y: safe.y + safe.height - handBand - legendBand, width: safe.width, height: legendBand }
+    : null;
 
-  // Frame de démarrage de l'emoji main : juste après le dernier segment.
+  // Frame de démarrage des éléments de bas (main / footer légende) : juste après le dernier segment de texte.
   const lastSegStartSec = props.reveal === 'staggered'
     ? STAGGER_LEAD_IN_SEC + Math.max(0, segments.length - 1) * STAGGER_GAP_SEC
     : ALL_AT_ONCE_DELAY_SEC;
@@ -86,6 +97,9 @@ export const Reel = (props) => {
       <style dangerouslySetInnerHTML={{ __html: OSWALD_FONT_FACE }} />
       <Background name={props.background} />
       <TextStack segments={segments} reveal={props.reveal} safe={textSafe} />
+      {ctaText && (
+        <LegendCta text={ctaText} zone={legendZone} startSec={lastSegStartSec + FADE_SEC} />
+      )}
       {props.hand_emoji && (
         <HandEmoji zone={handZone} startFrame={handStartFrame} />
       )}
