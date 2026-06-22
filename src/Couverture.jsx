@@ -29,13 +29,14 @@ const { fontFamily: LORA } = loadLora('normal', { weights: ['500', '600'], subse
 const { fontFamily: LORA_IT } = loadLora('italic', { weights: ['400'], subsets: ['latin'] });
 
 // Auto-fit du hook serif (sans mesure) — paliers tenant dans la safe-zone 3:4.
+// Agrandis ~+25 % (demande Cyrille 2026-06-22).
 const hookSize = (chars) => {
-  if (chars <= 38) return 110;
-  if (chars <= 68) return 92;
-  if (chars <= 105) return 76;
-  if (chars <= 150) return 62;
-  if (chars <= 210) return 52;
-  return 44;
+  if (chars <= 38) return 138;
+  if (chars <= 68) return 116;
+  if (chars <= 105) return 96;
+  if (chars <= 150) return 78;
+  if (chars <= 210) return 65;
+  return 55;
 };
 
 export const Couverture = ({
@@ -61,7 +62,7 @@ export const Couverture = ({
       {/* Gravité verticale : eyebrow (murmure) → hook (frappe) → signature (signe). */}
       {/* Eyebrow — linéale capitales espacées, taupe. */}
       <div style={{ position: 'absolute', top: 360, left: 0, right: 0, textAlign: 'center',
-        fontFamily: 'Oswald', fontWeight: 600, fontSize: 30, letterSpacing: '0.34em',
+        fontFamily: 'Oswald', fontWeight: 600, fontSize: 38, letterSpacing: '0.30em',
         textTransform: 'uppercase', color: TAUPE }}>
         {eyebrow}
       </div>
@@ -81,7 +82,7 @@ export const Couverture = ({
       <div style={{ position: 'absolute', bottom: 372, left: '50%', transform: 'translateX(-50%)',
         width: 70, height: 2, backgroundColor: TERRA, opacity: 0.85 }} />
       <div style={{ position: 'absolute', bottom: 300, left: 0, right: 0, textAlign: 'center',
-        fontFamily: LORA_IT, fontStyle: 'italic', fontWeight: 400, fontSize: 38,
+        fontFamily: LORA_IT, fontStyle: 'italic', fontWeight: 400, fontSize: 48,
         letterSpacing: '0.01em', color: ENCRE, opacity: 0.92 }}>
         {signature}
       </div>
