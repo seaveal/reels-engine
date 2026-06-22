@@ -134,6 +134,8 @@ await renderMedia({
   enforceAudioTrack: false,
   muted: true,
   concurrency: concurrencyArg ? parseInt(concurrencyArg.slice('--concurrency='.length), 10) : null,
+  ...(process.env.REMOTION_TIMEOUT_MS ? { timeoutInMilliseconds: parseInt(process.env.REMOTION_TIMEOUT_MS, 10) } : {}),
+  ...(process.env.REMOTION_OFFTHREAD_CACHE_BYTES ? { offthreadVideoCacheSizeInBytes: parseInt(process.env.REMOTION_OFFTHREAD_CACHE_BYTES, 10) } : {}),
   chromiumOptions: { gl: 'angle' },
   // Scale via --scale=N CLI (acté Cyrille 2026-05-24).
   // 1 (défaut) = 1080×1920 natif → preview rapide ~1.5min (validation Telegram)

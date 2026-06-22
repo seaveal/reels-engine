@@ -3,23 +3,32 @@
   "layout": "long",
   "duration_s": null,
   "pages": [
-    { "arrow": true, "lines": [
-        { "text": "S'il choisit de [[réparer]] cette [[BLESSURE MATERNELLE]]", "role": "heading", "color": "white", "size": "l", "align": "center" }
-    ] },
-    { "lines": [
-        { "text": "Plutôt que de la [[fuir]] en courant après le succès, les conquêtes, les [[addictions]] ou des distractions sans fin.", "align": "left" }
-    ] },
-    { "lines": [
-        { "text": "Alors il trouvera en lui-même la [[paix]] et la [[sécurité affective]] qu'il cherchait, ailleurs, chez sa femme.", "align": "left" }
-    ] },
-    { "lines": [
-        { "text": "Ce n'est qu'à ce [[moment-là]] qu'il pourra créer un [[lien solide]] et profond avec elle.", "align": "left" }
-    ] },
-    { "lines": [
-        { "text": "Un lien où l'[[amour]] apaise toute forme de [[conflit]].", "align": "left" }
-    ] },
-    { "lines": [
-        { "text": "POUR [[RÉPARER]] LA BLESSURE DE LA [[MÈRE]], LISEZ LA [[LÉGENDE]]", "align": "left" }
-    ] }
+    {
+      "arrow": true,
+      "lines": [
+        { "text": "Quand un [[homme]] porte en lui la [[BLESSURE DE LA MÈRE]] , il ne peut jamais être en [[paix]] avec sa [[compagne]].", "align": "left", "space_after": 0.7 },
+        { "text": "Inconsciemment, il lui fait [[payer]] le [[ressentiment]] qu'il garde envers sa [[mère]].", "align": "left", "space_after": 0.7 },
+        { "text": "Si [[maman]] était [[douce]] et soumise, incapable de le [[protéger]] d'un [[père]] trop [[strict]], alors, adulte,", "align": "left", "space_after": 0 },
+        { "text": "il tiendra sa [[compagne responsable]] de tout : des enfants aux corvées, en passant par les petites frictions et même de son [[manque d'attirance]] pour elle.", "align": "left", "space_after": 0.7 },
+        { "text": "Car, en silence, le [[petit garçon]] blessé, qui vit toujours en lui, [[crie]] encore :", "align": "left", "space_after": 0.7 },
+        { "text": "\"Maman... pourquoi m'as-tu [[abandonné]] ?\"", "align": "left" }
+      ]
+    },
+    {
+      "arrow": true,
+      "lines": [
+        { "text": "Si sa [[mère]] était [[critique]], il se [[protège]] par des [[reproches]] et peut [[humilier]] sa [[compagne]] sans s'en rendre compte.", "align": "left", "space_after": 0.7 },
+        { "text": "Et s'il a dû endosser le [[rôle]] du \"[[gentil petit garçon]]\" pour obtenir l'[[affection]] maternelle, alors adulte, il nourrit une [[colère sourde]] envers sa [[femme]].", "align": "left", "space_after": 0.7 },
+        { "text": "Se sentant [[abandonné]], il croit ne jamais [[recevoir]] l'amour qu'il recherche [[désespérément]].", "align": "left" }
+      ]
+    },
+    {
+      "lines": [
+        { "text": "Mais s'il choisit de [[réparer]] cette [[BLESSURE MATERNELLE]], plutôt que de la [[fuir]] en courant après le [[succès]], les [[conquêtes]], les [[addictions]] ou des [[distractions]] sans fin...", "align": "left", "space_after": 0.7 },
+        { "text": "Alors il trouvera en lui-même la [[paix]] et la [[sécurité]] affective qu'il cherchait, jusque-là, chez sa [[femme]].", "align": "left", "space_after": 0.7 },
+        { "text": "Ce n'est qu'à ce moment-là qu'il pourra [[créer]] un [[lien]] solide et [[profond]] avec elle, où l'[[amour]] apaise toute forme de [[conflit]].", "align": "left", "space_after": 0.7 },
+        { "text": "POUR RÉPARER DE LA BLESSURE DE LA MÈRE LISEZ LA LÉGENDE", "role": "cta", "align": "center" }
+      ]
+    }
   ]
 }

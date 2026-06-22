@@ -6,28 +6,29 @@
     {
       "arrow": true,
       "lines": [
-        { "text": "C'est un travail [[exigeant]].", "role": "heading", "color": "white", "size": "l", "align": "center" },
-        { "text": "Mais n'est-ce pas le cas pour toutes les plus [[belles choses]] de la vie ?", "align": "center" }
+        { "text": "LES RELATIONS LES PLUS FORTES SONT CELLES QUI RENAISSENT DE LEURS CENDRES.", "role": "heading", "color": "yellow", "align": "left", "space_after": 0.7 },
+        { "text": "Quand tout [[s’écroule]], la [[tentation]] de [[couper]] les ponts comme si rien n’avait compté est [[forte]]. Mais [[recommencer]], repartir de zéro, cela exige un [[courage]] rare.", "align": "left", "space_after": 0.7 },
+        { "text": " Il ne s’agit pas de faire comme si rien ne s’était passé. Non, c’est [[reconnaître]] les [[erreurs]], les regarder en face, et [[choisir]] de [[réparer]] et de reconstruire.", "align": "left", "space_after": 0.7 },
+        { "text": "Les [[relations s’éteignent]] quand la confiance vacille, quand les [[mots]] cessent de circuler. Mais voilà la [[vérité]] : si [[deux]] personnes s’apprécient et [[s’aiment]] réellement, alors [[tout]] peut être [[réparé]].", "align": "left", "space_after": 0.7 },
+        { "text": " [[Recommencer]], c’est apprendre à [[réparer]]. Pas seulement l’autre, mais soi-même aussi. C’est [[rallumer]] l’amitié, raviver la passion, poser de nouvelles bases.", "align": "left" }
+      ]
+    },
+    {
+      "arrow": true,
+      "lines": [
+        { "text": "[[Retourner]] en [[arrière]] est [[impossible]], vous ne changerez jamais le passé.", "align": "left", "space_after": 0.7 },
+        { "text": " Mais [[bâtir]] quelque chose de plus [[fort]] ? Ça, c’est à votre portée. Quelque chose [[nourri]] par les [[leçons]] du [[passé]], ancré dans le [[respect]] [[mutuel]].", "align": "left", "space_after": 0.7 },
+        { "text": "[[Recommencer]], ce n’est pas un signe de faiblesse. C’est la [[marque]] d’une véritable [[évolution]] et un [[acte]] [[d’amour]]. C’est dire :", "align": "left", "space_after": 0.7 },
+        { "text": "\"JE VOIS TES FAILLES, ET JE TE CHOISIS QUAND MÊME.\"", "align": "center" }
       ]
     },
     {
       "lines": [
-        { "text": "Alors, si vous hésitez à faire ce pas, ne laissez pas la [[peur]] ou pire, votre [[fierté mal placée]], vous paralyser.", "align": "left" }
-      ]
-    },
-    {
-      "lines": [
-        { "text": "Croyez en vos « [[secondes chances]] ».", "align": "left" }
-      ]
-    },
-    {
-      "lines": [
-        { "text": "Parce qu'elles ne sont pas l'apanage des [[faibles]], mais des [[audacieux]] qui veulent construire quelque chose de [[vrai]].", "align": "left" }
-      ]
-    },
-    {
-      "lines": [
-        { "text": "LISEZ LA [[LÉGENDE]]", "align": "center" }
+        { "text": "C’est un [[travail]] exigeant, mais n’est-ce pas le cas pour toutes les plus [[belles]] choses de la vie ?", "align": "left", "space_after": 0.7 },
+        { "text": "Alors, si vous [[hésitez]] à faire ce pas, ne laissez pas la [[peur]] ou pire, votre [[fierté mal placée]], vous [[paralyser]].", "align": "left", "space_after": 0.7 },
+        { "text": "[[Croyez]] en vos “[[secondes chances]]”.", "align": "left", "space_after": 0.7 },
+        { "text": " Parce qu’elles ne sont pas [[l’apanage]] des faibles, mais des [[audacieux]] qui veulent [[construire]] quelque chose de [[vrai]].", "align": "left", "space_after": 0.7 },
+        { "text": "LISEZ LA LÉGENDE", "role": "cta", "align": "center" }
       ]
     }
   ]

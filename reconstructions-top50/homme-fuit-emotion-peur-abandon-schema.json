@@ -6,33 +6,29 @@
     {
       "arrow": true,
       "lines": [
-        { "text": "Il se [[défend]].", "role": "heading", "color": "white", "size": "l", "align": "center" },
-        { "text": "Il dit : « J'ai [[tout fait]] pour vous ! »", "align": "center" }
+        { "text": "UN HOMME QUI N’A PAS RÉPARÉ SA RELATION À SA MÈRE TRAÎNE CE MANQUE DANS SON COUPLE. IL NE POURRA JAMAIS ÊTRE UN ROC ÉMOTIONNEL POUR SA FEMME. IL NE PEUT PAS DONNER CE QU’IL N’A JAMAIS REÇU.", "role": "heading", "align": "left", "space_after": 0.7 },
+        { "text": "Au fond de lui, l’[[enfant]] qu’il était [[attend]] toujours d’être [[materné]]. Il n’a [[pas]] reçu la [[tendresse]] dont il avait [[besoin]], ni la [[protection]] face à un [[père]] autoritaire.", "align": "left", "space_after": 0.7 },
+        { "text": "Alors il [[avance]] avec des [[manques]] béants, une [[colère]] rentrée et une [[attente]] : être [[apaisé]] par sa [[femme]] et sa [[famille]].", "align": "left", "space_after": 0.7 },
+        { "text": "C’est pourquoi il [[impose]] son point de vue [[sans comprendre]] le vôtre.", "align": "left" }
+      ]
+    },
+    {
+      "arrow": true,
+      "lines": [
+        { "text": "Ajoutez à cela la [[blessure]] du [[père]], héritée d’un [[système patriarcal]] qui a décrété que les [[hommes]] doivent [[dominer]] et [[réprimer]] leurs émotions.", "align": "left", "space_after": 0.7 },
+        { "text": "Il s’est [[enfermé]] dans l’[[idée]] que sa seule [[mission]] est de rapporter de l’[[argent]].", "align": "left", "space_after": 0.7 },
+        { "text": "Il s’est [[coupé]] de ses [[émotions]], de ce qu’il ressent.", "align": "left", "space_after": 0.7 },
+        { "text": "Alors quand sa [[femme]] ou ses [[enfants]] [[réclament]] du [[soutien]] émotionnel, il y voit une [[menace]].", "align": "left" }
       ]
     },
     {
       "lines": [
-        { "text": "Ou il libère la [[rage]] de l'enfant [[abandonné]] qui vit toujours en lui.", "align": "left" }
-      ]
-    },
-    {
-      "lines": [
-        { "text": "Souvent, il se pose en [[victime]], parce que c'est ainsi qu'il se [[sent]] au plus profond de lui-même.", "align": "left" }
-      ]
-    },
-    {
-      "lines": [
-        { "text": "Jusqu'à ce qu'il décide enfin d'affronter sa [[peur de l'abandon]], il restera enfermé dans ce [[schéma]].", "align": "left" }
-      ]
-    },
-    {
-      "lines": [
-        { "text": "Pris au [[piège]], malheureux, sur la [[défensive]].", "align": "left" }
-      ]
-    },
-    {
-      "lines": [
-        { "text": "VOICI COMMENT [[FAIRE]]", "align": "center" }
+        { "text": "Il se [[défend]]. Il dit : \"J’ai tout fait pour vous !\"*", "align": "left", "space_after": 0.7 },
+        { "text": "Ou il libère la [[rage]] de l’enfant [[abandonné]] qui vit toujours en lui.", "align": "left", "space_after": 0.7 },
+        { "text": "Souvent, il se pose en [[victime]], parce que c’est ainsi qu’il se [[sent]] au plus [[profond]] de lui même.", "align": "left", "space_after": 0.7 },
+        { "text": "Jusqu’à ce qu’il [[décide]] enfin de [[traiter]] sa [[peur]] de l’abandon, il restera [[enfermé]] dans ce [[schéma]].", "align": "left", "space_after": 0.7 },
+        { "text": "Pris au [[piège]], malheureux, sur la [[défensive]].", "align": "left", "space_after": 0.7 },
+        { "text": "VOICI COMMENT FAIRE", "role": "cta", "align": "center" }
       ]
     }
   ]

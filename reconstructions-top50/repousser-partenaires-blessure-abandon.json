@@ -4,30 +4,12 @@
   "duration_s": null,
   "pages": [
     {
-      "arrow": true,
       "lines": [
-        { "text": "J'ai passé [[BEAUCOUP de temps]] à essayer de comprendre", "role": "heading", "color": "white", "size": "l", "align": "center" },
-        { "text": "pourquoi je [[repoussais]] constamment mes [[partenaires]]...", "align": "center" }
-      ]
-    },
-    {
-      "lines": [
-        { "text": "Alors que tout ce que je [[désirais]], c'était être [[aimé]].", "align": "left" }
-      ]
-    },
-    {
-      "lines": [
-        { "text": "... C'est ça la [[blessure d'ABANDON]]...", "align": "left" }
-      ]
-    },
-    {
-      "lines": [
-        { "text": "... On adopte les [[comportements]] qui précisément conduisent les autres à nous [[quitter]].", "align": "left" }
-      ]
-    },
-    {
-      "lines": [
-        { "text": "JE M'EXPLIQUE", "role": "heading", "color": "white", "size": "l", "align": "center" }
+        { "text": "J’ai passé BEAUCOUP de temps à essayer de comprendre pourquoi je repoussais constamment mes partenaires...", "align": "left", "space_after": 0.7 },
+        { "text": "Alors que tout ce que je désirais, c’était être aimé...", "align": "left", "space_after": 0.7 },
+        { "text": "... C’est ça la  blessure d’ABANDON...", "align": "left", "space_after": 0.7 },
+        { "text": "... On adopte les comportements qui précisément conduisent les autres à nous quitter.", "align": "left", "space_after": 0.7 },
+        { "text": "JE M’EXPLIQUE", "role": "cta", "align": "center" }
       ]
     }
   ]

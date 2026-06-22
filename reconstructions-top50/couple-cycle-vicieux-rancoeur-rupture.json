@@ -3,45 +3,22 @@
   "layout": "long",
   "duration_s": null,
   "pages": [
-    {
-      "arrow": true,
-      "lines": [
-        { "text": "Ce [[comportement]], à son tour,", "role": "heading", "color": "white", "size": "l", "align": "center" },
-        { "text": "active les [[blessures]] de l'homme.", "align": "center" }
-      ]
-    },
-    {
-      "lines": [
-        { "text": "Il enferme le couple", "align": "left" },
-        { "text": "dans un [[cycle vicieux]]", "align": "left" },
-        { "text": "de [[rancœur]] sans fin.", "align": "left" }
-      ]
-    },
-    {
-      "lines": [
-        { "text": "Une rancœur qui [[abîme]] le lien", "align": "left" },
-        { "text": "et les conduit lentement", "align": "left" },
-        { "text": "vers la [[rupture]].", "align": "left" }
-      ]
-    },
-    {
-      "lines": [
-        { "text": "Chacun se voit comme la [[victime]].", "align": "left" },
-        { "text": "Chacun [[doute]] de la relation.", "align": "left" }
-      ]
-    },
-    {
-      "lines": [
-        { "text": "Sans comprendre que la [[clé]]", "align": "left" },
-        { "text": "se trouve dans leur propre", "align": "left" },
-        { "text": "[[réparation individuelle]].", "align": "left" }
-      ]
-    },
-    {
-      "lines": [
-        { "text": "LA SOLUTION EST", "role": "heading", "size": "l", "align": "center" },
-        { "text": "DANS LA [[LÉGENDE]]", "role": "heading", "size": "l", "align": "center" }
-      ]
-    }
+    { "arrow": true, "lines": [
+      { "text": "[[LORSQU'UN HOMME SE RENFERME OU DEVIENT DISTANT AVEC SA FEMME, ELLE SOUFFRE PROFONDÉMENT.]]", "role": "heading", "align": "center", "space_after": 0.7 },
+      { "text": "[[Elle]] recherche la [[sécurité]] à travers les [[conversations]] et la [[proximité]], tandis que [[lui]] la [[trouve]] dans la [[distance]] et [[l'indépendance]].", "align": "left", "space_after": 0.7 },
+      { "text": "Quand elle [[demande]] plus de communication, cela [[réveille]] en lui des blessures d'enfance, celles où il était souvent [[critiqué]] et ne se sentait jamais à la hauteur.", "align": "left", "space_after": 0.7 },
+      { "text": "Il perçoit alors ses [[demandes]] comme des [[reproches]], comme si elle menaçait sa [[liberté]].", "align": "left", "space_after": 0.7 },
+      { "text": "Il n'a jamais appris à gérer ses blessures non réparées – ce sentiment d'être [[dévalorisé]] ou en colère, il les [[évite]] et préfère le [[déni]].", "align": "left" }
+    ] },
+    { "arrow": true, "lines": [
+      { "text": "Alors, il [[s'éloigne]] pour y faire face à sa manière, sans comprendre qu'il [[fuit]] en réalité la [[racine]] du [[problème]] en se perdant dans le [[travail]], les [[addictions]] ou les [[distractions]].", "align": "left", "space_after": 0.7 },
+      { "text": "De son côté à elle, cette [[distance]] réactive les blessures de son [[enfance]], où elle n'a jamais reçu la proximité émotionnelle qu'elle attendait de ses [[parents]]. Elle commence à se sentir [[abandonnée]], rejetée.", "align": "left", "space_after": 0.7 },
+      { "text": "Pour [[apaiser]] ce sentiment [[d'abandon]], elle multiplie les appels, les [[messages]], les tentatives de discussions, souvent teintées de [[colère]] et de [[reproches]].", "align": "left" }
+    ] },
+    { "lines": [
+      { "text": "Ce [[comportement]], à son tour, [[active]] les blessures de [[l'homme]], enfermant le [[couple]] dans une [[cycle]] vicieux de [[rancœur]] sans fin qui [[abîme]] le [[lien]] et les conduit lentement vers la [[rupture]].", "align": "left", "space_after": 0.7 },
+      { "text": "[[Chacun]] se voit comme la [[victime]], chacun [[doute]] de la relation, sans comprendre que la [[clé]] se trouve dans [[leur]] propre [[réparation]] individuelle.", "align": "left", "space_after": 0.7 },
+      { "text": "LA SOLUTION EST DANS LA LÉGENDE", "role": "cta", "align": "center" }
+    ] }
   ]
 }
