@@ -4,7 +4,7 @@ import { TextStack } from './TextStack.jsx';
 import { PageStack } from './PageStack.jsx';
 import { HandEmoji } from './HandEmoji.jsx';
 import { LegendCta } from './LegendCta.jsx';
-import { safeBox, safeBoxLong, COLORS, STAGGER_LEAD_IN_SEC, STAGGER_GAP_SEC, ALL_AT_ONCE_DELAY_SEC, FPS, FADE_SEC, HAND_EMOJI_DELAY_AFTER_LAST_SEC, computePageHoldFrames } from './constants.js';
+import { safeBox, safeBoxLong, COLORS, STAGGER_LEAD_IN_SEC, STAGGER_GAP_SEC, ALL_AT_ONCE_DELAY_SEC, FPS, FADE_SEC, HAND_EMOJI_DELAY_AFTER_LAST_SEC, computePageHoldFrames, CAPTION_TAP_X, CAPTION_TAP_Y } from './constants.js';
 import { normaliseSegments } from './segments.js';
 import { normalisePages } from './pages.js';
 
@@ -84,11 +84,12 @@ export const Reel = (props) => {
   const handZone = props.hand_emoji
     ? { x: safe.x, y: safe.y + safe.height - handBand, width: safe.width, height: handBand }
     : null;
-  // La zone légende part du footer et DESCEND jusqu'à ~92% de la hauteur (vers la
-  // légende IG sous la vidéo) → la flèche peut réellement « plonger » vers la légende.
+  // La zone légende part du footer et DESCEND jusqu'au point de tap de la légende IG
+  // (bas-GAUCHE) → la flèche plonge réellement là où l'utilisateur tape.
   const legendTop = safe.y + safe.height - handBand - legendBand;
+  const captionTarget = { x: Math.round(width * CAPTION_TAP_X), y: Math.round(height * CAPTION_TAP_Y) };
   const legendZone = ctaText
-    ? { x: safe.x, y: legendTop, width: safe.width, height: Math.round(height * 0.93) - legendTop }
+    ? { x: safe.x, y: legendTop, width: safe.width, height: Math.round(captionTarget.y + 30) - legendTop }
     : null;
 
   // Frame de démarrage des éléments de bas (main / footer légende) : juste après le dernier segment de texte.
@@ -103,7 +104,7 @@ export const Reel = (props) => {
       <Background name={props.background} />
       <TextStack segments={segments} reveal={props.reveal} safe={textSafe} />
       {ctaText && (
-        <LegendCta text={ctaText} zone={legendZone} startSec={lastSegStartSec + FADE_SEC} />
+        <LegendCta text={ctaText} zone={legendZone} target={captionTarget} startSec={lastSegStartSec + FADE_SEC} />
       )}
       {props.hand_emoji && (
         <HandEmoji zone={handZone} startFrame={handStartFrame} />

@@ -62,6 +62,16 @@ export const ICON_ZONE_TOP = 0.50;   // la colonne d'icônes commence à mi-haut
 // SAFE ZONE basse (caption / handle / audio IG) : déjà couverte par SAFE_LONG.bottom
 // (0.16 → le texte s'arrête à ~0.84, au-dessus de la légende qui démarre ~0.86+).
 
+// POINT DE TAP DE LA LÉGENDE IG (« … plus » qui déplie la caption) — pour viser la
+// flèche « LISEZ LA LÉGENDE » EXACTEMENT là où l'utilisateur tape.
+// Mesuré sur la spec safe-zone Reels (Meta / Outfy / Kreatli, 1080x1920) :
+//   - le bloc gauche username+caption+audio occupe le bas ~270-320 px,
+//     démarrant à 60 px du bord gauche → caption ALIGNÉE À GAUCHE, pas centrée.
+//   - la ligne caption « … plus » est ~200-230 px au-dessus du bas.
+// => cible = bas-GAUCHE : x ≈ 184/1080 = 0.170 ; y ≈ (1920-215)/1920 = 0.888.
+export const CAPTION_TAP_X = 0.170; // fraction de largeur (bord gauche caption)
+export const CAPTION_TAP_Y = 0.888; // fraction de hauteur (ligne « … plus »)
+
 export const BACKGROUND_DURATION_SEC = 29;
 export const BACKGROUND_DURATION_FRAMES = Math.round(BACKGROUND_DURATION_SEC * FPS);
 
