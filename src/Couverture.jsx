@@ -62,7 +62,7 @@ export const Couverture = ({
       {/* Gravité verticale : eyebrow (murmure) → hook (frappe) → signature (signe). */}
       {/* Eyebrow — linéale capitales espacées, taupe. */}
       <div style={{ position: 'absolute', top: 360, left: 0, right: 0, textAlign: 'center',
-        fontFamily: 'Oswald', fontWeight: 600, fontSize: 38, letterSpacing: '0.30em',
+        fontFamily: 'Oswald', fontWeight: 600, fontSize: 48, letterSpacing: '0.22em',
         textTransform: 'uppercase', color: TAUPE }}>
         {eyebrow}
       </div>
