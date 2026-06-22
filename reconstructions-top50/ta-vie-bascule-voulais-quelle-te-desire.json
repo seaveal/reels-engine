@@ -1,29 +1,23 @@
 {
   "slug": "ta-vie-bascule-voulais-quelle-te-desire",
-  "layout": "long",
-  "duration_s": null,
-  "pages": [
+  "reveal": "staggered",
+  "hand_emoji": false,
+  "segments": [
     {
-      "arrow": true,
-      "lines": [
-        { "text": "Ta vie entière [[bascule]]", "role": "heading", "color": "white", "size": "l", "align": "center" },
-        { "text": "lorsque tu réalises que tu n'avais pas vraiment [[envie]] d'être avec cette personne…", "align": "center" }
-      ]
+      "role": "block",
+      "text": "Ta vie entière bascule lorsque tu réalises que tu n'avais pas vraiment [[envie]] d'être avec cette personne…"
     },
     {
-      "lines": [
-        { "text": "… Mais que tu voulais simplement qu'elle te [[désire]].", "align": "left" }
-      ]
+      "role": "block",
+      "text": "… Mais que tu voulais simplement qu'elle te [[désire]]…"
     },
     {
-      "lines": [
-        { "text": "… Parce que ta [[blessure d'abandon]] t'a rendu(e) [[obsédé(e)]] par le besoin d'être « choisi(e) ».", "align": "left" }
-      ]
+      "role": "block",
+      "text": "…Parce que ta [[blessure d'abandon]] t'a rendu [[obsédé(e)]] par le [[besoin]] d'être « [[choisi(e)]] »."
     },
     {
-      "lines": [
-        { "text": "LA SUITE DANS LA [[LÉGENDE]]", "role": "heading", "size": "l", "align": "center" }
-      ]
+      "role": "cta",
+      "text": "LA SUITE DANS LA LÉGENDE"
     }
   ]
 }

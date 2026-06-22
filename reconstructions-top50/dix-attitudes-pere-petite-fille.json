@@ -1,75 +1,15 @@
 {
   "slug": "dix-attitudes-pere-petite-fille",
-  "layout": "long",
-  "duration_s": null,
-  "pages": [
+  "reveal": "staggered",
+  "hand_emoji": false,
+  "segments": [
     {
-      "arrow": true,
-      "lines": [
-        { "text": "10 attitudes de votre [[père]]", "role": "heading", "color": "white", "size": "l", "align": "center" },
-        { "text": "qui ont involontairement [[saboté]] la capacité de la petite fille en vous à se sentir [[aimée]]…", "align": "center" },
-        { "text": "… et qui [[hantent]] encore les émotions de la femme que vous êtes devenue.", "align": "center" }
-      ]
+      "role": "block",
+      "text": "[[10 attitudes]] de votre père qui ont involontairement [[saboté]] la capacité de la [[petite fille]] en vous à se sentir [[aimée]]…"
     },
     {
-      "lines": [
-        { "text": "Il n'était pas [[présent]] émotionnellement, alors vous avez appris à vous [[débrouiller seule]], et aujourd'hui aucun homme n'arrive à entrer." }
-      ]
-    },
-    {
-      "lines": [
-        { "text": "Il ne [[validait jamais]] vos réussites, alors vous courez encore après une [[reconnaissance]] qui ne viendra pas." }
-      ]
-    },
-    {
-      "lines": [
-        { "text": "Il a fait de son amour quelque chose à [[mériter]], alors vous performez, vous donnez, vous vous [[épuisez]], en boucle." }
-      ]
-    },
-    {
-      "lines": [
-        { "text": "Il était [[imprévisible]], alors vous [[scrutez]] le moindre signe chez votre partenaire, vous anticipez le pire." }
-      ]
-    },
-    {
-      "lines": [
-        { "text": "Il [[contrôlait]] au lieu de [[protéger]], alors vous fuyez ou vous attirez exactement le même type d'homme." }
-      ]
-    },
-    {
-      "lines": [
-        { "text": "Il n'était pas là quand vous aviez [[peur]], alors la petite fille en vous ne sait toujours pas se laisser [[approcher]]." }
-      ]
-    },
-    {
-      "lines": [
-        { "text": "Il exigeait sans cesse [[plus]], alors rien n'est jamais [[assez]], surtout pas vous." }
-      ]
-    },
-    {
-      "lines": [
-        { "text": "L'[[intimité]] avec lui faisait peur, alors quand un homme s'approche vraiment, votre corps [[recule]] sans que vous compreniez pour quelle raison." }
-      ]
-    },
-    {
-      "lines": [
-        { "text": "Il vous a appris à cacher la [[vulnérabilité]], alors vous [[encaissez]] depuis 30 ans, et vous craquez seule, la nuit." }
-      ]
-    },
-    {
-      "lines": [
-        { "text": "Il a planté la [[peur d'être rejetée]], alors vous [[restez]] avec des hommes qui ne vous voient pas plutôt qu'être seule." }
-      ]
-    },
-    {
-      "lines": [
-        { "text": "Ce qu'il n'a pas dit est resté [[gravé]] plus fort que ce qu'il a [[fait]].", "align": "center" }
-      ]
-    },
-    {
-      "lines": [
-        { "text": "TOUT EST DANS LA [[LÉGENDE]]", "role": "heading", "size": "l", "align": "center" }
-      ]
+      "role": "cta",
+      "text": "LISEZ LA LÉGENDE"
     }
   ]
 }
