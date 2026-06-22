@@ -1,0 +1,47 @@
+{
+  "slug": "couple-cycle-vicieux-rancoeur-rupture",
+  "layout": "long",
+  "duration_s": null,
+  "pages": [
+    {
+      "arrow": true,
+      "lines": [
+        { "text": "Ce [[comportement]], à son tour,", "role": "heading", "color": "white", "size": "l", "align": "center" },
+        { "text": "active les [[blessures]] de l'homme.", "align": "center" }
+      ]
+    },
+    {
+      "lines": [
+        { "text": "Il enferme le couple", "align": "left" },
+        { "text": "dans un [[cycle vicieux]]", "align": "left" },
+        { "text": "de [[rancœur]] sans fin.", "align": "left" }
+      ]
+    },
+    {
+      "lines": [
+        { "text": "Une rancœur qui [[abîme]] le lien", "align": "left" },
+        { "text": "et les conduit lentement", "align": "left" },
+        { "text": "vers la [[rupture]].", "align": "left" }
+      ]
+    },
+    {
+      "lines": [
+        { "text": "Chacun se voit comme la [[victime]].", "align": "left" },
+        { "text": "Chacun [[doute]] de la relation.", "align": "left" }
+      ]
+    },
+    {
+      "lines": [
+        { "text": "Sans comprendre que la [[clé]]", "align": "left" },
+        { "text": "se trouve dans leur propre", "align": "left" },
+        { "text": "[[réparation individuelle]].", "align": "left" }
+      ]
+    },
+    {
+      "lines": [
+        { "text": "LA SOLUTION EST", "role": "heading", "size": "l", "align": "center" },
+        { "text": "DANS LA [[LÉGENDE]]", "role": "heading", "size": "l", "align": "center" }
+      ]
+    }
+  ]
+}

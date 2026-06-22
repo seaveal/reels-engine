@@ -84,8 +84,11 @@ export const Reel = (props) => {
   const handZone = props.hand_emoji
     ? { x: safe.x, y: safe.y + safe.height - handBand, width: safe.width, height: handBand }
     : null;
+  // La zone légende part du footer et DESCEND jusqu'à ~92% de la hauteur (vers la
+  // légende IG sous la vidéo) → la flèche peut réellement « plonger » vers la légende.
+  const legendTop = safe.y + safe.height - handBand - legendBand;
   const legendZone = ctaText
-    ? { x: safe.x, y: safe.y + safe.height - handBand - legendBand, width: safe.width, height: legendBand }
+    ? { x: safe.x, y: legendTop, width: safe.width, height: Math.round(height * 0.93) - legendTop }
     : null;
 
   // Frame de démarrage des éléments de bas (main / footer légende) : juste après le dernier segment de texte.

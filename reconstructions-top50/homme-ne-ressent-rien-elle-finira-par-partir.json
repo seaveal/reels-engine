@@ -1,0 +1,50 @@
+{
+  "slug": "homme-ne-ressent-rien-elle-finira-par-partir",
+  "layout": "long",
+  "duration_s": null,
+  "pages": [
+    {
+      "arrow": true,
+      "lines": [
+        { "text": "Il croit qu'elle [[exagère]].", "role": "heading", "color": "white", "size": "l", "align": "center" },
+        { "text": "Elle croit qu'il ne la [[voit pas]].", "align": "center" },
+        { "text": "Il croit qu'elle lui en [[veut]].", "align": "center" }
+      ]
+    },
+    {
+      "lines": [
+        { "text": "Elle croit qu'il ne l'[[aime pas]]", "align": "left" },
+        { "text": "comme elle en a [[besoin]].", "align": "left" }
+      ]
+    },
+    {
+      "lines": [
+        { "text": "Ils ont tous les deux [[tort]].", "align": "left" }
+      ]
+    },
+    {
+      "lines": [
+        { "text": "Et puis un matin, il se [[réveille]].", "align": "left" },
+        { "text": "Elle est [[encore là]].", "align": "left" },
+        { "text": "Mais [[plus vraiment]].", "align": "left" }
+      ]
+    },
+    {
+      "lines": [
+        { "text": "Elle arrête de [[demander]].", "align": "left" },
+        { "text": "Mais si lui ne [[comprend pas]]...", "align": "left" }
+      ]
+    },
+    {
+      "lines": [
+        { "text": "… Alors c'est bien elle", "align": "left" },
+        { "text": "qui finira par [[partir]].", "align": "left" }
+      ]
+    },
+    {
+      "lines": [
+        { "text": "LISEZ LA [[LÉGENDE]]", "role": "heading", "size": "l", "align": "center" }
+      ]
+    }
+  ]
+}

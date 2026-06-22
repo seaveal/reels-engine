@@ -1,0 +1,49 @@
+{
+  "slug": "connaitre-gens-traitent-ceux-qui-rien-offrir",
+  "layout": "long",
+  "duration_s": null,
+  "pages": [
+    {
+      "arrow": true,
+      "lines": [
+        { "text": "Vous voulez [[connaître les gens]] ?", "role": "heading", "color": "white", "size": "l", "align": "center" },
+        { "text": "Regardez comment ils traitent ceux qui n'ont [[rien à leur offrir]].", "align": "center" }
+      ]
+    },
+    {
+      "lines": [
+        { "text": "Pas son [[patron]]. Pas ses [[clients]]. Pas la personne dont elle attend une [[validation]]." }
+      ]
+    },
+    {
+      "lines": [
+        { "text": "Le serveur qui s'est trompé de commande. La caissière [[épuisée]]. Le [[SDF]] devant la boulangerie." }
+      ]
+    },
+    {
+      "lines": [
+        { "text": "C'est là que le [[masque tombe]]. C'est là que le [[corps]] de l'autre parle plus fort que ses [[mots]]." }
+      ]
+    },
+    {
+      "lines": [
+        { "text": "Une [[mâchoire]] qui se serre. Une [[nuque]] qui chauffe. Un [[souffle]] qui se coupe. Vous savez. Vous avez toujours su." }
+      ]
+    },
+    {
+      "lines": [
+        { "text": "Le [[mental négocie]]. « Il est stressé. Au fond, il est gentil. » Le [[corps]], lui, ne ment [[jamais]]." }
+      ]
+    },
+    {
+      "lines": [
+        { "text": "Les vrais voient sans [[juger]], aiment sans [[attentes]]." }
+      ]
+    },
+    {
+      "lines": [
+        { "text": "LISEZ LA LÉGENDE", "role": "heading", "color": "white", "size": "l", "align": "center" }
+      ]
+    }
+  ]
+}

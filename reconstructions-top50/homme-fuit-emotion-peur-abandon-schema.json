@@ -1,0 +1,39 @@
+{
+  "slug": "homme-fuit-emotion-peur-abandon-schema",
+  "layout": "long",
+  "duration_s": null,
+  "pages": [
+    {
+      "arrow": true,
+      "lines": [
+        { "text": "Il se [[défend]].", "role": "heading", "color": "white", "size": "l", "align": "center" },
+        { "text": "Il dit : « J'ai [[tout fait]] pour vous ! »", "align": "center" }
+      ]
+    },
+    {
+      "lines": [
+        { "text": "Ou il libère la [[rage]] de l'enfant [[abandonné]] qui vit toujours en lui.", "align": "left" }
+      ]
+    },
+    {
+      "lines": [
+        { "text": "Souvent, il se pose en [[victime]], parce que c'est ainsi qu'il se [[sent]] au plus profond de lui-même.", "align": "left" }
+      ]
+    },
+    {
+      "lines": [
+        { "text": "Jusqu'à ce qu'il décide enfin d'affronter sa [[peur de l'abandon]], il restera enfermé dans ce [[schéma]].", "align": "left" }
+      ]
+    },
+    {
+      "lines": [
+        { "text": "Pris au [[piège]], malheureux, sur la [[défensive]].", "align": "left" }
+      ]
+    },
+    {
+      "lines": [
+        { "text": "VOICI COMMENT [[FAIRE]]", "align": "center" }
+      ]
+    }
+  ]
+}

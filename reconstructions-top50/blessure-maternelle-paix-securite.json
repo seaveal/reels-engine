@@ -1,0 +1,25 @@
+{
+  "slug": "blessure-maternelle-paix-securite",
+  "layout": "long",
+  "duration_s": null,
+  "pages": [
+    { "arrow": true, "lines": [
+        { "text": "S'il choisit de [[réparer]] cette [[BLESSURE MATERNELLE]]", "role": "heading", "color": "white", "size": "l", "align": "center" }
+    ] },
+    { "lines": [
+        { "text": "Plutôt que de la [[fuir]] en courant après le succès, les conquêtes, les [[addictions]] ou des distractions sans fin.", "align": "left" }
+    ] },
+    { "lines": [
+        { "text": "Alors il trouvera en lui-même la [[paix]] et la [[sécurité affective]] qu'il cherchait, ailleurs, chez sa femme.", "align": "left" }
+    ] },
+    { "lines": [
+        { "text": "Ce n'est qu'à ce [[moment-là]] qu'il pourra créer un [[lien solide]] et profond avec elle.", "align": "left" }
+    ] },
+    { "lines": [
+        { "text": "Un lien où l'[[amour]] apaise toute forme de [[conflit]].", "align": "left" }
+    ] },
+    { "lines": [
+        { "text": "POUR [[RÉPARER]] LA BLESSURE DE LA [[MÈRE]], LISEZ LA [[LÉGENDE]]", "align": "left" }
+    ] }
+  ]
+}

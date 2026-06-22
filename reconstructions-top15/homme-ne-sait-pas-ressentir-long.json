@@ -6,127 +6,208 @@
     {
       "arrow": true,
       "lines": [
-        { "text": "Un homme qui ne sait pas [[ressentir]] ne sait pas [[aimer]].", "role": "heading", "color": "white", "size": "l", "align": "center" },
-        { "text": "Il finira toujours par [[perdre]] ce qui comptait le plus pour lui.", "align": "left" }
+        {
+          "text": "Un homme qui ne sait pas [[ressentir]] ses émotions ne sait pas [[aimer]].",
+          "role": "heading",
+          "color": "white",
+          "size": "l",
+          "align": "center"
+        },
+        {
+          "text": "Il finira toujours par [[perdre]] ce qui comptait le plus pour lui.",
+          "align": "left"
+        }
       ]
     },
     {
       "lines": [
-        { "text": "Et il ne saura jamais quelle a été sa [[part]] dans la [[perte]].", "align": "left" }
+        {
+          "text": "Et il ne saura jamais quelle a été sa [[part]] dans la [[perte]].",
+          "align": "left"
+        }
       ]
     },
     {
       "lines": [
-        { "text": "Vous [[vivez]] dans votre [[tête]]. Vous [[intellectualisez tout]]. Vous voulez avoir [[raison]].", "align": "left" }
+        {
+          "text": "Vous [[vivez]] dans votre [[tête]]. Vous [[intellectualisez tout]]. Vous voulez avoir [[raison]].",
+          "align": "left"
+        }
       ]
     },
     {
       "lines": [
-        { "text": "Vous [[argumentez]] au lieu d'écouter. Vous [[analysez]] au lieu de [[ressentir]].", "align": "left" }
+        {
+          "text": "Vous [[argumentez]] au lieu d'écouter. Vous [[analysez]] au lieu de [[ressentir]].",
+          "align": "left"
+        }
       ]
     },
     {
       "lines": [
-        { "text": "Elle, elle veut juste être [[en lien]]. Et vous ne savez pas ce que cela veut [[dire]].", "align": "left" }
-      ]
-    },
-    {
-      "arrow": true,
-      "lines": [
-        { "text": "[[Enfant]], vous n'avez pas reçu beaucoup d'[[affection]] physique ou verbale. Vos [[parents]] étaient stricts, [[distants]].", "align": "left" }
-      ]
-    },
-    {
-      "lines": [
-        { "text": "Alors votre corps a pris une [[décision]], avant même vos six ans. Pour être [[aimé]], il faut être [[parfait]]. [[Performant]]. Gagner beaucoup d'argent. Surtout, ne jamais montrer une faille.", "align": "left" }
-      ]
-    },
-    {
-      "lines": [
-        { "text": "[[Trente ans]] plus tard, vous êtes encore dans ce [[programme]]. Personne ne vous a appris à en [[sortir]].", "align": "left" }
-      ]
-    },
-    {
-      "arrow": true,
-      "lines": [
-        { "text": "Chaque fois qu'elle exprime un [[besoin]], vous croyez entendre une [[critique]].", "align": "left" }
-      ]
-    },
-    {
-      "lines": [
-        { "text": "Vous vous [[refermez]]. Vous vous [[justifiez]]. Vous vous [[protégez]]. Et sans le savoir, vous l'[[éloignez]] encore plus.", "align": "left" }
-      ]
-    },
-    {
-      "lines": [
-        { "text": "Vous [[parlez]] deux [[langues différentes]].", "align": "left" }
-      ]
-    },
-    {
-      "lines": [
-        { "text": "Elle parle avec son [[cœur]]. Vous, avec votre [[logique]].", "align": "left" }
-      ]
-    },
-    {
-      "lines": [
-        { "text": "Elle veut une [[connexion]]. Vous voulez des [[explications]].", "align": "left" }
-      ]
-    },
-    {
-      "lines": [
-        { "text": "Elle exprime un [[manque]]. Vous y voyez un [[reproche]].", "align": "left" }
-      ]
-    },
-    {
-      "lines": [
-        { "text": "Elle [[tend la main]]. Vous vous [[repliez]].", "align": "left" }
+        {
+          "text": "Elle, elle veut juste être [[en lien]]. Et vous ne savez pas ce que cela veut [[dire]].",
+          "align": "left"
+        }
       ]
     },
     {
       "arrow": true,
       "lines": [
-        { "text": "Vous la croyez trop [[émotive]]. Elle vous croit incapable de [[ressentir]].", "align": "left" }
+        {
+          "text": "[[Enfant]], vous n'avez pas reçu beaucoup d'[[affection]] physique ou verbale. Vos [[parents]] étaient stricts, [[distants]].",
+          "align": "left"
+        }
       ]
     },
     {
       "lines": [
-        { "text": "Il croit qu'elle [[exagère]]. Elle croit qu'il ne la [[voit]] pas.", "align": "left" }
+        {
+          "text": "Alors votre corps a pris une [[décision]], avant même vos six ans. Pour être [[aimé]], il faut être [[parfait]]. [[Performant]]. Gagner beaucoup d'argent. Surtout, ne jamais montrer une faille.",
+          "align": "left"
+        }
       ]
     },
     {
       "lines": [
-        { "text": "Il croit qu'elle lui en [[veut]]. Elle croit qu'il ne l'[[aime]] pas comme elle en a besoin.", "align": "left" }
-      ]
-    },
-    {
-      "lines": [
-        { "text": "[[Ils ont tous les deux tort.]] Ils sont tous les deux [[blessés]].", "bold": true, "align": "left" }
+        {
+          "text": "[[Trente ans]] plus tard, vous êtes encore dans ce [[programme]]. Personne ne vous a appris à en [[sortir]].",
+          "align": "left"
+        }
       ]
     },
     {
       "arrow": true,
       "lines": [
-        { "text": "Et puis un matin, il se [[réveille]]. Elle est encore là. Mais [[plus vraiment]].", "align": "left" }
+        {
+          "text": "Chaque fois qu'elle exprime un [[besoin]], vous croyez entendre une [[critique]].",
+          "align": "left"
+        }
       ]
     },
     {
       "lines": [
-        { "text": "Elle [[arrête]] de [[demander]]. Elle arrête de [[tendre la main]]. Elle s'organise toute seule.", "align": "left" }
+        {
+          "text": "Vous vous [[refermez]]. Vous vous [[justifiez]]. Vous vous [[protégez]]. Et sans le savoir, vous l'[[éloignez]] encore plus.",
+          "align": "left"
+        }
       ]
     },
     {
       "lines": [
-        { "text": "Mais si [[lui]] ne [[comprend]] pas...", "align": "left" }
+        {
+          "text": "Vous [[parlez]] deux [[langues différentes]].",
+          "align": "left"
+        }
       ]
     },
     {
       "lines": [
-        { "text": "... Alors c'est bien [[elle]] qui finira par [[partir]].", "align": "left" }
+        {
+          "text": "Elle parle avec son [[cœur]]. Vous, avec votre [[logique]].",
+          "align": "left"
+        }
       ]
     },
     {
       "lines": [
-        { "text": "LISEZ LA LÉGENDE", "role": "cta", "size": "s", "align": "center" }
+        {
+          "text": "Elle veut une [[connexion]]. Vous voulez des [[explications]].",
+          "align": "left"
+        }
+      ]
+    },
+    {
+      "lines": [
+        {
+          "text": "Elle exprime un [[manque]]. Vous y voyez un [[reproche]].",
+          "align": "left"
+        }
+      ]
+    },
+    {
+      "lines": [
+        {
+          "text": "Elle [[tend la main]]. Vous vous [[repliez]].",
+          "align": "left"
+        }
+      ]
+    },
+    {
+      "arrow": true,
+      "lines": [
+        {
+          "text": "Vous la croyez trop [[émotive]]. Elle vous croit incapable de [[ressentir]].",
+          "align": "left"
+        }
+      ]
+    },
+    {
+      "lines": [
+        {
+          "text": "Il croit qu'elle [[exagère]]. Elle croit qu'il ne la [[voit]] pas.",
+          "align": "left"
+        }
+      ]
+    },
+    {
+      "lines": [
+        {
+          "text": "Il croit qu'elle lui en [[veut]]. Elle croit qu'il ne l'[[aime]] pas comme elle en a besoin.",
+          "align": "left"
+        }
+      ]
+    },
+    {
+      "lines": [
+        {
+          "text": "[[Ils ont tous les deux tort.]] Ils sont tous les deux [[blessés]].",
+          "bold": true,
+          "align": "left"
+        }
+      ]
+    },
+    {
+      "arrow": true,
+      "lines": [
+        {
+          "text": "Et puis un matin, il se [[réveille]]. Elle est encore là. Mais [[plus vraiment]].",
+          "align": "left"
+        }
+      ]
+    },
+    {
+      "lines": [
+        {
+          "text": "Elle [[arrête]] de [[demander]]. Elle arrête de [[tendre la main]]. Elle s'organise toute seule.",
+          "align": "left"
+        }
+      ]
+    },
+    {
+      "lines": [
+        {
+          "text": "Mais si [[lui]] ne [[comprend]] pas...",
+          "align": "left"
+        }
+      ]
+    },
+    {
+      "lines": [
+        {
+          "text": "... Alors c'est bien [[elle]] qui finira par [[partir]].",
+          "align": "left"
+        }
+      ]
+    },
+    {
+      "lines": [
+        {
+          "text": "LISEZ LA LÉGENDE",
+          "role": "cta",
+          "size": "s",
+          "align": "center"
+        }
       ]
     }
   ]

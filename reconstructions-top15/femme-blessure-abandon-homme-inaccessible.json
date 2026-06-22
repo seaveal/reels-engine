@@ -6,28 +6,49 @@
     {
       "arrow": true,
       "lines": [
-        { "text": "Une femme qui n'a pas [[réparé]] sa [[blessure d'abandon]]", "role": "heading", "color": "white", "size": "l", "align": "center" },
-        { "text": "vécue dans l'enfance...", "align": "left" }
+        {
+          "text": "Une femme qui n'a pas [[réparé]] sa [[blessure d'abandon]]",
+          "role": "heading",
+          "color": "white",
+          "size": "l",
+          "align": "center"
+        },
+        {
+          "text": "vécue dans l'enfance...",
+          "align": "left"
+        }
       ]
     },
     {
       "lines": [
-        { "text": "... se retrouvera à chercher sans cesse comment [[conquérir l'amour]] d'un [[homme inaccessible]].", "align": "left" }
+        {
+          "text": "... se retrouvera à chercher sans cesse comment [[conquérir l'amour]] d'un [[homme inaccessible]].",
+          "align": "left"
+        }
       ]
     },
     {
       "lines": [
-        { "text": "... Afin que sa [[petite fille intérieure]] puisse [[réparer]] la première [[rupture d'amour]].", "align": "left" }
+        {
+          "text": "... Afin que sa [[petite fille intérieure]] puisse [[réparer]] la première [[rupture d'amour]].",
+          "align": "left"
+        }
       ]
     },
     {
       "lines": [
-        { "text": "... Vécue avec son [[papa]]...", "align": "left" }
+        {
+          "text": "... Vécue avec son [[papa]]...",
+          "align": "left"
+        }
       ]
     },
     {
       "lines": [
-        { "text": "VOICI COMMENT [[BRISER LE CYCLE]]", "align": "left" }
+        {
+          "text": "VOICI COMMENT [[BRISER LE CYCLE]]",
+          "align": "left"
+        }
       ]
     }
   ]
