@@ -1,6 +1,7 @@
 import { interpolate, useCurrentFrame } from 'remotion';
-import { PAGE_FADE_SEC, FPS, COLORS } from './constants.js';
+import { PAGE_FADE_SEC, FPS, COLORS, CAPTION_TAP_X, CAPTION_TAP_Y } from './constants.js';
 import { SegmentLine } from './SegmentLine.jsx';
+import { LegendCta } from './LegendCta.jsx';
 
 // FORMAT LIST (layout:"list") — réels « liste numérotée / antithèse » des originaux :
 //   - un grand NUMÉRO blanc gras centré, en haut
@@ -58,27 +59,14 @@ export const ListPage = ({ page, safe, width, height }) => {
           />
         ))}
       </div>
-      {/* Footer « LISEZ LA LÉGENDE » (dernière page) — plus bas, crème, centré */}
-      {page.footer && (
-        <div
-          style={{
-            position: 'absolute',
-            left: safe.x,
-            top: Math.round(height * 0.60),
-            width: safe.width,
-            textAlign: 'center',
-            fontFamily: 'Oswald',
-            fontWeight: 600,
-            fontSize: footerFs,
-            letterSpacing: '0.07em',
-            textTransform: 'uppercase',
-            color: COLORS.cream,
-            opacity: 0.95,
-          }}
-        >
-          {page.footer}
-        </div>
-      )}
+      {/* Footer « LISEZ LA LÉGENDE » (dernière page) — crème + flèche tourniquettis
+          qui plonge vers le tap caption IG (bas-gauche), comme les hooks. */}
+      {page.footer && (() => {
+        const footerTop = Math.round(height * 0.60);
+        const target = { x: Math.round(width * CAPTION_TAP_X), y: Math.round(height * CAPTION_TAP_Y) };
+        const zone = { x: safe.x, y: footerTop, width: safe.width, height: (target.y + 30) - footerTop };
+        return <LegendCta text={page.footer} zone={zone} target={target} startSec={0.6} />;
+      })()}
     </div>
   );
 };
