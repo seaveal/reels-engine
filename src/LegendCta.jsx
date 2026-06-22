@@ -28,17 +28,49 @@ export const LegendCta = ({ text, zone, target, startSec = 0.6 }) => {
   const sx = Math.round(W * 0.56);
   const sy = footerH + 16;
 
-  const dx = tx - sx; // négatif (vers la gauche)
-  const dy = ty - sy; // positif (vers le bas)
-  // Courbe manuscrite : léger bombé à droite au départ puis plongée vers le bas-gauche.
-  const c1x = sx + dx * 0.12 + W * 0.06;
-  const c1y = sy + dy * 0.30;
-  const c2x = sx + dx * 0.62 - W * 0.02;
-  const c2y = sy + dy * 0.74;
-  const d = `M ${sx} ${sy} C ${c1x.toFixed(1)} ${c1y.toFixed(1)}, ${c2x.toFixed(1)} ${c2y.toFixed(1)}, ${tx} ${ty}`;
+  // --- Tracé MANUSCRIT « tourniquettis » : descente vers le bas-gauche ponctuée de
+  // boucles cursives + zigzag, comme la flèche dessinée à la main de l'original. ---
+  const dx = tx - sx, dy = ty - sy;
+  const len = Math.hypot(dx, dy) || 1;
+  const ux = dx / len, uy = dy / len;   // direction de descente
+  const ppx = -uy, ppy = ux;            // perpendiculaire (gauche/droite du tracé)
+  // Point à la fraction f de S→T, décalé de `off` px sur la perpendiculaire.
+  const P = (f, off) => [sx + dx * f + ppx * off, sy + dy * f + ppy * off];
+  const A = Math.max(34, Math.min(70, W * 0.085)); // amplitude du zigzag
+  const R = A * 1.25;                                 // rayon des boucles
 
-  // Pointe orientée dans le sens du tracé (du dernier point de contrôle vers la cible).
-  const ang = Math.atan2(ty - c2y, tx - c2x);
+  // Boucle cursive de A→B (B un peu plus loin) bombant du côté `side` (+1/-1) :
+  // les deux extrémités proches créent le croisement (effet tourniquette).
+  const loop = (fa, side) => {
+    const [ax, ay] = P(fa, side * A * 0.2);
+    const [bx, by] = P(fa + 0.05, -side * A * 0.2);
+    const c1x = ax + ppx * side * R * 2.4 - ux * R * 0.7;
+    const c1y = ay + ppy * side * R * 2.4 - uy * R * 0.7;
+    const c2x = bx + ppx * side * R * 2.4 + ux * R * 0.7;
+    const c2y = by + ppy * side * R * 2.4 + uy * R * 0.7;
+    return ` C ${c1x.toFixed(1)} ${c1y.toFixed(1)}, ${c2x.toFixed(1)} ${c2y.toFixed(1)}, ${bx.toFixed(1)} ${by.toFixed(1)}`;
+  };
+  // Segment lisse vers le point (f, off), bombé du côté `side` à mi-chemin.
+  const segTo = (fromF, toF, off, side) => {
+    const [ex, ey] = P(toF, off);
+    const mf = (fromF + toF) / 2;
+    const [mx, my] = P(mf, side * A);
+    return ` Q ${mx.toFixed(1)} ${my.toFixed(1)}, ${ex.toFixed(1)} ${ey.toFixed(1)}`;
+  };
+
+  const [x0, y0] = P(0, 0);
+  let d = `M ${x0.toFixed(1)} ${y0.toFixed(1)}`;
+  d += segTo(0, 0.20, A * 0.2, +1);   // zig à droite
+  d += loop(0.22, +1);                 // 1re tourniquette
+  d += segTo(0.27, 0.50, -A * 0.2, -1); // zag à gauche
+  d += loop(0.55, -1);                 // 2e tourniquette
+  d += segTo(0.60, 0.82, A * 0.15, +1); // re-zig
+  // dernier tronçon vers la cible (pour orienter la pointe)
+  const [pLx, pLy] = P(0.82, A * 0.15);
+  d += ` Q ${P(0.92, -A * 0.1)[0].toFixed(1)} ${P(0.92, -A * 0.1)[1].toFixed(1)}, ${tx} ${ty}`;
+
+  // Pointe orientée dans le sens du dernier tronçon (vers la cible).
+  const ang = Math.atan2(ty - pLy, tx - pLx);
   const L = 30;
   const b1x = tx - L * Math.cos(ang - 0.45);
   const b1y = ty - L * Math.sin(ang - 0.45);
