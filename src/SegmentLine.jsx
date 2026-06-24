@@ -46,7 +46,12 @@ export const SegmentLine = ({ text, bold, kind, fontSize, align = 'center', colo
         textAlign: align,
         textTransform: isUpper ? 'uppercase' : 'none',
         letterSpacing: resolvedLetterSpacing,
-        wordBreak: 'break-word',
+        // JAMAIS de mot coupé (Cyrille 2026-06-25) : un mot reste entier (l'auto-fit
+        // réduit la taille pour qu'il tienne, cf. autoFit overflow guard). Plus de césure
+        // « MALCHAN/CE » ni de ligne avec un fragment de mot.
+        wordBreak: 'normal',
+        overflowWrap: 'normal',
+        hyphens: 'none',
         width: '100%',
         marginBottom,
       }}

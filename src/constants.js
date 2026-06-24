@@ -45,7 +45,10 @@ export const SAFE = {
 // Tout en PROPORTIONS → responsive : tient identique sur toute taille de téléphone.
 export const SAFE_LONG = {
   left: 0.11,
-  right: 0.10,
+  // right 0.14 (était 0.10, Cyrille 2026-06-25) : le texte s'arrête à x≈0.86, AVANT la
+  // colonne d'icônes IG (like/commentaire/partage/enregistrer, moitié basse droite).
+  // Plus aucun recouvrement des icônes ; resserre aussi un peu le texte (jugé trop gros).
+  right: 0.14,
   top: 0.155,
   bottom: 0.16,
 };

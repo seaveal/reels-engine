@@ -28,7 +28,11 @@ const wrapAndMeasure = ({ text, fontSize, fontWeight, fontFamily, maxWidth, lett
   };
   const lines = [];
   let cur = '';
+  let overflow = false;
   for (const w of words) {
+    // Un mot seul plus large que la safe width = il sera coupé au rendu (interdit).
+    // On le signale → l'auto-fit réduira la taille jusqu'à ce qu'il tienne entier.
+    if (widthOf(w) > maxWidth) overflow = true;
     const trial = cur ? cur + ' ' + w : w;
     if (!cur || widthOf(trial) <= maxWidth) {
       cur = trial;
@@ -38,7 +42,7 @@ const wrapAndMeasure = ({ text, fontSize, fontWeight, fontFamily, maxWidth, lett
     }
   }
   if (cur) lines.push(cur);
-  return { lines: lines.length, height: lines.length * fontSize * LINE_HEIGHT };
+  return { lines: lines.length, height: lines.length * fontSize * LINE_HEIGHT, overflow };
 };
 
 /**
@@ -93,6 +97,8 @@ export const computeAutoFitFontSize = ({
           maxWidth,
           letterSpacingEm: line.letterSpacing != null ? line.letterSpacing : 0,
         });
+        // Un mot déborde la largeur à cette taille → taille trop grande (sinon césure).
+        if (m.overflow) return Infinity;
         H += m.height;
         if (li < seg.lines.length - 1) {
           const perGap = perLineGapEm && perLineGapEm[si] && perLineGapEm[si][li] != null
