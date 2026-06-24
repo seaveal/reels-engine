@@ -72,6 +72,20 @@ export const ICON_ZONE_TOP = 0.50;   // la colonne d'icônes commence à mi-haut
 export const CAPTION_TAP_X = 0.170; // fraction de largeur (bord gauche caption)
 export const CAPTION_TAP_Y = 0.888; // fraction de hauteur (ligne « … plus »)
 
+// PASTILLE DE PROFIL (Cyrille 2026-06-24) : avatar @lecorpsnetrichejamais + anneau
+// dégradé « story Instagram », overlay GLOBAL haut-gauche (tous formats, toute la
+// durée). Tout en PROPORTIONS de la composition → responsive. Alignée en hauteur sur
+// le handle déjà incrusté dans le fond (centré ~12 %) → en-tête « avatar + @handle ».
+// Reste AU-DESSUS des safe zones de texte (court 0.17 / long 0.155) : pas de
+// chevauchement avec le texte (bas pastille ≈ 0.085 + 0.0625 ≈ 0.147).
+export const BADGE = {
+  sizeRatio: 0.115, // diamètre extérieur (anneau compris) / largeur — ≈124 px @1080
+  ringRatio: 0.05,  // épaisseur de l'anneau dégradé / diamètre extérieur
+  gapRatio: 0.022,  // liseré sombre anneau↔photo / diamètre extérieur
+  leftRatio: 0.05,  // marge gauche / largeur
+  topRatio: 0.085,  // bord haut / hauteur (centre pastille ≈ hauteur du handle)
+};
+
 export const BACKGROUND_DURATION_SEC = 29;
 export const BACKGROUND_DURATION_FRAMES = Math.round(BACKGROUND_DURATION_SEC * FPS);
 

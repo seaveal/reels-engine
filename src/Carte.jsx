@@ -1,6 +1,7 @@
-import { AbsoluteFill, staticFile } from 'remotion';
+import { AbsoluteFill, staticFile, useVideoConfig } from 'remotion';
 import { FONT_FAMILY, COLORS } from './constants.js';
 import { parseInline } from './highlight.js';
+import { ProfileBadge } from './ProfileBadge.jsx';
 
 // Carte illustrative pour articles FB/Circle (ADR Cyrille 2026-06-21 : « 3 images
 // qui illustrent l'article », forme = cartes texte Remotion). Format carré
@@ -36,9 +37,12 @@ export const Carte = ({ text = 'EXEMPLE DE [[CARTE]]', handle = '@CyrilleNovou' 
   const stripped = raw.replace(/\[\[([^\]]+)\]\]/g, '$1');
   const fontSize = fontSizeFor(stripped.length);
   const pieces = parseInline(raw);
+  const { width, height } = useVideoConfig();
   return (
     <AbsoluteFill style={{ backgroundColor: TERRACOTTA }}>
       <style>{OSWALD_FONT_FACE}</style>
+      {/* Pastille harmonisée charte carte : anneau crème, liseré terracotta (fond). */}
+      <ProfileBadge width={width} height={height} ring={COLORS.cream} gapColor={TERRACOTTA} />
       {/* liseré haut discret (accent marque) */}
       <div style={{ position: 'absolute', top: 64, left: '50%', transform: 'translateX(-50%)',
         width: 84, height: 6, borderRadius: 3, backgroundColor: COLORS.cream, opacity: 0.85 }} />

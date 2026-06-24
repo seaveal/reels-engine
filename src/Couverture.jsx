@@ -1,6 +1,7 @@
-import { AbsoluteFill, staticFile } from 'remotion';
+import { AbsoluteFill, staticFile, useVideoConfig } from 'remotion';
 import { loadFont as loadLora } from '@remotion/google-fonts/Lora';
 import { parseInline } from './highlight.js';
+import { ProfileBadge } from './ProfileBadge.jsx';
 
 // Couverture de Reel Instagram (still PNG 1080×1920) — charte « L'Écho Incarné »
 // (philosophie-echo-incarne.md). Sert de cover_url à la publication, et de
@@ -49,9 +50,12 @@ export const Couverture = ({
   const stripped = raw.replace(/\[\[([^\]]+)\]\]/g, '$1');
   const size = hookSize(stripped.length);
   const pieces = parseInline(raw);
+  const { width, height } = useVideoConfig();
   return (
     <AbsoluteFill style={{ backgroundColor: CREME }}>
       <style>{OSWALD_FONT_FACE}</style>
+      {/* Pastille harmonisée charte « L'Écho Incarné » : anneau terracotta, liseré crème (fond). */}
+      <ProfileBadge width={width} height={height} ring={TERRA} gapColor={CREME} />
 
       {/* Repères safe-zone 3:4 (debug, désactivable) : la grille IG croppe 1080×1440 centré. */}
       {safezone && (

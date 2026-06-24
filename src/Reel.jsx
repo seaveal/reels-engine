@@ -5,6 +5,7 @@ import { PageStack } from './PageStack.jsx';
 import { ListPage } from './ListPage.jsx';
 import { HandEmoji } from './HandEmoji.jsx';
 import { LegendCta } from './LegendCta.jsx';
+import { ProfileBadge } from './ProfileBadge.jsx';
 import { safeBox, safeBoxLong, COLORS, STAGGER_LEAD_IN_SEC, STAGGER_GAP_SEC, ALL_AT_ONCE_DELAY_SEC, FPS, FADE_SEC, HAND_EMOJI_DELAY_AFTER_LAST_SEC, computePageHoldFrames, CAPTION_TAP_X, CAPTION_TAP_Y } from './constants.js';
 import { normaliseSegments } from './segments.js';
 import { normalisePages } from './pages.js';
@@ -53,6 +54,7 @@ export const Reel = (props) => {
       <AbsoluteFill style={{ backgroundColor: COLORS.black }}>
         <style dangerouslySetInnerHTML={{ __html: OSWALD_FONT_FACE }} />
         <Background name={props.background} />
+        <ProfileBadge width={width} height={height} />
         <Series>
           {pages.map((page, i) => (
             <Series.Sequence key={i} durationInFrames={holdFrames[i] ?? 1}>
@@ -76,6 +78,7 @@ export const Reel = (props) => {
       <AbsoluteFill style={{ backgroundColor: COLORS.black }}>
         <style dangerouslySetInnerHTML={{ __html: OSWALD_FONT_FACE }} />
         <Background name={props.background} />
+        <ProfileBadge width={width} height={height} />
         <Series>
           {pages.map((page, i) => (
             <Series.Sequence
@@ -123,6 +126,7 @@ export const Reel = (props) => {
     <AbsoluteFill style={{ backgroundColor: COLORS.black }}>
       <style dangerouslySetInnerHTML={{ __html: OSWALD_FONT_FACE }} />
       <Background name={props.background} />
+      <ProfileBadge width={width} height={height} />
       <TextStack segments={segments} reveal={props.reveal} safe={textSafe} />
       {ctaText && (
         <LegendCta text={ctaText} zone={legendZone} target={captionTarget} startSec={lastSegStartSec + FADE_SEC} />
