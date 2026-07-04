@@ -3,6 +3,7 @@ import { FPS, HEIGHT, WIDTH, computeDurationFrames } from './constants.js';
 import { Reel } from './Reel.jsx';
 import { Carte } from './Carte.jsx';
 import { Couverture } from './Couverture.jsx';
+import { Slide } from './Slide.jsx';
 
 export const RemotionRoot = () => (
   <>
@@ -38,6 +39,16 @@ export const RemotionRoot = () => (
       width={1080}
       height={1080}
       defaultProps={{ text: 'EXEMPLE DE [[CARTE]]', handle: '@CyrilleNovou' }}
+    />
+    {/* Slide de carrousel IG (still PNG 1080×1350, 4:5) — chantier 3 contenu v2. */}
+    <Composition
+      id="Slide"
+      component={Slide}
+      durationInFrames={1}
+      fps={FPS}
+      width={1080}
+      height={1350}
+      defaultProps={{ text: 'EXEMPLE DE [[SLIDE]]', index: 1, total: 8, badge: true, handle: '@CyrilleNovou' }}
     />
     {/* Couverture de Reel IG (still PNG 1080×1920) — charte « L'Écho Incarné ». */}
     <Composition
