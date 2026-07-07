@@ -35,5 +35,5 @@ export const TYPE = {
   hookBody:  { fontSize: 72,  lineHeight: 1.16, letterSpacing: '-0.01em', fontWeight: 400 },
   hookCta:   { fontSize: 82,  lineHeight: 1.08, fontWeight: 400 },
   sub:       { fontSize: 44,  lineHeight: 1.4,  fontWeight: 400 }, // souffle (souvent en italique)
-  cta:       { fontSize: 24,  letterSpacing: '0.18em', textTransform: 'uppercase' as const }, // renvoi légende, mono terracotta
+  cta:       { fontSize: 34,  letterSpacing: '0.18em', textTransform: 'uppercase' as const, fontWeight: 700 }, // renvoi légende, mono terracotta — 24->34 + gras (Cyrille 2026-07-07 : illisible en petit)
 } as const;
