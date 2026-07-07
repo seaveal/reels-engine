@@ -52,6 +52,10 @@ const DEFAULT_PHOTO = '../uploads/cyrille-novou-new-ok.jpg';
 const esc = (s='') => s.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 // [[mot]] -> présence terracotta italique (l'unique voix qui bascule)
 const pivot = (s='') => esc(s).replace(/\[\[([^\]]+)\]\]/g, '<span class="pivot">$1</span>');
+// Eyebrow de marque (Cyrille 2026-07-07) : l'URL du site, SOUVERAIN + QUOTIDIEN en
+// terracotta. HTML brut (non échappé) — le handle @lecorpsnetrichejamais reste en pied.
+const BRAND_EYEBROW = '<span style="color:var(--terra)">SOUVERAIN</span>AU<span style="color:var(--terra)">QUOTIDIEN</span>.COM';
+const eyebrowHtml = (v) => v ? esc(v) : BRAND_EYEBROW;
 const num = (i, t) => String(i ?? 1).padStart(2,'0') + ' / ' + String(t ?? 9).padStart(2,'0');
 const pastille = (size, photo) => {
   const pad1 = Math.round(size*0.045), pad2 = Math.round(size*0.035);
@@ -67,7 +71,7 @@ const echoDots = () => `<div class="echo">
 // ------------------------------------------------------------------ variantes
 function buildCover(s){
   return `<div class="row">
-    <div><div class="eyebrow">${esc(s.eyebrow||'@lecorpsnetrichejamais')}</div>
+    <div><div class="eyebrow">${eyebrowHtml(s.eyebrow)}</div>
          <div class="mono num">${num(s.index,s.total)}</div></div>
     ${pastille(200, s.photo)}
   </div>
@@ -92,7 +96,7 @@ function buildBody(s){
     <span class="tag">Suite →</span></div>`;
 }
 function buildCta(s){
-  return `<span class="eyebrow" style="align-self:stretch">${esc(s.eyebrow||'@lecorpsnetrichejamais')}</span>
+  return `<span class="eyebrow" style="align-self:stretch">${eyebrowHtml(s.eyebrow)}</span>
   <div>
     <div style="margin-bottom:56px">${pastille(206, s.photo)}</div>
     <div class="hook cta">${pivot(s.text)}</div>
