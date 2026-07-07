@@ -55,6 +55,11 @@ if (!spec.segments && Array.isArray(spec.pages)) {
   }).filter(s => s.text);
 }
 
+if (!Array.isArray(spec.segments) || !spec.segments.length) {
+  console.error(`✗ spec sans segments ni pages exploitables : ${specPath}`);
+  process.exit(2);
+}
+
 // Même loi que la page : caractères ÷ 27, borné 4–26 s
 const holdMs = seg => Math.min(26, Math.max(4, seg.text.replace(/\[\[|\]\]/g, '').length / 27)) * 1000;
 const totalMs = spec.segments.reduce((a, s) => a + holdMs(s), 0);
@@ -88,7 +93,10 @@ for (const platform of platforms) {
     const mp4 = webm.replace(/\.webm$/, '.mp4');
     const r = spawnSync('ffmpeg', ['-y', '-i', webm, '-c:v', 'libx264', '-pix_fmt', 'yuv420p',
       '-r', '30', '-movflags', '+faststart', '-an', mp4], { stdio: 'ignore' });
-    console.log(r.status === 0 ? `✓ ${mp4}` : `✗ conversion mp4 échouée, webm conservé : ${webm}`);
+    if (r.status !== 0) {
+      process.exitCode = 1; // le pipeline attend les .mp4 : échec ffmpeg = run en échec (2026-07-07)
+      console.error(`✗ conversion mp4 échouée, webm conservé : ${webm}`);
+    } else console.log(`✓ ${mp4}`);
   } else {
     console.log(`✓ ${webm}  (mp4 : ffmpeg -i "${webm}" -c:v libx264 -pix_fmt yuv420p -movflags +faststart out.mp4)`);
   }

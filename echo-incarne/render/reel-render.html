@@ -3,9 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>Écho Incarné — rendu réel vidéo (headless)</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Archivo:wght@500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="../fonts/echo-incarne-fonts.css" rel="stylesheet"><!-- polices vendorées (audit 2026-07-07), plus de dépendance réseau -->
 <style>
   :root{
     --creme:#F0E7D6; --terra:#A8432B; --terraNuit:#D9714E; --encre:#2A211A;
@@ -115,14 +113,21 @@ window.loadReel = function(spec, opts = {}) {
 
 // =============================================================== lecture
 function showSegment(i) {
-  const { spec, T } = CFG;
+  const { spec, T, Z } = CFG;
   const seg = spec.segments[i];
   const isCta = seg.role === 'cta';
   const displaySeg = isCta ? spec.segments[Math.max(0, i - 1)] : seg;
   const isTitle = displaySeg.role === 'title';
   const page = document.getElementById('page');
   if (!isCta) {
-    page.innerHTML = `<div style="font-family:var(--serif);font-weight:${isTitle?500:400};font-size:${isTitle?116:84}px;line-height:${isTitle?1.05:1.2};letter-spacing:${isTitle?'-0.01em':'0'};opacity:${isTitle?1:.92};animation:eiRise .8s ease both;">${pivot(displaySeg.text, T.accent)}</div>`;
+    page.innerHTML = `<div style="font-family:var(--serif);font-weight:${isTitle?500:400};font-size:${isTitle?116:84}px;line-height:${isTitle?1.05:1.2};letter-spacing:${isTitle?'-0.01em':'0'};opacity:${isTitle?1:.92};animation:eiRise .8s ease both;white-space:pre-line;">${pivot(displaySeg.text, T.accent)}</div>`;
+    // Auto-fit (fix réels longs, audit 2026-07-07) : les pages denses des specs
+    // `layout: long` (plusieurs lignes concaténées) débordaient de la safe zone à
+    // fonte fixe. Rétrécit jusqu'à tenir dans la zone utile (chrome + CTA réservés).
+    const el = page.firstElementChild;
+    const avail = 1920 - Z.top - Z.bottom - 340;
+    let fs = isTitle ? 116 : 84;
+    while (el.scrollHeight > avail && fs > 44) { fs -= 4; el.style.fontSize = fs + 'px'; }
   }
   const cta = document.getElementById('ctaRow');
   cta.style.opacity = isCta ? '1' : '0';
