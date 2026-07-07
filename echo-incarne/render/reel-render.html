@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Écho Incarné — rendu réel vidéo (headless)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Archivo:wght@500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --creme:#F0E7D6; --terra:#A8432B; --terraNuit:#D9714E; --encre:#2A211A;
+    --serif:'Cormorant Garamond',serif; --sans:'Archivo',sans-serif; --mono:'IBM Plex Mono',monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{background:#000;}
+  #stage{width:1080px;height:1920px;position:relative;overflow:hidden;}
+  @keyframes eiDrift{0%{transform:translate(-8%,-6%) scale(1.15);}50%{transform:translate(8%,6%) scale(1.35);}100%{transform:translate(-8%,-6%) scale(1.15);}}
+  @keyframes eiRipple{0%{transform:translate(-50%,-50%) scale(.32);opacity:0;}16%{opacity:1;}100%{transform:translate(-50%,-50%) scale(2.7);opacity:0;}}
+  @keyframes eiGrain{0%{transform:translate(0,0);}100%{transform:translate(-7%,5%);}}
+  @keyframes eiRise{0%{opacity:0;transform:translateY(30px);}100%{opacity:1;transform:translateY(0);}}
+  .ripple{position:absolute;left:50%;top:43%;width:940px;height:940px;border-radius:50%;border:2px solid;animation:eiRipple 13s linear infinite;}
+</style>
+</head>
+<body>
+  <div id="stage"></div>
+
+<script>
+// =============================================================== thèmes & plateformes
+const THEMES = {
+  papier: { bg:'#ECE3D0', text:'#2A211A', glow:'rgba(255,248,235,.85)', echo:'rgba(168,67,43,.16)', gb:'multiply',  grainOp:0.10, accent:'#A8432B' },
+  nuit:   { bg:'#1B1510', text:'#F0E7D6', glow:'rgba(168,67,43,.42)',   echo:'rgba(217,113,78,.20)', gb:'soft-light', grainOp:0.16, accent:'#D9714E' },
+};
+// Safe zones 2026 (organique). Légende = bas-GAUCHE sur les 3 plateformes.
+// - instagram : UI haut ~250px, légende/actions ~500px bas, rail droit ~160px.
+//   CTA aligné à droite (design validé), flèche ↓ à gauche de la capsule.
+// - tiktok : haut ~150px, bas ~480px (légende + musique), rail droit ~164px.
+//   CTA aligné à GAUCHE, flèche ↓ à l'extrême gauche, pointée vers la légende.
+// - youtube (Shorts) : rail droit ~192px (le plus large), bas ~450px (titre chaîne +
+//   musique + gros bouton s'abonner bas-gauche). CTA aligné à GAUCHE, flèche ↓ à gauche.
+const PLATFORMS = {
+  instagram: { top:280, right:180, bottom:550, left:104, ctaAlign:'flex-end',   arrow:'down-left',  cta:"D'où ça vient — en légende",     label:'Instagram Reels' },
+  tiktok:    { top:280, right:184, bottom:560, left:104, ctaAlign:'flex-start', arrow:'down-left',  cta:"D'où ça vient — en légende",     label:'TikTok' },
+  // YouTube Shorts : la DESCRIPTION s'ouvre en HAUT À DROITE -> flèche ↑ à droite de la capsule
+  youtube:   { top:300, right:212, bottom:530, left:104, ctaAlign:'flex-end',   arrow:'up-right',   cta:"D'où ça vient — en description", label:'YouTube Shorts' },
+};
+const PHOTO = '../uploads/cyrille-novou-new-ok.jpg';
+const GRAIN = 'data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20width=%22180%22%20height=%22180%22%3E%3Cfilter%20id=%22n%22%3E%3CfeTurbulence%20type=%22fractalNoise%22%20baseFrequency=%220.85%22%20numOctaves=%222%22%20stitchTiles=%22stitch%22%2F%3E%3C%2Ffilter%3E%3Crect%20width=%22100%25%22%20height=%22100%25%22%20filter=%22url%28%23n%29%22%2F%3E%3C%2Fsvg%3E';
+
+const esc = (s='') => s.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const pivot = (s, accent) => esc(s).replace(/\[\[([^\]]+)\]\]/g,
+  `<span style="color:${accent};font-style:italic">$1</span>`);
+
+// Loi moteur : caractères ÷ 27 s, borné 4–26 s
+const holdMs = seg => Math.min(26, Math.max(4, seg.text.replace(/\[\[|\]\]/g,'').length / 27)) * 1000;
+
+let CFG = null; // {spec, theme, platform, T, Z}
+
+// =============================================================== mise en place
+window.loadReel = function(spec, opts = {}) {
+  const T = THEMES[opts.theme || 'papier'] || THEMES.papier;
+  const Z = PLATFORMS[opts.platform || 'instagram'] || PLATFORMS.instagram;
+  CFG = { spec, T, Z, guides: !!opts.guides };
+  // Libellé CTA : donné par le JSON (segment role=cta), parenthèses retirées.
+  // Sur YouTube, la légende s'appelle « description » -> adaptation mécanique.
+  const ctaSeg = (spec.segments || []).find(s => s.role === 'cta');
+  let ctaLabel = ctaSeg ? ctaSeg.text.replace(/^\s*\(|\)\s*$/g, '').replace(/\[\[|\]\]/g, '') : Z.cta;
+  if ((opts.platform || 'instagram') === 'youtube') ctaLabel = ctaLabel.replace(/l[ée]gende/gi, 'DESCRIPTION');
+  const handleHtml = `@le<span style="color:${T.accent}">corps</span>ne<span style="color:${T.accent}">triche</span>jamais`;
+
+  document.getElementById('stage').innerHTML = `
+    <div style="position:absolute;inset:0;background:${T.bg}"></div>
+    <div style="position:absolute;inset:-20%;background:radial-gradient(circle at 50% 43%, ${T.glow}, transparent 62%);animation:eiDrift 26s ease-in-out infinite;"></div>
+    ${[0,3.25,6.5,9.75].map(d=>`<div class="ripple" style="border-color:${T.echo};animation-delay:${d}s"></div>`).join('')}
+    <div style="position:absolute;inset:-10%;background-image:url(${GRAIN});background-size:190px 190px;opacity:${T.grainOp};mix-blend-mode:${T.gb};animation:eiGrain 7s steps(6) infinite;pointer-events:none;"></div>
+
+    <div style="position:absolute;inset:0;padding:${Z.top}px ${Z.right}px ${Z.bottom}px ${Z.left}px;display:flex;flex-direction:column;justify-content:space-between;color:${T.text};">
+      <div style="display:flex;align-items:center;gap:30px;animation:eiRise .9s ease both;">
+        <div style="width:112px;height:112px;border-radius:50%;background:${T.accent};padding:6px;flex:none;">
+          <div style="width:100%;height:100%;border-radius:50%;background:${T.bg};padding:5px;">
+            <img src="${PHOTO}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;filter:grayscale(1) contrast(1.02);display:block;">
+          </div>
+        </div>
+        <div style="font-family:var(--mono);font-size:30px;letter-spacing:.18em;text-transform:uppercase;opacity:.9;">${handleHtml}</div>
+      </div>
+
+      <div id="page" style="min-height:640px;display:flex;flex-direction:column;justify-content:center;"></div>
+
+      <div id="ctaRow" style="display:flex;align-items:flex-start;justify-content:${Z.ctaAlign};gap:34px;opacity:0;transform:translateY(36px);transition:opacity .7s ease, transform .7s ease;">
+        ${Z.arrow==='up-right' ? '' : `<div style="font-size:72px;line-height:1;color:${T.accent};transform:translateY(52px);">↓</div>`}
+        <div id="ctaCapsule" style="display:inline-flex;align-items:center;background:${T.accent};color:#F5EDDD;border-radius:999px;padding:32px 54px;font-family:var(--mono);font-size:36px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;box-shadow:0 12px 44px rgba(0,0,0,.22);">${esc(ctaLabel)}</div>
+        ${Z.arrow==='up-right' ? `<div style="font-size:72px;line-height:1;color:${T.accent};transform:translateY(-46px);">↑</div>` : ''}
+      </div>
+    </div>
+
+    ${CFG.guides ? `<div style="position:absolute;inset:0;pointer-events:none;font-family:var(--mono);color:rgba(255,84,60,.85);">
+      <div style="position:absolute;left:0;right:0;top:${Z.top-30}px;border-top:2px dashed rgba(255,84,60,.6)"></div>
+      <div style="position:absolute;left:0;right:0;bottom:${Z.bottom-30}px;border-top:2px dashed rgba(255,84,60,.6)"></div>
+      <div style="position:absolute;top:${Z.top-30}px;bottom:${Z.bottom-30}px;right:${Z.right-20}px;border-right:2px dashed rgba(255,84,60,.6)"></div>
+      <div style="position:absolute;top:${Z.top-72}px;left:${Z.left}px;font-size:24px;">${Z.label} — safe zone</div>
+    </div>` : ''}`;
+  // Auto-fit capsule CTA (fix 2026-07-07) : les libellés longs venant du segment cta
+  // du spec (« LA SOLUTION EST DANS LA DESCRIPTION ») débordaient de la safe zone.
+  // Fonte 36 -> 20 px puis letter-spacing/padding réduits jusqu'à tenir dans la
+  // zone utile (largeur - marges plateforme - flèche - gap).
+  const capsule = document.getElementById('ctaCapsule');
+  if (capsule) {
+    const zone = 1080 - Z.left - Z.right - (72 + 34);
+    let fs = 36;
+    while (capsule.scrollWidth > zone && fs > 20) { fs -= 2; capsule.style.fontSize = fs + 'px'; }
+    if (capsule.scrollWidth > zone) capsule.style.letterSpacing = '.03em';
+    if (capsule.scrollWidth > zone) capsule.style.padding = '26px 34px';
+  }
+  return true;
+};
+
+// =============================================================== lecture
+function showSegment(i) {
+  const { spec, T } = CFG;
+  const seg = spec.segments[i];
+  const isCta = seg.role === 'cta';
+  const displaySeg = isCta ? spec.segments[Math.max(0, i - 1)] : seg;
+  const isTitle = displaySeg.role === 'title';
+  const page = document.getElementById('page');
+  if (!isCta) {
+    page.innerHTML = `<div style="font-family:var(--serif);font-weight:${isTitle?500:400};font-size:${isTitle?116:84}px;line-height:${isTitle?1.05:1.2};letter-spacing:${isTitle?'-0.01em':'0'};opacity:${isTitle?1:.92};animation:eiRise .8s ease both;">${pivot(displaySeg.text, T.accent)}</div>`;
+  }
+  const cta = document.getElementById('ctaRow');
+  cta.style.opacity = isCta ? '1' : '0';
+  cta.style.transform = isCta ? 'translateY(0)' : 'translateY(36px)';
+}
+
+window.reelDurationMs = spec => spec.segments.reduce((a, s) => a + holdMs(s), 0);
+
+window.playReel = async function() {
+  const { spec } = CFG;
+  for (let i = 0; i < spec.segments.length; i++) {
+    showSegment(i);
+    await new Promise(r => setTimeout(r, holdMs(spec.segments[i])));
+  }
+  return true;
+};
+
+// Aperçu manuel : ?d=<spec b64>&platform=&theme=&guides=1 — sinon démo en boucle
+(function(){
+  const q = new URLSearchParams(location.search);
+  let spec = null;
+  try { if (q.get('d')) spec = JSON.parse(decodeURIComponent(escape(atob(q.get('d'))))); } catch(e){}
+  spec = spec || { slug:'demo', segments:[
+    { role:'title', text:'CE QUE VOUS VOYEZ COMME UNE [[DISPUTE]].' },
+    { role:'block', text:'VOTRE CORPS LE VIT COMME UNE [[BLESSURE]] QUI SAIGNE ENCORE.' },
+    { role:'cta',   text:"(D'OÙ ÇA VIENT VRAIMENT, EN LÉGENDE)" },
+  ]};
+  window.loadReel(spec, { platform: q.get('platform') || 'instagram', theme: q.get('theme') || 'papier', guides: q.get('guides') === '1' });
+  if (!q.get('norun')) (async function loop(){ while(true){ await window.playReel(); } })();
+})();
+</script>
+</body>
+</html>
