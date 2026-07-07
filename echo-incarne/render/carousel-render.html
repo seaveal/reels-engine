@@ -96,7 +96,7 @@ function buildCta(s){
   <div>
     <div style="margin-bottom:56px">${pastille(206, s.photo)}</div>
     <div class="hook cta">${pivot(s.text)}</div>
-    ${s.sub?`<div class="sub italic">${esc(s.sub)}</div>`:''}
+    ${s.sub?`<div class="sub italic">${pivot(s.sub)}</div>`:''}
   </div>
   <div class="legend">${esc(s.legend||'La réponse est en légende')}</div>`;
 }
