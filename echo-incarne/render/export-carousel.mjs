@@ -42,9 +42,27 @@ const outDir = outArg || path.join('out', slug);
 await mkdir(outDir, { recursive: true });
 
 // Sépare "Phrase forte. Le souffle qui suit." -> {head, sub}
+// Bracket-aware (Cyrille 2026-07-07) : ne coupe JAMAIS à l'intérieur d'un bloc [[...]],
+// sinon la paire se scinde entre head et sub -> crochets bruts à l'écran (ex. un « . »
+// à l'intérieur d'une citation surlignée). Coupe au 1er point de rupture HORS crochets :
+// saut de paragraphe (\n\n) ou fin de phrase (.!?) + espace, selon ce qui vient en premier.
 function splitText(t) {
-  const m = t.match(/^(.*?[.!?])\s+(.+)$/s);
-  return m ? { head: m[1], sub: m[2] } : { head: t, sub: '' };
+  let depth = 0;
+  for (let i = 0; i < t.length; i++) {
+    if (t[i] === '[' && t[i + 1] === '[') { depth++; i++; continue; }
+    if (t[i] === ']' && t[i + 1] === ']') { depth = Math.max(0, depth - 1); i++; continue; }
+    if (depth > 0) continue;                       // dans un [[...]] -> jamais de coupe
+    const para = t.slice(i).match(/^\n\s*\n\s*/);  // saut de paragraphe
+    if (para) {
+      const sub = t.slice(i + para[0].length).trim();
+      if (sub) return { head: t.slice(0, i).trim(), sub };
+    }
+    if (/[.!?]/.test(t[i]) && /\s/.test(t[i + 1] || '')) {  // fin de phrase + espace
+      const sub = t.slice(i + 1).trim();
+      if (sub) return { head: t.slice(0, i + 1).trim(), sub };
+    }
+  }
+  return { head: t.trim(), sub: '' };
 }
 
 const raw = spec.slides || [];
