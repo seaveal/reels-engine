@@ -67,7 +67,7 @@ const echoDots = () => `<div class="echo">
 // ------------------------------------------------------------------ variantes
 function buildCover(s){
   return `<div class="row">
-    <div><div class="eyebrow">${esc(s.eyebrow||'Souverain au Quotidien')}</div>
+    <div><div class="eyebrow">${esc(s.eyebrow||'@lecorpsnetrichejamais')}</div>
          <div class="mono num">${num(s.index,s.total)}</div></div>
     ${pastille(200, s.photo)}
   </div>
@@ -92,7 +92,7 @@ function buildBody(s){
     <span class="tag">Suite →</span></div>`;
 }
 function buildCta(s){
-  return `<span class="eyebrow" style="align-self:stretch">${esc(s.eyebrow||'Souverain au Quotidien')}</span>
+  return `<span class="eyebrow" style="align-self:stretch">${esc(s.eyebrow||'@lecorpsnetrichejamais')}</span>
   <div>
     <div style="margin-bottom:56px">${pastille(206, s.photo)}</div>
     <div class="hook cta">${pivot(s.text)}</div>
@@ -118,7 +118,7 @@ window.renderSlide = function(data){
   if(p){ try{ window.renderSlide(JSON.parse(decodeURIComponent(escape(atob(p))))); return; }catch(e){} }
   window.renderSlide({variant:'cover', pilier:'Le mécanisme',
     text:"Une femme qui tolère l'insupportable a été [[dressée]].",
-    index:1, total:9, handle:'@souverainauquotidien'});
+    index:1, total:9, handle:'@lecorpsnetrichejamais'});
 })();
 </script>
 </body>
