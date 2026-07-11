@@ -65,28 +65,10 @@ function splitText(t) {
   return { head: t.trim(), sub: '' };
 }
 
-// Aération automatique (Cyrille 2026-07-11 : « les carrousels n'ont jamais de sauts
-// de ligne ») : un bloc SANS saut de ligne manuel est aéré à chaque fin de phrase —
-// chaque phrase devient un paragraphe (\n\n), rendu en respiration (.souffle) par
-// carousel-render.html. Bracket-aware ([[...]] jamais coupé) ; un texte déjà aéré à
-// la main (contient \n) n'est PAS retouché : la rédaction garde la main.
-function aerate(t) {
-  if (!t || t.includes('\n')) return t;
-  let out = '', depth = 0;
-  for (let i = 0; i < t.length; i++) {
-    const c = t[i];
-    out += c;
-    if (c === '[' && t[i + 1] === '[') { depth++; out += t[++i]; continue; }
-    if (c === ']' && t[i + 1] === ']') { depth = Math.max(0, depth - 1); out += t[++i]; continue; }
-    if (depth === 0 && /[.!?…]/.test(c) && /\s/.test(t[i + 1] || '')) {
-      let j = i + 1;
-      while (j < t.length && /\s/.test(t[j])) j++;
-      if (j < t.length) { out += '\n\n'; i = j - 1; }
-    }
-  }
-  return out;
-}
-
+// Le rendu est FIDÈLE au texte (Cyrille 2026-07-11 : « c'est à la rédaction qu'il
+// faut aérer, pas au rendering ») : les respirations sont les \n\n écrits par la
+// rédaction (gate « pavé sans respiration » côté pipeline), le rendu les affiche
+// (.souffle dans carousel-render.html) mais n'en invente jamais.
 const raw = spec.slides || [];
 const total = raw.length;
 const pilierLabel = spec.pilier ? (PILIER_LABELS[spec.pilier] || spec.pilier) : undefined;
@@ -94,10 +76,10 @@ const pilierLabel = spec.pilier ? (PILIER_LABELS[spec.pilier] || spec.pilier) : 
 const slides = raw.map((t, i) => {
   const { head, sub } = splitText(t);
   const base = { index: i + 1, total, handle: spec.handle, photo: spec.photo };
-  if (i === 0) return { ...base, variant: 'cover', text: aerate(t), pilier: pilierLabel };
+  if (i === 0) return { ...base, variant: 'cover', text: t, pilier: pilierLabel };
   if (i === total - 1)
-    return { ...base, variant: 'cta', text: head, sub: aerate(sub), legend: spec.legend || LEGENDS[i % LEGENDS.length] };
-  return { ...base, variant: 'body', text: head, sub: aerate(sub) };
+    return { ...base, variant: 'cta', text: head, sub, legend: spec.legend || LEGENDS[i % LEGENDS.length] };
+  return { ...base, variant: 'body', text: head, sub };
 });
 
 const here = path.dirname(fileURLToPath(import.meta.url));
