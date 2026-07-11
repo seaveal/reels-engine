@@ -28,6 +28,7 @@
   .hook.body{font-size:72px;line-height:1.16;letter-spacing:-.01em;}
   .hook.cta{font-size:82px;line-height:1.08;}
   .sub{font-size:44px;line-height:1.4;color:var(--encreSoft);margin-top:44px;}
+  .souffle{display:block;height:.55em;} /* respiration = saut de paragraphe (\n\n) */
   .sub.italic{font-family:var(--serif);font-style:italic;font-size:48px;color:var(--encreSoft);margin-top:36px;}
   .pivot{color:var(--terra);font-style:italic;}
   .echo{display:flex;gap:22px;align-items:center;margin-bottom:64px;}
@@ -51,12 +52,14 @@
 const DEFAULT_PHOTO = '../uploads/cyrille-novou-new-ok.jpg';
 const esc = (s='') => s.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 // [[mot]] -> présence terracotta italique (l'unique voix qui bascule)
-// esc -> [[surlignage]] -> saut de ligne éditeur (\n) = <br> (Cyrille 2026-07-07 :
-// un retour à la ligne tapé dans l'éditeur doit apparaître au rendu ; runs de \n collapsés
-// en UN seul <br>, espaces autour retirés).
+// esc -> [[surlignage]] -> sauts de ligne éditeur (Cyrille 2026-07-07, revu 2026-07-11 :
+// « les carrousels n'ont jamais de sauts de ligne ») : un saut de PARAGRAPHE (ligne
+// vide, ≥ 2 \n) devient une vraie respiration (.souffle, gap vertical), un simple \n
+// devient un <br>. Avant, tout était collapsé en UN <br> sans aération.
 const pivot = (s='') => esc(s)
   .replace(/\[\[([^\]]+)\]\]/g, '<span class="pivot">$1</span>')
-  .replace(/[ \t]*\n(?:[ \t]*\n)*[ \t]*/g, '<br>');
+  .replace(/[ \t]*\n(?:[ \t]*\n)+[ \t]*/g, '<span class="souffle"></span>')
+  .replace(/[ \t]*\n[ \t]*/g, '<br>');
 // Eyebrow de marque (Cyrille 2026-07-07) : l'URL du site, SOUVERAIN + QUOTIDIEN en
 // terracotta. HTML brut (non échappé) — le handle @lecorpsnetrichejamais reste en pied.
 const BRAND_EYEBROW = '<span style="color:var(--terra)">SOUVERAIN</span>AU<span style="color:var(--terra)">QUOTIDIEN</span>.COM';
