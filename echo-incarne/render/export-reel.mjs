@@ -55,14 +55,23 @@ if (!spec.segments && Array.isArray(spec.pages)) {
   }).filter(s => s.text);
 }
 
-if (!Array.isArray(spec.segments) || !spec.segments.length) {
+const isMessage = spec.layout === 'message';
+if (!isMessage && (!Array.isArray(spec.segments) || !spec.segments.length)) {
   console.error(`✗ spec sans segments ni pages exploitables : ${specPath}`);
+  process.exit(2);
+}
+if (isMessage && !Array.isArray(spec.messages)) {
+  console.error(`✗ spec layout:message sans tableau messages : ${specPath}`);
   process.exit(2);
 }
 
 // Même loi que la page : caractères ÷ 27, borné 4–26 s
 const holdMs = seg => Math.min(26, Math.max(4, seg.text.replace(/\[\[|\]\]/g, '').length / 27)) * 1000;
-const totalMs = spec.segments.reduce((a, s) => a + holdMs(s), 0);
+// layout:message — durée = frappe + lecture par bulle (miroir de reel-render.html) + CTA.
+const msgReadMs = t => Math.min(4200, Math.max(1300, String(t || '').length / 22 * 1000));
+const totalMs = isMessage
+  ? spec.messages.reduce((a, m) => a + 650 + msgReadMs(m.text), 0) + 1600
+  : spec.segments.reduce((a, s) => a + holdMs(s), 0);
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const pageUrl = pathToFileURL(path.join(here, 'reel-render.html')).href + '?norun=1';
@@ -70,7 +79,11 @@ const pageUrl = pathToFileURL(path.join(here, 'reel-render.html')).href + '?noru
 const hasFfmpeg = spawnSync('ffmpeg', ['-version'], { stdio: 'ignore' }).status === 0;
 const browser = await chromium.launch();
 
-for (const platform of platforms) {
+// Rendu d'UNE plateforme (contexte + enregistrement + conversion mp4). Isolé pour pouvoir
+// exécuter les plateformes EN PARALLÈLE (fix masse 2026-07-15) : l'enregistrement est en temps
+// réel (~la durée du réel), or c'était fait 3× en SÉQUENTIEL → ~2min40/réel. En parallèle
+// (contextes indépendants, même navigateur), un réel passe à ~la durée d'UNE plateforme (×3).
+async function renderPlatform(platform) {
   const ctx = await browser.newContext({
     viewport: { width: 1080, height: 1920 },
     deviceScaleFactor: 1,
@@ -102,5 +115,12 @@ for (const platform of platforms) {
   }
 }
 
+// Plateformes en parallèle. Un échec de plateforme n'arrête pas les autres (exitCode posé,
+// run marqué en échec) — le pipeline attend les 3 mp4.
+await Promise.all(platforms.map(p => renderPlatform(p).catch(e => {
+  process.exitCode = 1;
+  console.error(`✗ ${p} : ${(e && e.message) || e}`);
+})));
+
 await browser.close();
-console.log(`Durée séquence : ${(totalMs / 1000).toFixed(1)} s (${spec.segments.length} segments, loi caractères÷27 bornée 4–26 s)`);
+console.log(`Durée séquence : ${(totalMs / 1000).toFixed(1)} s (${isMessage ? spec.messages.length + ' bulles' : spec.segments.length + ' segments'}, loi caractères÷27 bornée 4–26 s)`);

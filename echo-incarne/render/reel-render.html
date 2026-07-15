@@ -17,6 +17,9 @@
   @keyframes eiGrain{0%{transform:translate(0,0);}100%{transform:translate(-7%,5%);}}
   @keyframes eiRise{0%{opacity:0;transform:translateY(30px);}100%{opacity:1;transform:translateY(0);}}
   .ripple{position:absolute;left:50%;top:43%;width:940px;height:940px;border-radius:50%;border:2px solid;animation:eiRipple 13s linear infinite;}
+  /* Mode message reconstitué (layout:message) — bulles de conversation */
+  @keyframes eiTdot{0%,80%,100%{opacity:.3;transform:translateY(0);}40%{opacity:1;transform:translateY(-7px);}}
+  .tdot{width:16px;height:16px;border-radius:50%;background:#F5EDDD;display:inline-block;animation:eiTdot 1s infinite;}
 </style>
 </head>
 <body>
@@ -61,7 +64,10 @@ window.loadReel = function(spec, opts = {}) {
   // Libellé CTA : donné par le JSON (segment role=cta), parenthèses retirées.
   // Sur YouTube, la légende s'appelle « description » -> adaptation mécanique.
   const ctaSeg = (spec.segments || []).find(s => s.role === 'cta');
-  let ctaLabel = ctaSeg ? ctaSeg.text.replace(/^\s*\(|\)\s*$/g, '').replace(/\[\[|\]\]/g, '') : Z.cta;
+  // layout:message n'a pas de segment cta — la ligne CTA vient de spec.cta.
+  let ctaLabel = spec.layout === 'message'
+    ? String(spec.cta || Z.cta).replace(/^\s*\(|\)\s*$/g, '').replace(/\[\[|\]\]/g, '')
+    : (ctaSeg ? ctaSeg.text.replace(/^\s*\(|\)\s*$/g, '').replace(/\[\[|\]\]/g, '') : Z.cta);
   if ((opts.platform || 'instagram') === 'youtube') ctaLabel = ctaLabel.replace(/l[ée]gende/gi, 'DESCRIPTION');
   const handleHtml = `@le<span style="color:${T.accent}">corps</span>ne<span style="color:${T.accent}">triche</span>jamais`;
 
@@ -108,8 +114,47 @@ window.loadReel = function(spec, opts = {}) {
     if (capsule.scrollWidth > zone) capsule.style.letterSpacing = '.03em';
     if (capsule.scrollWidth > zone) capsule.style.padding = '26px 34px';
   }
+  if (spec.layout === 'message') buildMessageChat(spec, T);
   return true;
 };
+
+// =============================================================== mode message (bulles)
+const msgList = spec => spec.messages || (spec.reel_json && spec.reel_json.messages) || [];
+// Zone chat : hook (haut) + bulles empilées collées en bas (les plus récentes visibles).
+function buildMessageChat(spec, T) {
+  const page = document.getElementById('page');
+  page.style.flex = '1';
+  page.style.minHeight = '0';
+  page.style.justifyContent = 'flex-start';
+  page.innerHTML =
+    `<div id="msgHook" style="font-family:var(--sans);font-weight:800;font-size:60px;line-height:1.1;letter-spacing:-.01em;text-transform:uppercase;color:${T.text};margin-bottom:44px;animation:eiRise .8s ease both;">${pivot(spec.hook || '', T.accent)}</div>` +
+    `<div id="msgChat" style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;gap:24px;overflow:hidden;"></div>`;
+  const hook = document.getElementById('msgHook');
+  let fs = 60;
+  while (hook.scrollHeight > 340 && fs > 34) { fs -= 4; hook.style.fontSize = fs + 'px'; }
+}
+
+function msgBubbleHtml(m, T) {
+  const out = m.side === 'out';
+  const bg = out ? T.accent : '#5E5449';
+  const tail = out ? 'border-bottom-right-radius:10px' : 'border-bottom-left-radius:10px';
+  const time = m.time ? `<div style="font-family:var(--mono);font-size:22px;color:${T.text};opacity:.5;margin:8px 12px 0;text-align:${out ? 'right' : 'left'}">${esc(m.time)}</div>` : '';
+  return `<div style="display:flex;justify-content:${out ? 'flex-end' : 'flex-start'};animation:eiRise .45s ease both;">
+    <div style="max-width:80%;">
+      <div style="background:${bg};color:#F5EDDD;font-family:var(--sans);font-size:42px;line-height:1.26;padding:24px 34px;border-radius:36px;${tail};word-break:break-word;box-shadow:0 6px 22px rgba(0,0,0,.14);">${esc(m.text)}</div>${time}
+    </div></div>`;
+}
+function msgTypingHtml(side, T) {
+  const out = side === 'out';
+  const bg = out ? T.accent : '#5E5449';
+  return `<div style="display:flex;justify-content:${out ? 'flex-end' : 'flex-start'};animation:eiRise .25s ease both;">
+    <div style="background:${bg};border-radius:36px;padding:28px 34px;display:flex;gap:14px;align-items:center;">
+      <span class="tdot"></span><span class="tdot" style="animation-delay:.18s"></span><span class="tdot" style="animation-delay:.36s"></span>
+    </div></div>`;
+}
+const msgWait = ms => new Promise(r => setTimeout(r, ms));
+const MSG_TYPING_MS = 650;
+const msgReadMs = t => Math.min(4200, Math.max(1300, String(t).length / 22 * 1000));
 
 // =============================================================== lecture
 function showSegment(i) {
@@ -134,10 +179,34 @@ function showSegment(i) {
   cta.style.transform = isCta ? 'translateY(0)' : 'translateY(36px)';
 }
 
-window.reelDurationMs = spec => spec.segments.reduce((a, s) => a + holdMs(s), 0);
+window.reelDurationMs = spec => spec.layout === 'message'
+  ? msgList(spec).reduce((a, m) => a + MSG_TYPING_MS + msgReadMs(m.text), 0) + 1600
+  : spec.segments.reduce((a, s) => a + holdMs(s), 0);
+
+// Joue la conversation : pour chaque message, indicateur de frappe « ●●● » du bon côté
+// puis apparition de la bulle (fondu + montée), accumulation en bas. CTA après la dernière.
+window.playMessageReel = async function() {
+  const { spec, T } = CFG;
+  const chat = document.getElementById('msgChat');
+  if (!chat) return true;
+  chat.innerHTML = '';
+  for (const m of msgList(spec)) {
+    chat.insertAdjacentHTML('beforeend', msgTypingHtml(m.side, T));
+    const typing = chat.lastElementChild;
+    await msgWait(MSG_TYPING_MS);
+    typing.remove();
+    chat.insertAdjacentHTML('beforeend', msgBubbleHtml(m, T));
+    await msgWait(msgReadMs(m.text));
+  }
+  const cta = document.getElementById('ctaRow');
+  if (cta) { cta.style.opacity = '1'; cta.style.transform = 'translateY(0)'; }
+  await msgWait(1600);
+  return true;
+};
 
 window.playReel = async function() {
   const { spec } = CFG;
+  if (spec.layout === 'message') return window.playMessageReel();
   for (let i = 0; i < spec.segments.length; i++) {
     showSegment(i);
     await new Promise(r => setTimeout(r, holdMs(spec.segments[i])));
