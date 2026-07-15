@@ -56,7 +56,9 @@ if (!spec.segments && Array.isArray(spec.pages)) {
 }
 
 const isMessage = spec.layout === 'message';
-if (!isMessage && (!Array.isArray(spec.segments) || !spec.segments.length)) {
+const isConfrontation = spec.layout === 'confrontation';
+const isStructured = isMessage || isConfrontation;
+if (!isStructured && (!Array.isArray(spec.segments) || !spec.segments.length)) {
   console.error(`✗ spec sans segments ni pages exploitables : ${specPath}`);
   process.exit(2);
 }
@@ -64,13 +66,20 @@ if (isMessage && !Array.isArray(spec.messages)) {
   console.error(`✗ spec layout:message sans tableau messages : ${specPath}`);
   process.exit(2);
 }
+if (isConfrontation && !(spec.top && spec.bottom)) {
+  console.error(`✗ spec layout:confrontation sans top/bottom : ${specPath}`);
+  process.exit(2);
+}
 
 // Même loi que la page : caractères ÷ 27, borné 4–26 s
 const holdMs = seg => Math.min(26, Math.max(4, seg.text.replace(/\[\[|\]\]/g, '').length / 27)) * 1000;
-// layout:message — durée = frappe + lecture par bulle (miroir de reel-render.html) + CTA.
+// Durées miroir de reel-render.html (structuré = message / confrontation) + CTA.
 const msgReadMs = t => Math.min(4200, Math.max(1300, String(t || '').length / 22 * 1000));
+const cfBottomReadMs = t => Math.min(5200, Math.max(2600, String(t || '').length / 20 * 1000));
 const totalMs = isMessage
   ? spec.messages.reduce((a, m) => a + 650 + msgReadMs(m.text), 0) + 1600
+  : isConfrontation
+  ? 400 + 2600 + 650 + cfBottomReadMs((spec.bottom || {}).text) + 1600
   : spec.segments.reduce((a, s) => a + holdMs(s), 0);
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -123,4 +132,4 @@ await Promise.all(platforms.map(p => renderPlatform(p).catch(e => {
 })));
 
 await browser.close();
-console.log(`Durée séquence : ${(totalMs / 1000).toFixed(1)} s (${isMessage ? spec.messages.length + ' bulles' : spec.segments.length + ' segments'}, loi caractères÷27 bornée 4–26 s)`);
+console.log(`Durée séquence : ${(totalMs / 1000).toFixed(1)} s (${isMessage ? spec.messages.length + ' bulles' : isConfrontation ? 'confrontation split' : spec.segments.length + ' segments'}, loi caractères÷27 bornée 4–26 s)`);
