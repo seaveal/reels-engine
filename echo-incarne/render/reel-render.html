@@ -118,6 +118,10 @@ window.loadReel = function(spec, opts = {}) {
   }
   if (spec.layout === 'message') buildMessageChat(spec, T);
   if (spec.layout === 'confrontation') buildConfrontation(spec, T);
+  if (spec.layout === 'avantapres') buildAvantApres(spec, T);
+  if (spec.layout === 'timeline') buildTimeline(spec, T);
+  if (spec.layout === 'liste') buildListe(spec, T);
+  if (spec.layout === 'citation') buildCitation(spec, T);
   return true;
 };
 
@@ -230,9 +234,115 @@ function showSegment(i) {
   cta.style.transform = isCta ? 'translateY(0)' : 'translateY(36px)';
 }
 
+// ---- helpers partagés des layouts structurés ----
+function fitPage(page, sel) {
+  const avail = 1920 - CFG.Z.top - CFG.Z.bottom - 340;
+  let guard = 0;
+  while (page.scrollHeight > avail && guard++ < 60) {
+    page.querySelectorAll(sel).forEach(el => {
+      const fs = parseFloat(getComputedStyle(el).fontSize);
+      if (fs > 36) el.style.fontSize = (fs - 4) + 'px';
+    });
+  }
+}
+function revealCta() { const c = document.getElementById('ctaRow'); if (c) { c.style.opacity = '1'; c.style.transform = 'translateY(0)'; } }
+const readMs = (t, div, lo, hi) => Math.min(hi, Math.max(lo, String(t || '').length / div * 1000));
+function hookHtml(spec, T, fs) {
+  return spec.hook ? `<div style="font-family:var(--sans);font-weight:800;font-size:${fs}px;line-height:1.1;text-transform:uppercase;color:${T.text};text-align:left;margin-bottom:46px;animation:eiRise .8s ease both;">${pivot(spec.hook, T.accent)}</div>` : '';
+}
+
+// =============================================================== mode avant/après
+function buildAvantApres(spec, T) {
+  const page = document.getElementById('page');
+  page.style.flex = '1'; page.style.minHeight = '0'; page.style.justifyContent = 'center';
+  const a = spec.avant || {}, g = spec.geste || {}, ap = spec.apres || {};
+  page.innerHTML = hookHtml(spec, T, 48) +
+    `<div id="aa0" style="opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease;">
+      <div style="font-family:var(--mono);font-size:26px;letter-spacing:.16em;text-transform:uppercase;color:${T.text};opacity:.5;margin-bottom:12px;">${esc(a.eyebrow || 'AVANT')}</div>
+      <div class="aaFit" style="font-family:var(--serif);font-size:66px;line-height:1.18;color:${T.text};opacity:.62;">${pivot(a.text || '', T.accent)}</div></div>
+    <div id="aa1" style="opacity:0;transform:scale(.96);transition:opacity .5s ease,transform .5s ease;margin:38px 0;padding:28px 34px;border-left:6px solid ${T.accent};background:${T.echo};">
+      <div style="font-family:var(--mono);font-size:24px;letter-spacing:.14em;text-transform:uppercase;color:${T.accent};margin-bottom:10px;">LE GESTE</div>
+      <div class="aaFit" style="font-family:var(--sans);font-weight:500;font-size:52px;line-height:1.22;color:${T.text};">${pivot(g.text || '', T.accent)}</div></div>
+    <div id="aa2" style="opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease;">
+      <div style="font-family:var(--mono);font-size:26px;letter-spacing:.16em;text-transform:uppercase;color:${T.accent};margin-bottom:12px;">${esc(ap.eyebrow || 'APRÈS')}</div>
+      <div class="aaFit" style="font-family:var(--serif);font-weight:500;font-size:76px;line-height:1.16;color:${T.text};">${pivot(ap.text || '', T.accent)}</div></div>`;
+  fitPage(page, '.aaFit');
+}
+window.playAvantApres = async function() {
+  const holds = [2400, 2600, 3000];
+  await msgWait(400);
+  for (let i = 0; i < 3; i++) { const el = document.getElementById('aa' + i); if (el) { el.style.opacity = '1'; el.style.transform = 'none'; } await msgWait(holds[i]); }
+  revealCta(); await msgWait(1600); return true;
+};
+
+// =============================================================== mode ligne du temps
+function buildTimeline(spec, T) {
+  const page = document.getElementById('page');
+  page.style.flex = '1'; page.style.minHeight = '0'; page.style.justifyContent = 'center';
+  const steps = (spec.steps || []).slice(0, 4);
+  page.innerHTML = hookHtml(spec, T, 48) + `<div style="display:flex;flex-direction:column;">` +
+    steps.map((s, i) => `<div id="tl${i}" style="display:flex;gap:30px;opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease;">
+      <div style="display:flex;flex-direction:column;align-items:center;">
+        <div style="width:26px;height:26px;border-radius:50%;background:${T.accent};flex:none;margin-top:8px;"></div>
+        ${i < steps.length - 1 ? `<div style="width:3px;flex:1;background:${T.accent};opacity:.3;min-height:50px;"></div>` : ''}
+      </div>
+      <div style="padding-bottom:${i < steps.length - 1 ? '44px' : '0'};">
+        <div style="font-family:var(--mono);font-size:26px;letter-spacing:.14em;text-transform:uppercase;color:${T.accent};margin-bottom:10px;">${esc(s.label || ('ÉTAPE ' + (i + 1)))}</div>
+        <div class="tlFit" style="font-family:var(--serif);font-size:58px;line-height:1.18;color:${T.text};">${pivot(s.text || '', T.accent)}</div>
+      </div></div>`).join('') + `</div>`;
+  fitPage(page, '.tlFit');
+}
+window.playTimeline = async function() {
+  const steps = (CFG.spec.steps || []).slice(0, 4);
+  await msgWait(400);
+  for (let i = 0; i < steps.length; i++) { const el = document.getElementById('tl' + i); if (el) { el.style.opacity = '1'; el.style.transform = 'none'; } await msgWait(readMs(steps[i].text, 22, 2000, 3400)); }
+  revealCta(); await msgWait(1600); return true;
+};
+
+// =============================================================== mode liste numérotée
+function buildListe(spec, T) {
+  const page = document.getElementById('page');
+  page.style.flex = '1'; page.style.minHeight = '0'; page.style.justifyContent = 'center';
+  const items = (spec.items || []).slice(0, 6);
+  page.innerHTML = hookHtml(spec, T, 54) + `<div style="display:flex;flex-direction:column;gap:30px;">` +
+    items.map((it, i) => `<div id="li${i}" style="display:flex;gap:26px;align-items:baseline;opacity:0;transform:translateX(-16px);transition:opacity .5s ease,transform .5s ease;">
+      <div style="font-family:var(--mono);font-weight:700;font-size:56px;color:${T.accent};flex:none;line-height:1;">${i + 1}</div>
+      <div class="liFit" style="font-family:var(--serif);font-size:56px;line-height:1.2;color:${T.text};">${pivot(String(it), T.accent)}</div></div>`).join('') + `</div>`;
+  fitPage(page, '.liFit');
+}
+window.playListe = async function() {
+  const items = (CFG.spec.items || []).slice(0, 6);
+  await msgWait(500);
+  for (let i = 0; i < items.length; i++) { const el = document.getElementById('li' + i); if (el) { el.style.opacity = '1'; el.style.transform = 'none'; } await msgWait(readMs(items[i], 24, 1500, 2600)); }
+  revealCta(); await msgWait(1700); return true;
+};
+
+// =============================================================== mode citation
+function buildCitation(spec, T) {
+  const page = document.getElementById('page');
+  page.style.flex = '1'; page.style.minHeight = '0'; page.style.justifyContent = 'center';
+  page.innerHTML =
+    `<div id="ct0" style="opacity:0;transform:translateY(20px);transition:opacity .8s ease,transform .8s ease;">
+      <div style="font-family:var(--serif);font-weight:600;font-size:120px;line-height:.4;color:${T.accent};margin-bottom:24px;">«</div>
+      <div class="ctFit" style="font-family:var(--serif);font-weight:500;font-size:88px;line-height:1.16;color:${T.text};">${pivot(spec.quote || '', T.accent)}</div></div>` +
+    (spec.dev ? `<div id="ct1" style="opacity:0;transform:translateY(16px);transition:opacity .7s ease,transform .7s ease;margin-top:44px;font-family:var(--sans);font-size:46px;line-height:1.3;color:${T.text};">${pivot(spec.dev, T.accent)}</div>` : '');
+  fitPage(page, '.ctFit');
+}
+window.playCitation = async function() {
+  await msgWait(500);
+  const q = document.getElementById('ct0'); if (q) { q.style.opacity = '1'; q.style.transform = 'none'; }
+  await msgWait(3400);
+  const d = document.getElementById('ct1'); if (d) { d.style.opacity = '1'; d.style.transform = 'none'; await msgWait(3000); }
+  revealCta(); await msgWait(1600); return true;
+};
+
 window.reelDurationMs = spec =>
   spec.layout === 'message' ? msgList(spec).reduce((a, m) => a + MSG_TYPING_MS + msgReadMs(m.text), 0) + 1600
   : spec.layout === 'confrontation' ? 400 + 2600 + 650 + cfBottomReadMs(spec) + 1600
+  : spec.layout === 'avantapres' ? 400 + 2400 + 2600 + 3000 + 1600
+  : spec.layout === 'timeline' ? 400 + (spec.steps || []).slice(0, 4).reduce((a, s) => a + readMs(s.text, 22, 2000, 3400), 0) + 1600
+  : spec.layout === 'liste' ? 500 + (spec.items || []).slice(0, 6).reduce((a, it) => a + readMs(it, 24, 1500, 2600), 0) + 1700
+  : spec.layout === 'citation' ? 500 + 3400 + (spec.dev ? 3000 : 0) + 1600
   : spec.segments.reduce((a, s) => a + holdMs(s), 0);
 
 // Joue la conversation : pour chaque message, indicateur de frappe « ●●● » du bon côté
@@ -260,6 +370,10 @@ window.playReel = async function() {
   const { spec } = CFG;
   if (spec.layout === 'message') return window.playMessageReel();
   if (spec.layout === 'confrontation') return window.playConfrontationReel();
+  if (spec.layout === 'avantapres') return window.playAvantApres();
+  if (spec.layout === 'timeline') return window.playTimeline();
+  if (spec.layout === 'liste') return window.playListe();
+  if (spec.layout === 'citation') return window.playCitation();
   for (let i = 0; i < spec.segments.length; i++) {
     showSegment(i);
     await new Promise(r => setTimeout(r, holdMs(spec.segments[i])));
