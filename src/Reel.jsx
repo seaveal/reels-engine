@@ -6,6 +6,7 @@ import { ListPage } from './ListPage.jsx';
 import { HandEmoji } from './HandEmoji.jsx';
 import { LegendCta } from './LegendCta.jsx';
 import { ProfileBadge } from './ProfileBadge.jsx';
+import { MessageReel } from './MessageReel.jsx';
 import { safeBox, safeBoxLong, COLORS, STAGGER_LEAD_IN_SEC, STAGGER_GAP_SEC, ALL_AT_ONCE_DELAY_SEC, FPS, FADE_SEC, HAND_EMOJI_DELAY_AFTER_LAST_SEC, computePageHoldFrames, CAPTION_TAP_X, CAPTION_TAP_Y } from './constants.js';
 import { normaliseSegments } from './segments.js';
 import { normalisePages } from './pages.js';
@@ -41,6 +42,12 @@ const LEGEND_BAND_RATIO = 0.18;
 export const Reel = (props) => {
   const { width, height } = useVideoConfig();
   const safe = safeBox(width, height);
+
+  // FORMAT MESSAGE (layout:"message") — conversation reconstituée en bulles.
+  // ADDITIF : délègue entièrement à MessageReel, ne touche pas aux formats existants.
+  if (props.layout === 'message') {
+    return <MessageReel {...props} />;
+  }
 
   // FORMAT LONG (layout:"long") — paging / replace. Chaque page occupe sa propre
   // fenêtre temporelle (Series) ; la page suivante remplace la précédente.

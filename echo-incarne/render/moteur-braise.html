@@ -1,0 +1,475 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>H3C — Moteur réel « La Braise » (headless)</title>
+<!--
+  DIRECTION A — « LA BRAISE »
+  Nuit incandescente. Fond encre chaude, halo de braise terracotta, grain.
+  Typo affiche ultra-condensée (Anton) pour l'arrêt du pouce ; les [[pivots]]
+  basculent en serif italique terracotta (ADN Écho Incarné). Coupes sèches,
+  punch-in bref — grammaire d'animation nerveuse, jamais criarde.
+  Contrat : window.loadReel(spec, opts) / await window.playReel() /
+  window.reelDurationMs(spec) / window.renderSlide(data) (image 1080×1350).
+  Aperçu manuel : ?d=<spec b64> ou ?demo=court|long|message|confrontation|
+  avantapres|timeline|liste|citation|carte &platform= &theme=papier|nuit &guides=1 &norun=1
+  PROD : vendorer Anton, Cormorant Garamond, IBM Plex Mono en @font-face locales
+  (remplacer le <link> Google Fonts ci-dessous — aperçu seulement).
+-->
+<link href="../fonts/echo-incarne-fonts.css" rel="stylesheet"><!-- polices vendorées 2026-07-16 (offline) -->
+<style>
+  :root{--sans:'Anton',sans-serif;--serif:'Cormorant Garamond',serif;--mono:'IBM Plex Mono',monospace;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{background:#000;}
+  #stage{width:1080px;height:1920px;position:relative;overflow:hidden;}
+  @keyframes brGlow{0%{transform:translate(-6%,5%) scale(1.12);}50%{transform:translate(6%,-4%) scale(1.32);}100%{transform:translate(-6%,5%) scale(1.12);}}
+  @keyframes brGrain{0%{transform:translate(0,0);}100%{transform:translate(-7%,5%);}}
+  @keyframes brPunch{0%{opacity:0;transform:scale(1.06) translateY(12px);}55%{opacity:1;}100%{opacity:1;transform:scale(1) translateY(0);}}
+  @keyframes brBar{0%{transform:scaleX(0);}100%{transform:scaleX(1);}}
+  @keyframes brRise{0%{opacity:0;transform:translateY(26px);}100%{opacity:1;transform:translateY(0);}}
+  @keyframes brTdot{0%,80%,100%{opacity:.3;transform:translateY(0);}40%{opacity:1;transform:translateY(-7px);}}
+  .tdot{width:16px;height:16px;border-radius:50%;background:#F5EDDD;display:inline-block;animation:brTdot 1s infinite;}
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<script>
+// ============================================================ constantes
+const THEMES = {
+  braise:{bg:'#17100A',text:'#F2E8D7',dim:'rgba(242,232,215,.52)',accent:'#E0653A',deep:'#A8432B',glow:'rgba(168,67,43,.55)',echo:'rgba(224,101,58,.14)',grainOp:.15,gb:'soft-light',bubbleIn:'#393026',capText:'#F7EEDD'},
+  papier:{bg:'#EFE5D2',text:'#241A12',dim:'rgba(36,26,18,.5)',accent:'#A8432B',deep:'#8F3722',glow:'rgba(255,246,230,.9)',echo:'rgba(168,67,43,.12)',grainOp:.09,gb:'multiply',bubbleIn:'#5E5449',capText:'#F7EEDD'},
+};
+const PLATFORMS = {
+  instagram:{top:280,right:180,bottom:550,left:104,ctaAlign:'flex-end',arrow:'down-left',cta:"D'où ça vient — en légende",label:'Instagram Reels'},
+  tiktok:{top:280,right:184,bottom:560,left:104,ctaAlign:'flex-start',arrow:'down-left',cta:"D'où ça vient — en légende",label:'TikTok'},
+  youtube:{top:300,right:212,bottom:530,left:104,ctaAlign:'flex-end',arrow:'up-right',cta:"D'où ça vient — en description",label:'YouTube Shorts'},
+};
+const GRAIN='data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20width=%22180%22%20height=%22180%22%3E%3Cfilter%20id=%22n%22%3E%3CfeTurbulence%20type=%22fractalNoise%22%20baseFrequency=%220.85%22%20numOctaves=%222%22%20stitchTiles=%22stitch%22%2F%3E%3C%2Ffilter%3E%3Crect%20width=%22100%25%22%20height=%22100%25%22%20filter=%22url%28%23n%29%22%2F%3E%3C%2Fsvg%3E';
+const PHOTO='../uploads/cyrille-novou-new-ok.jpg'; // pastille profil (même convention que la prod)
+const esc=(s='')=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const pivot=(s,T)=>esc(s).replace(/\[\[([^\]]+)\]\]/g,`<span style="font-family:var(--serif);font-style:italic;font-weight:600;color:${T.accent}">$1</span>`);
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+const holdMs=seg=>Math.min(26,Math.max(4,seg.text.replace(/\[\[|\]\]/g,'').length/27))*1000;
+// Révélation dans l'ordre de lecture : gaps entre lignes configurables par le
+// serveur — seg.line_delays_ms[] (par ligne) ou line_delay_ms (uniforme),
+// posables au niveau du segment ou du spec. Défaut 450 ms.
+const lineGaps=(seg,spec,n)=>{
+  const arr=seg.line_delays_ms||spec.line_delays_ms;
+  const uni=(seg.line_delay_ms!=null?seg.line_delay_ms:(spec.line_delay_ms!=null?spec.line_delay_ms:450));
+  return Array.from({length:Math.max(0,n-1)},(_,i)=>Array.isArray(arr)?(arr[i]!=null?arr[i]:uni):uni);
+};
+const segLines=(text,T)=>String(text).split('\n').filter(l=>l.trim()).map(l=>`<div class="segLine" style="opacity:0;transform:translateY(16px);transition:opacity 0.4s ease,transform 0.4s ease;">${pivot(l,T)}</div>`).join('');
+const readMs=(t,div,lo,hi)=>Math.min(hi,Math.max(lo,String(t||'').length/div*1000));
+const msgReadMs=t=>Math.min(4200,Math.max(1300,String(t).length/22*1000));
+const cfReadMs=spec=>Math.min(5200,Math.max(2600,String((spec.bottom||{}).text||'').length/20*1000));
+const MSG_TYPING_MS=650;
+let CFG=null;
+
+// Adaptateur schéma vault : { pages:[{lines:[{text,role}],arrow}] } -> { segments }
+function adaptSpec(spec){
+  if(!spec.segments&&Array.isArray(spec.pages)){
+    spec.segments=spec.pages.map((p,i)=>{
+      const lines=(p.lines||[]).filter(l=>String(l.text||'').trim());
+      const isCta=lines.some(l=>String(l.role||'').toLowerCase()==='cta');
+      const isHeading=lines.every(l=>String(l.role||'').toLowerCase()==='heading');
+      return{role:isCta?'cta':(i===0&&isHeading?'title':'block'),text:lines.map(l=>String(l.text)).join('\n')};
+    }).filter(s=>s.text);
+  }
+  return spec;
+}
+
+// ============================================================ mise en place
+window.loadReel=function(spec,opts={}){
+  spec=adaptSpec(spec);
+  const T=THEMES[opts.theme==='papier'?'papier':'braise'];
+  const Z=PLATFORMS[opts.platform||'instagram']||PLATFORMS.instagram;
+  CFG={spec,T,Z,guides:!!opts.guides};
+  const ctaSeg=(spec.segments||[]).find(s=>s.role==='cta');
+  let ctaLabel=spec.cta?String(spec.cta).replace(/^\s*\(|\)\s*$/g,'').replace(/\[\[|\]\]/g,'')
+    :(ctaSeg?ctaSeg.text.replace(/^\s*\(|\)\s*$/g,'').replace(/\[\[|\]\]/g,''):Z.cta);
+  if((opts.platform||'instagram')==='youtube') ctaLabel=ctaLabel.replace(/l[ée]gende/gi,'DESCRIPTION');
+  const stage=document.getElementById('stage');
+  stage.style.height='1920px';
+  stage.innerHTML=`
+    <div style="position:absolute;inset:0;background:${T.bg}"></div>
+    <div style="position:absolute;inset:-25%;background:radial-gradient(circle at 50% 78%, ${T.glow}, transparent 58%);animation:brGlow 22s ease-in-out infinite;"></div>
+    <div style="position:absolute;inset:0;background:radial-gradient(circle at 50% 30%, transparent 55%, rgba(0,0,0,.28));"></div>
+    <div style="position:absolute;inset:-10%;background-image:url(${GRAIN});background-size:190px 190px;opacity:${T.grainOp};mix-blend-mode:${T.gb};animation:brGrain 7s steps(6) infinite;pointer-events:none;"></div>
+    <div style="position:absolute;inset:0;padding:${Z.top}px ${Z.right}px ${Z.bottom}px ${Z.left}px;display:flex;flex-direction:column;justify-content:space-between;color:${T.text};">
+      <div style="display:flex;align-items:center;gap:30px;animation:brRise .9s ease both;">
+        <div style="width:116px;height:116px;border-radius:50%;background:conic-gradient(from 210deg, #FEDA75, #FA7E1E, #D62976, #962FBF, #4F5BD5, #FEDA75);padding:5px;flex:none;">
+          <div style="width:100%;height:100%;border-radius:50%;background:${T.bg};padding:3px;">
+            <img src="${PHOTO}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;filter:grayscale(1) contrast(1.02);display:block;">
+          </div>
+        </div>
+        <div style="font-family:var(--mono);font-size:33px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:${T.text};">@le<span style="color:${T.accent}">corps</span>ne<span style="color:${T.accent}">triche</span>jamais</div>
+      </div>
+      <div id="page" style="min-height:640px;display:flex;flex-direction:column;justify-content:center;"></div>
+      <div id="ctaRow" style="display:flex;align-items:flex-start;justify-content:${Z.ctaAlign};gap:34px;opacity:0;transform:translateY(36px);transition:opacity .55s ease,transform .55s ease;">
+        ${Z.arrow==='up-right'?'':`<div style="font-size:70px;line-height:1;color:${T.accent};transform:translateY(46px);">↓</div>`}
+        <div id="ctaCapsule" style="display:inline-flex;align-items:center;background:${T.accent};color:${T.capText};border-radius:6px;padding:30px 48px;font-family:var(--mono);font-size:34px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;box-shadow:0 14px 44px rgba(0,0,0,.35);">${esc(ctaLabel)}</div>
+        ${Z.arrow==='up-right'?`<div style="font-size:70px;line-height:1;color:${T.accent};transform:translateY(-44px);">↑</div>`:''}
+      </div>
+    </div>
+    ${CFG.guides?guidesHtml(Z):''}`;
+  fitCapsule(Z);
+  const B={message:buildMessage,confrontation:buildConfrontation,avantapres:buildAvantApres,timeline:buildTimeline,liste:buildListe,citation:buildCitation}[spec.layout];
+  if(B) B(spec,T);
+  return true;
+};
+function guidesHtml(Z){
+  return `<div style="position:absolute;inset:0;pointer-events:none;font-family:var(--mono);color:rgba(255,84,60,.85);">
+    <div style="position:absolute;left:0;right:0;top:${Z.top-30}px;border-top:2px dashed rgba(255,84,60,.6)"></div>
+    <div style="position:absolute;left:0;right:0;bottom:${Z.bottom-30}px;border-top:2px dashed rgba(255,84,60,.6)"></div>
+    <div style="position:absolute;top:${Z.top-30}px;bottom:${Z.bottom-30}px;right:${Z.right-20}px;border-right:2px dashed rgba(255,84,60,.6)"></div>
+    <div style="position:absolute;top:${Z.top-72}px;left:${Z.left}px;font-size:24px;">${Z.label} — safe zone</div>
+  </div>`;
+}
+function fitCapsule(Z){
+  const c=document.getElementById('ctaCapsule');
+  if(!c)return;
+  const zone=1080-Z.left-Z.right-(70+34);
+  let fs=34;
+  while(c.scrollWidth>zone&&fs>20){fs-=2;c.style.fontSize=fs+'px';}
+  if(c.scrollWidth>zone)c.style.letterSpacing='.03em';
+  if(c.scrollWidth>zone)c.style.padding='24px 30px';
+}
+function fitPage(page,sel){
+  // Mesure le CONTENU, pas la boîte flex : #page a flex:1, son scrollHeight vaut
+  // la hauteur de la zone flex — on neutralise flex/height le temps de la mesure.
+  const avail=1920-CFG.Z.top-CFG.Z.bottom-340;
+  const pf=page.style.flex,ph=page.style.height,pm=page.style.minHeight;
+  page.style.flex='none';page.style.height='auto';page.style.minHeight='0';
+  let guard=0;
+  while(page.scrollHeight>avail&&guard++<60){
+    page.querySelectorAll(sel).forEach(el=>{
+      const fs=parseFloat(getComputedStyle(el).fontSize);
+      if(fs>36)el.style.fontSize=(fs-4)+'px';
+    });
+  }
+  page.style.flex=pf;page.style.height=ph;page.style.minHeight=pm;
+}
+function revealCta(){const c=document.getElementById('ctaRow');if(c){c.style.opacity='1';c.style.transform='translateY(0)';}}
+function hookHtml(spec,T,fs){
+  return spec.hook?`<div style="font-family:var(--sans);font-size:${fs}px;line-height:1.04;letter-spacing:.01em;text-transform:uppercase;color:${T.text};margin-bottom:48px;animation:brPunch .35s ease both;">${pivot(spec.hook,T)}</div>`:'';
+}
+
+// ============================================================ format court / long (segments)
+function showSegment(i){
+  const {spec,T,Z}=CFG;
+  const seg=spec.segments[i];
+  const isCta=seg.role==='cta';
+  const displaySeg=isCta?spec.segments[Math.max(0,i-1)]:seg;
+  const isTitle=displaySeg.role==='title';
+  const page=document.getElementById('page');
+  if(!isCta){
+    page.innerHTML=`<div>
+      ${isTitle?`<div style="width:140px;height:12px;background:${T.accent};transform-origin:left;animation:brBar .5s .1s ease both;margin-bottom:44px;"></div>`:''}
+      <div class="segFit" style="font-family:var(--sans);font-size:${isTitle?136:100}px;line-height:${isTitle?.99:1.07};letter-spacing:.01em;text-transform:uppercase;">${segLines(displaySeg.text,T)}</div>
+    </div>`;
+    const el=page.querySelector('.segFit');
+    const avail=1920-Z.top-Z.bottom-340-(isTitle?56:0);
+    let fs=isTitle?136:100;
+    while(el.scrollHeight>avail&&fs>44){fs-=4;el.style.fontSize=fs+'px';}
+  }
+  const cta=document.getElementById('ctaRow');
+  cta.style.opacity=isCta?'1':'0';
+  cta.style.transform=isCta?'translateY(0)':'translateY(36px)';
+}
+
+// ============================================================ confrontation
+function buildConfrontation(spec,T){
+  const page=document.getElementById('page');
+  page.style.flex='1';page.style.minHeight='0';page.style.justifyContent='center';
+  const top=spec.top||{},bottom=spec.bottom||{};
+  page.innerHTML=hookHtml(spec,T,58)+
+    `<div id="cf0" style="opacity:0;transform:translateY(18px);transition:opacity .45s ease,transform .45s ease;">`+
+      (top.eyebrow?`<div style="font-family:var(--mono);font-size:26px;letter-spacing:.16em;text-transform:uppercase;color:${T.dim};margin-bottom:16px;">${esc(top.eyebrow)}</div>`:'')+
+      `<div class="cfFit" style="font-family:var(--sans);font-size:78px;line-height:1.08;text-transform:uppercase;color:${T.dim};text-decoration:line-through;text-decoration-color:${T.accent};text-decoration-thickness:5px;">${pivot(top.text||'',T)}</div></div>`+
+    `<div id="cf1" style="display:flex;align-items:center;gap:24px;margin:44px 0;opacity:0;transition:opacity .4s ease;">
+      <div style="flex:1;height:3px;background:${T.text};opacity:.18;"></div>
+      <div style="font-family:var(--mono);font-size:30px;letter-spacing:.14em;color:${T.accent};">MAIS</div>
+      <div style="flex:1;height:3px;background:${T.text};opacity:.18;"></div></div>`+
+    `<div id="cf2" style="opacity:0;transform:translateY(24px);transition:opacity .5s ease,transform .5s ease;">`+
+      (bottom.eyebrow?`<div style="font-family:var(--mono);font-size:26px;letter-spacing:.16em;text-transform:uppercase;color:${T.accent};margin-bottom:16px;">${esc(bottom.eyebrow)}</div>`:'')+
+      `<div class="cfFit" style="font-family:var(--sans);font-size:96px;line-height:1.04;text-transform:uppercase;color:${T.text};">${pivot(bottom.text||'',T)}</div></div>`;
+  fitPage(page,'.cfFit');
+}
+async function playConfrontation(){
+  const el=id=>document.getElementById(id);
+  await wait(400);
+  if(el('cf0')){el('cf0').style.opacity='1';el('cf0').style.transform='none';}
+  await wait(2600);
+  if(el('cf1'))el('cf1').style.opacity='1';
+  await wait(650);
+  if(el('cf2')){el('cf2').style.opacity='1';el('cf2').style.transform='none';}
+  await wait(cfReadMs(CFG.spec));
+  revealCta();await wait(1600);return true;
+}
+
+// ============================================================ avant / après
+function buildAvantApres(spec,T){
+  const page=document.getElementById('page');
+  page.style.flex='1';page.style.minHeight='0';page.style.justifyContent='center';
+  const a=spec.avant||{},g=spec.geste||{},ap=spec.apres||{};
+  page.innerHTML=hookHtml(spec,T,54)+
+    `<div id="aa0" style="opacity:0;transform:translateY(18px);transition:opacity .5s ease,transform .5s ease;">
+      <div style="font-family:var(--mono);font-size:26px;letter-spacing:.16em;text-transform:uppercase;color:${T.dim};margin-bottom:14px;">${esc(a.eyebrow||'AVANT')}</div>
+      <div class="aaFit" style="font-family:var(--serif);font-size:62px;line-height:1.2;color:${T.dim};">${pivot(a.text||'',T)}</div></div>
+    <div id="aa1" style="opacity:0;transform:scale(.96);transition:opacity .4s ease,transform .4s ease;margin:38px 0;padding:30px 36px;border-left:10px solid ${T.accent};background:${T.echo};">
+      <div style="font-family:var(--mono);font-size:24px;letter-spacing:.14em;text-transform:uppercase;color:${T.accent};margin-bottom:12px;">LE GESTE</div>
+      <div class="aaFit" style="font-family:var(--sans);font-size:56px;line-height:1.14;text-transform:uppercase;letter-spacing:.01em;color:${T.text};">${pivot(g.text||'',T)}</div></div>
+    <div id="aa2" style="opacity:0;transform:translateY(24px);transition:opacity .5s ease,transform .5s ease;">
+      <div style="font-family:var(--mono);font-size:26px;letter-spacing:.16em;text-transform:uppercase;color:${T.accent};margin-bottom:14px;">${esc(ap.eyebrow||'APRÈS')}</div>
+      <div class="aaFit" style="font-family:var(--sans);font-size:84px;line-height:1.06;text-transform:uppercase;color:${T.text};">${pivot(ap.text||'',T)}</div></div>`;
+  fitPage(page,'.aaFit');
+}
+async function playAvantApres(){
+  const holds=[2400,2600,3000];
+  await wait(400);
+  for(let i=0;i<3;i++){const el=document.getElementById('aa'+i);if(el){el.style.opacity='1';el.style.transform='none';}await wait(holds[i]);}
+  revealCta();await wait(1600);return true;
+}
+
+// ============================================================ timeline
+function buildTimeline(spec,T){
+  const page=document.getElementById('page');
+  page.style.flex='1';page.style.minHeight='0';page.style.justifyContent='center';
+  const steps=(spec.steps||[]).slice(0,4);
+  page.innerHTML=hookHtml(spec,T,54)+`<div style="display:flex;flex-direction:column;">`+
+    steps.map((s,i)=>`<div id="tl${i}" style="display:flex;gap:30px;opacity:0;transform:translateY(20px);transition:opacity .45s ease,transform .45s ease;">
+      <div style="display:flex;flex-direction:column;align-items:center;">
+        <div style="width:24px;height:24px;background:${T.accent};flex:none;margin-top:12px;"></div>
+        ${i<steps.length-1?`<div style="width:3px;flex:1;background:${T.accent};opacity:.3;min-height:50px;"></div>`:''}</div>
+      <div style="padding-bottom:${i<steps.length-1?'42px':'0'};">
+        <div style="font-family:var(--mono);font-size:26px;letter-spacing:.14em;text-transform:uppercase;color:${T.accent};margin-bottom:10px;">${esc(s.label||('ÉTAPE '+(i+1)))}</div>
+        <div class="tlFit" style="font-family:var(--serif);font-size:58px;line-height:1.2;font-weight:500;color:${T.text};">${pivot(s.text||'',T)}</div></div></div>`).join('')+`</div>`;
+  fitPage(page,'.tlFit');
+}
+async function playTimeline(){
+  const steps=(CFG.spec.steps||[]).slice(0,4);
+  await wait(400);
+  for(let i=0;i<steps.length;i++){const el=document.getElementById('tl'+i);if(el){el.style.opacity='1';el.style.transform='none';}await wait(readMs(steps[i].text,22,2000,3400));}
+  revealCta();await wait(1600);return true;
+}
+
+// ============================================================ liste
+function buildListe(spec,T){
+  const page=document.getElementById('page');
+  page.style.flex='1';page.style.minHeight='0';page.style.justifyContent='center';
+  const items=(spec.items||[]).slice(0,6);
+  page.innerHTML=hookHtml(spec,T,58)+`<div style="display:flex;flex-direction:column;gap:32px;">`+
+    items.map((it,i)=>`<div id="li${i}" style="display:flex;gap:28px;align-items:baseline;opacity:0;transform:translateX(-16px);transition:opacity .4s ease,transform .4s ease;">
+      <div style="font-family:var(--sans);font-size:62px;color:${T.accent};flex:none;line-height:1;">${i+1}</div>
+      <div class="liFit" style="font-family:var(--serif);font-size:56px;font-weight:500;line-height:1.2;color:${T.text};">${pivot(String(it),T)}</div></div>`).join('')+`</div>`;
+  fitPage(page,'.liFit');
+}
+async function playListe(){
+  const items=(CFG.spec.items||[]).slice(0,6);
+  await wait(500);
+  for(let i=0;i<items.length;i++){const el=document.getElementById('li'+i);if(el){el.style.opacity='1';el.style.transform='none';}await wait(readMs(items[i],24,1500,2600));}
+  revealCta();await wait(1700);return true;
+}
+
+// ============================================================ citation
+function buildCitation(spec,T){
+  const page=document.getElementById('page');
+  page.style.flex='1';page.style.minHeight='0';page.style.justifyContent='center';
+  page.innerHTML=
+    `<div id="ct0" style="opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease;">
+      <div style="width:140px;height:12px;background:${T.accent};margin-bottom:46px;"></div>
+      <div class="ctFit" style="font-family:var(--sans);font-size:94px;line-height:1.05;text-transform:uppercase;letter-spacing:.01em;color:${T.text};">${pivot(spec.quote||'',T)}</div></div>`+
+    (spec.dev?`<div id="ct1" style="opacity:0;transform:translateY(16px);transition:opacity .5s ease,transform .5s ease;margin-top:44px;font-family:var(--serif);font-style:italic;font-size:48px;line-height:1.3;color:${T.dim};">${pivot(spec.dev,T)}</div>`:'');
+  fitPage(page,'.ctFit');
+}
+async function playCitation(){
+  await wait(500);
+  const q=document.getElementById('ct0');if(q){q.style.opacity='1';q.style.transform='none';}
+  await wait(3400);
+  const d=document.getElementById('ct1');if(d){d.style.opacity='1';d.style.transform='none';await wait(3000);}
+  revealCta();await wait(1600);return true;
+}
+
+// ============================================================ message (bulles)
+const msgList=spec=>spec.messages||[];
+function buildMessage(spec,T){
+  const page=document.getElementById('page');
+  page.style.flex='1';page.style.minHeight='0';page.style.justifyContent='flex-start';
+  page.innerHTML=
+    `<div id="msgHook" style="font-family:var(--sans);font-size:64px;line-height:1.06;letter-spacing:.01em;text-transform:uppercase;color:${T.text};margin-bottom:44px;animation:brPunch .35s ease both;">${pivot(spec.hook||'',T)}</div>`+
+    `<div id="msgChat" style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;gap:24px;overflow:hidden;"></div>`;
+  const hook=document.getElementById('msgHook');
+  let fs=64;
+  while(hook.scrollHeight>340&&fs>34){fs-=4;hook.style.fontSize=fs+'px';}
+}
+function msgBubbleHtml(m,T){
+  const out=m.side==='out';
+  const bg=out?T.accent:T.bubbleIn;
+  const time=m.time?`<div style="font-family:var(--mono);font-size:22px;color:${T.dim};margin:8px 10px 0;text-align:${out?'right':'left'}">${esc(m.time)}</div>`:'';
+  return `<div style="display:flex;justify-content:${out?'flex-end':'flex-start'};animation:brRise .4s ease both;">
+    <div style="max-width:80%;">
+      <div style="background:${bg};color:#F7EEDD;font-family:var(--mono);font-size:38px;line-height:1.32;padding:26px 34px;border-radius:10px;border-bottom-${out?'right':'left'}-radius:2px;word-break:break-word;box-shadow:0 8px 26px rgba(0,0,0,.28);">${esc(m.text)}</div>${time}
+    </div></div>`;
+}
+function msgTypingHtml(side,T){
+  const bg=side==='out'?T.accent:T.bubbleIn;
+  return `<div style="display:flex;justify-content:${side==='out'?'flex-end':'flex-start'};animation:brRise .25s ease both;">
+    <div style="background:${bg};border-radius:10px;padding:28px 34px;display:flex;gap:14px;align-items:center;">
+      <span class="tdot"></span><span class="tdot" style="animation-delay:.18s"></span><span class="tdot" style="animation-delay:.36s"></span></div></div>`;
+}
+async function playMessage(){
+  const {spec,T}=CFG;
+  const chat=document.getElementById('msgChat');
+  if(!chat)return true;
+  chat.innerHTML='';
+  for(const m of msgList(spec)){
+    chat.insertAdjacentHTML('beforeend',msgTypingHtml(m.side,T));
+    const typing=chat.lastElementChild;
+    await wait(MSG_TYPING_MS);
+    typing.remove();
+    chat.insertAdjacentHTML('beforeend',msgBubbleHtml(m,T));
+    await wait(msgReadMs(m.text));
+  }
+  revealCta();await wait(1600);return true;
+}
+
+// ============================================================ lecture & durée
+window.playReel=async function(){
+  const {spec}=CFG;
+  if(spec.layout==='message')return playMessage();
+  if(spec.layout==='confrontation')return playConfrontation();
+  if(spec.layout==='avantapres')return playAvantApres();
+  if(spec.layout==='timeline')return playTimeline();
+  if(spec.layout==='liste')return playListe();
+  if(spec.layout==='citation')return playCitation();
+  for(let i=0;i<spec.segments.length;i++){
+    const seg=spec.segments[i];
+    showSegment(i);
+    if(seg.role!=='cta'){
+      const els=Array.from(document.querySelectorAll('#page .segLine'));
+      const gaps=lineGaps(seg,spec,els.length);
+      let used=0;
+      for(let j=0;j<els.length;j++){
+        els[j].style.opacity='1';els[j].style.transform='none';
+        if(j<els.length-1){await wait(gaps[j]);used+=gaps[j];}
+      }
+      await wait(Math.max(900,holdMs(seg)-used));
+    } else {
+      await wait(holdMs(seg));
+    }
+  }
+  return true;
+};
+window.reelDurationMs=spec=>{
+  spec=adaptSpec(spec);
+  return spec.layout==='message'?msgList(spec).reduce((a,m)=>a+MSG_TYPING_MS+msgReadMs(m.text),0)+1600
+  :spec.layout==='confrontation'?400+2600+650+cfReadMs(spec)+1600
+  :spec.layout==='avantapres'?400+2400+2600+3000+1600
+  :spec.layout==='timeline'?400+(spec.steps||[]).slice(0,4).reduce((a,s)=>a+readMs(s.text,22,2000,3400),0)+1600
+  :spec.layout==='liste'?500+(spec.items||[]).slice(0,6).reduce((a,it)=>a+readMs(it,24,1500,2600),0)+1700
+  :spec.layout==='citation'?500+3400+(spec.dev?3000:0)+1600
+  :(spec.segments||[]).reduce((a,s)=>a+holdMs(s),0);
+};
+
+// ============================================================ image fixe (carte / couverture) 1080×1350
+window.renderSlide=function(data){
+  let d=data||{};
+  if(Array.isArray(d))d={text:d[0]};
+  if(Array.isArray(d.slides)){const i=d.slide_index||0;const s=d.slides[i];d=Object.assign({},d,typeof s==='object'?s:{text:s});}
+  const text=d.texte||d.text||'';
+  const T=THEMES[(d.theme==='papier')?'papier':'braise'];
+  const v=d.variant||'cover';
+  const stage=document.getElementById('stage');
+  stage.style.height='1350px';
+  const pastille=size=>`<div style="width:${size}px;height:${size}px;border-radius:50%;background:conic-gradient(from 210deg, #FEDA75, #FA7E1E, #D62976, #962FBF, #4F5BD5, #FEDA75);padding:5px;flex:none;"><div style="width:100%;height:100%;border-radius:50%;background:${T.bg};padding:3px;"><img src="${PHOTO}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;filter:grayscale(1) contrast(1.02);display:block;"></div></div>`;
+  const deco=`<div style="position:absolute;inset:0;background:${T.bg}"></div>
+    <div style="position:absolute;inset:-25%;background:radial-gradient(circle at 50% 82%, ${T.glow}, transparent 58%);"></div>
+    <div style="position:absolute;inset:-10%;background-image:url(${GRAIN});background-size:190px 190px;opacity:${T.grainOp};mix-blend-mode:${T.gb};"></div>`;
+  const num=d.index?`<div style="font-family:var(--mono);font-size:24px;color:${T.dim};">${String(d.index).padStart(2,'0')} / ${String(d.total||9).padStart(2,'0')}</div>`:'';
+  const footer=right=>`<div style="border-top:1px solid ${T.dim};padding-top:26px;display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-family:var(--mono);font-size:24px;letter-spacing:.14em;color:${T.dim};">${esc(d.handle||'@lecorpsnetrichejamais')}</span>
+        <span style="font-family:var(--mono);font-size:22px;letter-spacing:.3em;text-transform:uppercase;color:${T.accent};">${right}</span></div>`;
+  let inner='';
+  if(v==='body'){
+    inner=`<div style="display:flex;justify-content:space-between;align-items:center;">
+        <div style="font-family:var(--mono);font-size:25px;letter-spacing:.2em;text-transform:uppercase;color:${T.accent};">${esc(d.eyebrow||'LE SIGNE')}</div>${num}</div>
+      <div><div id="slideFit" style="font-family:var(--sans);font-size:96px;line-height:1.04;text-transform:uppercase;letter-spacing:.01em;">${pivot(text,T)}</div>
+      ${d.sub?`<div style="margin-top:40px;font-family:var(--serif);font-size:42px;line-height:1.35;color:${T.dim};">${pivot(d.sub,T)}</div>`:''}</div>
+      ${footer('SUITE →')}`;
+  }else if(v==='cta'){
+    inner=`<div style="display:flex;justify-content:center;">${pastille(180)}</div>
+      <div style="text-align:center;"><div id="slideFit" style="font-family:var(--sans);font-size:100px;line-height:1.0;text-transform:uppercase;">${pivot(text,T)}</div>
+      ${d.sub?`<div style="margin-top:40px;font-family:var(--serif);font-style:italic;font-size:46px;line-height:1.3;color:${T.dim};">${pivot(d.sub,T)}</div>`:''}</div>
+      <div style="text-align:center;font-family:var(--mono);font-size:26px;letter-spacing:.18em;text-transform:uppercase;color:${T.accent};">${esc(d.legend||'La réponse est en légende')}</div>`;
+  }else{
+    inner=`<div style="display:flex;align-items:center;justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:26px;">${pastille(112)}
+          ${d.pilier?`<div style="font-family:var(--mono);font-size:24px;letter-spacing:.2em;text-transform:uppercase;color:${T.accent};">${esc(d.pilier)}</div>`:''}</div>${num}</div>
+      <div><div style="width:140px;height:12px;background:${T.accent};margin-bottom:44px;"></div>
+        <div id="slideFit" style="font-family:var(--sans);font-size:112px;line-height:1.0;text-transform:uppercase;letter-spacing:.01em;">${pivot(text,T)}</div>
+        ${d.sub?`<div style="margin-top:40px;font-family:var(--serif);font-style:italic;font-size:44px;line-height:1.3;color:${T.dim};">${pivot(d.sub,T)}</div>`:''}</div>
+      ${footer('LA BRAISE')}`;
+  }
+  stage.innerHTML=deco+`<div style="position:absolute;inset:0;padding:96px;display:flex;flex-direction:column;justify-content:space-between;color:${T.text};">`+inner+'</div>';
+  const el=document.getElementById('slideFit');
+  let fs=parseFloat(getComputedStyle(el).fontSize);
+  const avail=v==='cta'?640:(v==='body'?720:760);
+  while(el.scrollHeight>avail&&fs>48){fs-=4;el.style.fontSize=fs+'px';}
+  return true;
+};
+
+// ============================================================ aperçu manuel
+const DEMOS={
+  court:{slug:'demo-court',segments:[
+    {role:'title',text:'CE QUE VOUS VOYEZ COMME UNE [[DISPUTE]].'},
+    {role:'block',text:'VOTRE CORPS LE VIT COMME UNE [[BLESSURE]] QUI SAIGNE ENCORE.'},
+    {role:'cta',text:"(D'OÙ ÇA VIENT VRAIMENT, EN LÉGENDE)"}]},
+  long:{slug:'demo-long',layout:'long',pages:[
+    {lines:[{text:'VOUS TOMBEZ TOUJOURS SUR LE MÊME [[HOMME]].',role:'heading'}],arrow:true},
+    {lines:[{text:'ET VOUS APPELEZ ÇA LA [[MALCHANCE]].',role:'heading'},{text:'Et pourtant.',role:'body'}],arrow:true},
+    {lines:[{text:"Ce n'est pas la malchance.",role:'body'},{text:"C'est un [[schéma]] que votre enfance a gravé.",role:'body'}],arrow:true},
+    {lines:[{text:'LISEZ LA LÉGENDE',role:'cta'}]}]},
+  message:{slug:'demo-message',layout:'message',hook:"L'échange qu'on relit à [[2h du matin]].",cta:'LISEZ LA LÉGENDE',messages:[
+    {side:'out',text:'Tu dors ?',time:'02:14'},
+    {side:'in',text:'Non. Je pensais à nous.'},
+    {side:'out',text:"Mon ventre se serre chaque fois que tu t'éloignes."},
+    {side:'in',text:'…'},
+    {side:'out',text:"Et je confonds ça avec de l'amour depuis dix ans."}]},
+  confrontation:{slug:'demo-confrontation',layout:'confrontation',hook:"Ce n'est pas de l'amour.",cta:'LA SUITE DANS LA LÉGENDE',
+    top:{eyebrow:'ON VOUS DIT QUE',text:"S'il vous aime assez, il restera."},
+    bottom:{eyebrow:'VOTRE CORPS, LUI',text:"Se serre chaque fois qu'il s'éloigne. C'est une [[alarme]], pas de l'amour."}},
+  avantapres:{slug:'demo-avantapres',layout:'avantapres',hook:'Essayez ça 30 secondes.',cta:'LISEZ LA LÉGENDE',
+    avant:{eyebrow:'AVANT',text:'Le ventre serré, le souffle court, vous relisez son message.'},
+    geste:{text:'Une main sur le sternum. Inspirez 4 secondes, soufflez 6.'},
+    apres:{eyebrow:'APRÈS',text:'Le souffle redescend. La [[boule]] se desserre.'}},
+  timeline:{slug:'demo-timeline',layout:'timeline',hook:'La même peur, six mois plus tard.',cta:'LA SUITE DANS LA LÉGENDE',steps:[
+    {label:'MOIS 1',text:'Vous vérifiez son téléphone « juste une fois ».'},
+    {label:'MOIS 3',text:'Vous connaissez ses trajets par cœur.'},
+    {label:'MOIS 6',text:"Vous ne dormez plus tant qu'il n'a pas [[répondu]]."}]},
+  liste:{slug:'demo-liste',layout:'liste',hook:'4 choses à arrêter quand il ne répond pas.',cta:'LISEZ LA LÉGENDE',items:[
+    'Retenir votre [[souffle]].','Relire la conversation.','Poser le téléphone face visible.','Chercher ce que vous avez « mal fait ».']},
+  citation:{slug:'demo-citation',layout:'citation',cta:'LISEZ LA LÉGENDE',
+    quote:"Vous n'êtes pas trop intense. Vous êtes seule depuis trop [[longtemps]].",
+    dev:"Et votre corps le crie là où les mots n'osent pas : la gorge, le sternum."},
+};
+(function(){
+  const q=new URLSearchParams(location.search);
+  const dm=q.get('demo')||'';
+  if(dm.startsWith('carte')){
+    const CARTES={
+      'carte':{variant:'cover',texte:"Une femme qui tolère l'insupportable a été [[dressée]].",pilier:'LE MÉCANISME',index:1,total:9},
+      'carte-corps':{variant:'body',eyebrow:'LE SIGNE',texte:"Vous confondez le [[manque]] avec l'amour.",sub:"Le manque parle de votre enfance. L'amour, de votre présent.",index:3,total:9},
+      'carte-cta':{variant:'cta',texte:'Votre corps sait [[avant]] vous.',sub:'Écoutez-le une semaine. Notez ce qui se serre.',legend:'La réponse est en légende'},
+    };
+    window.renderSlide(Object.assign({theme:q.get('theme')},CARTES[dm]||CARTES['carte']));
+    return;
+  }
+  let spec=null;
+  try{if(q.get('d'))spec=JSON.parse(decodeURIComponent(escape(atob(q.get('d')))));}catch(e){}
+  spec=spec||DEMOS[q.get('demo')||'court']||DEMOS.court;
+  window.loadReel(spec,{platform:q.get('platform')||'instagram',theme:q.get('theme')||'nuit',guides:q.get('guides')==='1'});
+  if(!q.get('norun'))(async function loop(){while(true){await window.playReel();await wait(600);}})();
+})();
+</script>
+</body>
+</html>

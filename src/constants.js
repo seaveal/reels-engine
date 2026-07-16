@@ -12,6 +12,10 @@ export const COLORS = {
   // Mesuré sur les 3 originaux (palettegen) : RGB ≈ (249,233,219) = #F9E9DB.
   // Même teinte que la flèche dessinée « → » de bas de page.
   cream: '#F9E9DB',
+  // Format MESSAGE (bulles) — accent terracotta canonique H3C (#A8432B, « L'Écho
+  // Incarné », print+écran alignés) pour la bulle ENVOYÉE ; gris sombre pour la REÇUE.
+  terracotta: '#A8432B',
+  bubbleIn: '#262626',
 };
 
 // Safe zone tunée 2026-05-23 sur références réelles :
@@ -128,6 +132,37 @@ export const PAGE_CHARS_PER_SEC = 27;
 export const PAGE_MIN_SEC = 4;
 export const PAGE_MAX_SEC = 26;
 
+// --- Format MESSAGE (layout:"message") — conversation reconstituée en bulles. ADDITIF,
+// n'affecte ni le court ni le long. Chaque message : indicateur de frappe « … » puis la
+// bulle apparaît (fondu + léger slide). Timeline absolue (pas de Series) : la durée totale
+// = lead-in + Σ(frappe + reveal + lecture) + apparition CTA + tail statique.
+export const MSG_LEAD_IN_SEC = 0.5;       // avant la première bulle
+export const MSG_TYPING_SEC = 0.7;        // indicateur de frappe avant chaque bulle
+export const MSG_REVEAL_SEC = 0.35;       // fondu/slide d'apparition de la bulle
+export const MSG_MIN_READ_SEC = 1.0;      // lecture minimale d'une bulle
+export const MSG_CHARS_PER_SEC = 22;      // vitesse de lecture d'une bulle (lue en contexte)
+export const MSG_CTA_SEC = 1.6;           // apparition du CTA après la dernière bulle
+export const MSG_TAIL_SEC = 2.8;          // temps statique final
+
+// Durée d'un « créneau » message = frappe + reveal + lecture (proportionnelle au texte).
+export const messageSlotSec = (m) => {
+  const chars = String((m && m.text) || '').length;
+  const read = Math.max(MSG_MIN_READ_SEC, chars / MSG_CHARS_PER_SEC);
+  return MSG_TYPING_SEC + MSG_REVEAL_SEC + read;
+};
+// Instant de départ (frappe) de chaque message, en secondes.
+export const messageStarts = (spec) => {
+  const out = [];
+  let acc = MSG_LEAD_IN_SEC;
+  for (const m of (spec.messages ?? [])) { out.push(acc); acc += messageSlotSec(m); }
+  return out;
+};
+export const computeMessageSec = (spec) => {
+  const msgs = spec.messages ?? [];
+  const body = msgs.reduce((a, m) => a + messageSlotSec(m), 0);
+  return MSG_LEAD_IN_SEC + body + MSG_CTA_SEC + MSG_TAIL_SEC;
+};
+
 export const safeBox = (width, height) => ({
   x: Math.round(SAFE.left * width),
   y: Math.round(SAFE.top * height),
@@ -188,6 +223,8 @@ export const computePageHoldFrames = (spec) =>
 
 export const computeDurationSec = (spec) => {
   if (spec.duration_s != null) return spec.duration_s;
+  // FORMAT MESSAGE (bulles) : timeline absolue dérivée du volume de chaque bulle.
+  if (spec.layout === 'message') return computeMessageSec(spec);
   // FORMAT LONG / LIST (paging) : somme des durées de page.
   if (spec.layout === 'long' || spec.layout === 'list') {
     const holds = computePageHolds(spec);

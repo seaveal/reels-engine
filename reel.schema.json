@@ -8,9 +8,41 @@
   "oneOf": [
     { "$ref": "#/$defs/shortReel" },
     { "$ref": "#/$defs/longReel" },
-    { "$ref": "#/$defs/listReel" }
+    { "$ref": "#/$defs/listReel" },
+    { "$ref": "#/$defs/messageReel" }
   ],
   "$defs": {
+    "messageReel": {
+      "type": "object",
+      "required": ["slug", "layout", "messages"],
+      "additionalProperties": false,
+      "description": "FORMAT MESSAGE (conversation reconstituée en bulles — transpositioning 2026-07-13). hook en overlay haut, bulles in/out révélées une par une avec indicateur de frappe, CTA final optionnel.",
+      "properties": {
+        "slug": { "$ref": "#/$defs/slug" },
+        "layout": { "const": "message", "description": "Discriminant : 'message' active le mode conversation en bulles." },
+        "hook": { "type": "string", "minLength": 1, "maxLength": 120, "description": "Accroche en overlay haut (l'angle qui coupe le défilement). Markup [[mot]] = jaune." },
+        "cta": { "type": "string", "maxLength": 80, "description": "Ligne CTA finale (mot-clé funnel EN COMMENTAIRE). Optionnel." },
+        "duration_s": { "$ref": "#/$defs/duration_s" },
+        "background": { "$ref": "#/$defs/background" },
+        "messages": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "description": "1 à 8 bulles, dans l'ordre chronologique de l'échange.",
+          "items": { "$ref": "#/$defs/message" }
+        }
+      }
+    },
+    "message": {
+      "type": "object",
+      "required": ["side", "text"],
+      "additionalProperties": false,
+      "properties": {
+        "side": { "enum": ["in", "out"], "description": "in = message REÇU (bulle gauche, gris). out = message ENVOYÉ (bulle droite, terracotta)." },
+        "text": { "type": "string", "minLength": 1, "maxLength": 240 },
+        "time": { "type": "string", "maxLength": 8, "description": "Horodatage optionnel affiché sous la bulle (ex. '02:14')." }
+      }
+    },
     "slug": {
       "type": "string",
       "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",

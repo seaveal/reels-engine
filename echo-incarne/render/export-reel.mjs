@@ -31,6 +31,9 @@ const platformArg = opt('platform', 'instagram');
 const platforms = platformArg === 'all' ? PLATFORMS_ALL : [platformArg];
 const theme = opt('theme', 'papier');
 const outDir = opt('out', 'out/reels');
+// Moteur de rendu (2026-07-16) : défaut = Écho Incarné historique ; --template=moteur-braise.html
+// (ou -fracture / -manifeste) pour les 3 nouvelles directions. Les 4 exposent la même interface.
+const template = opt('template', 'reel-render.html');
 await mkdir(outDir, { recursive: true });
 
 const spec = JSON.parse(await readFile(specPath, 'utf8'));
@@ -85,7 +88,7 @@ const totalMs = isMessage
   : spec.segments.reduce((a, s) => a + holdMs(s), 0);
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const pageUrl = pathToFileURL(path.join(here, 'reel-render.html')).href + '?norun=1';
+const pageUrl = pathToFileURL(path.join(here, template)).href + '?norun=1';
 
 const hasFfmpeg = spawnSync('ffmpeg', ['-version'], { stdio: 'ignore' }).status === 0;
 const browser = await chromium.launch();

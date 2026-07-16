@@ -20,6 +20,9 @@ const specPath = argv.find(a => !a.startsWith('--'));
 const outFlag = argv.find(a => a.startsWith('--outdir='));
 const outArg = outFlag ? outFlag.slice('--outdir='.length)
   : argv.filter(a => !a.startsWith('--'))[1];
+// Moteur (2026-07-16) : défaut = Écho Incarné ; --template=carrousel-braise.html (ou -fracture/-manifeste).
+const tplFlag = argv.find(a => a.startsWith('--template='));
+const template = tplFlag ? tplFlag.slice('--template='.length) : 'carousel-render.html';
 if (!specPath) {
   console.error('usage: node export-carousel.mjs <spec.json> [outDir|--outdir=DIR]');
   process.exit(1);
@@ -83,7 +86,7 @@ const slides = raw.map((t, i) => {
 });
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const pageUrl = pathToFileURL(path.join(here, 'carousel-render.html')).href;
+const pageUrl = pathToFileURL(path.join(here, template)).href;
 
 const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: 1080, height: 1440 }, deviceScaleFactor: 1 });
