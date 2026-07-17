@@ -350,12 +350,11 @@ window.playReel=async function(){
     if(seg.role!=='cta'){
       const els=Array.from(document.querySelectorAll('#page .segLine'));
       const gaps=lineGaps(seg,spec,els.length);
-      let used=0;
       for(let j=0;j<els.length;j++){
         els[j].style.opacity='1';els[j].style.transform='none';
-        if(j<els.length-1){await wait(gaps[j]);used+=gaps[j];}
+        if(j<els.length-1){await wait(gaps[j]);}
       }
-      await wait(Math.max(900,holdMs(seg)-used));
+      await wait(holdMs(seg)); // temps de lecture PLEIN après révélation complète (fix « trop vite » 2026-07-17 : le plancher 900ms faisait flasher les blocs multi-lignes à texte court)
     } else {
       await wait(holdMs(seg));
     }
