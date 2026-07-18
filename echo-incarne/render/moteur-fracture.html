@@ -348,13 +348,10 @@ window.playReel=async function(){
     const seg=spec.segments[i];
     showSegment(i);
     if(seg.role!=='cta'){
-      const els=Array.from(document.querySelectorAll('#page .segLine'));
-      const gaps=lineGaps(seg,spec,els.length);
-      for(let j=0;j<els.length;j++){
-        els[j].style.opacity='1';els[j].style.transform='none';
-        if(j<els.length-1){await wait(gaps[j]);}
-      }
-      await wait(holdMs(seg)); // temps de lecture PLEIN après révélation complète (fix « trop vite » 2026-07-17 : le plancher 900ms faisait flasher les blocs multi-lignes à texte court)
+      // Page affichée D'UN COUP (doctrine mise-en-scène-reel : « lecture affichée d'un coup »),
+      // tenue EXACTEMENT le temps de lecture chars/27 borné 4-26 s (algo de durée convenu, comme l'écho).
+      Array.from(document.querySelectorAll('#page .segLine')).forEach(el=>{el.style.opacity='1';el.style.transform='none';});
+      await wait(holdMs(seg));
     } else {
       await wait(holdMs(seg));
     }
