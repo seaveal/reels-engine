@@ -51,8 +51,9 @@ const esc = (s='') => s.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt
 const pivot = (s, accent) => esc(s).replace(/\[\[([^\]]+)\]\]/g,
   `<span style="color:${accent};font-style:italic">$1</span>`);
 
-// Loi moteur : caractères ÷ 27 s, borné 4–26 s
-const holdMs = seg => Math.min(26, Math.max(4, seg.text.replace(/\[\[|\]\]/g,'').length / 27)) * 1000;
+// Loi moteur : durée d'affichage = f(nombre de caractères) = caractères ÷ 27, borné 2–26 s.
+// Plancher abaissé 4→2 s le 2026-07-17 (Cyrille) : à 4 s la plupart des pages courtes s'y collaient → la durée ne variait plus avec le texte.
+const holdMs = seg => Math.min(26, Math.max(2, seg.text.replace(/\[\[|\]\]/g,'').length / 27)) * 1000;
 
 let CFG = null; // {spec, theme, platform, T, Z}
 

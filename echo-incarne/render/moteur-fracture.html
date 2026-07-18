@@ -49,7 +49,9 @@ const esc=(s='')=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&g
 const pivot=(s,T)=>esc(s).replace(/\[\[([^\]]+)\]\]/g,
   `<span style="background:${T.chip};color:${T.chipText};padding:.02em .14em;box-decoration-break:clone;-webkit-box-decoration-break:clone;">$1</span>`);
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
-const holdMs=seg=>Math.min(26,Math.max(4,seg.text.replace(/\[\[|\]\]/g,'').length/27))*1000;
+// Durée d'affichage = f(nombre de caractères) : chars/27, plancher 2 s (readabilité mini), plafond 26 s.
+// Plancher abaissé 4→2 s le 2026-07-17 (Cyrille) : à 4 s la plupart des pages courtes s'y collaient → la durée ne variait plus avec le texte.
+const holdMs=seg=>Math.min(26,Math.max(2,seg.text.replace(/\[\[|\]\]/g,'').length/27))*1000;
 // Révélation dans l'ordre de lecture : gaps entre lignes configurables par le
 // serveur — seg.line_delays_ms[] (par ligne) ou line_delay_ms (uniforme),
 // posables au niveau du segment ou du spec. Défaut 450 ms.
@@ -348,10 +350,14 @@ window.playReel=async function(){
     const seg=spec.segments[i];
     showSegment(i);
     if(seg.role!=='cta'){
-      // Page affichée D'UN COUP (doctrine mise-en-scène-reel : « lecture affichée d'un coup »),
-      // tenue EXACTEMENT le temps de lecture chars/27 borné 4-26 s (algo de durée convenu, comme l'écho).
-      Array.from(document.querySelectorAll('#page .segLine')).forEach(el=>{el.style.opacity='1';el.style.transform='none';});
-      await wait(holdMs(seg));
+      const els=Array.from(document.querySelectorAll('#page .segLine'));
+      const gaps=lineGaps(seg,spec,els.length);
+      let used=0;
+      for(let j=0;j<els.length;j++){
+        els[j].style.opacity='1';els[j].style.transform='none';
+        if(j<els.length-1){await wait(gaps[j]);used+=gaps[j];}
+      }
+      await wait(Math.max(900,holdMs(seg)-used));
     } else {
       await wait(holdMs(seg));
     }
