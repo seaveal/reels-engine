@@ -12,3 +12,4 @@ qa/*.jpg
 .DS_Store
 .bak-*/
 *.bak-*
+graphify-out/
