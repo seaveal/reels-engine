@@ -1,0 +1,15 @@
+{
+  "slug": "confrontation-ce-nest-pas-de-lamour",
+  "layout": "confrontation",
+  "genre": "femme",
+  "hook": "Ce n'est pas de l'amour.",
+  "cta": "LA SUITE DANS LA LÉGENDE",
+  "top": {
+    "eyebrow": "ON VOUS DIT QUE",
+    "text": "S'il vous aime assez, il restera."
+  },
+  "bottom": {
+    "eyebrow": "VOTRE CORPS, LUI",
+    "text": "Se serre chaque fois qu'il s'éloigne. C'est une [[alarme]], pas de l'amour."
+  }
+}

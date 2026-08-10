@@ -1,0 +1,18 @@
+{
+  "slug": "avantapres-essayez-ca",
+  "layout": "avantapres",
+  "genre": "femme",
+  "hook": "Essayez ça 30 secondes.",
+  "cta": "LISEZ LA LÉGENDE",
+  "avant": {
+    "eyebrow": "AVANT",
+    "text": "Le ventre serré, le souffle court, vous relisez son message."
+  },
+  "geste": {
+    "text": "Une main sur le sternum. Inspirez 4 secondes, soufflez 6."
+  },
+  "apres": {
+    "eyebrow": "APRÈS",
+    "text": "Le souffle redescend. La [[boule]] se desserre."
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "slug": "long-meme-homme",
+  "layout": "long",
+  "hand_emoji": true,
+  "pages": [
+    {
+      "lines": [
+        {
+          "text": "VOUS TOMBEZ TOUJOURS SUR LE MÊME [[HOMME]].",
+          "role": "heading"
+        }
+      ],
+      "arrow": true
+    },
+    {
+      "lines": [
+        {
+          "text": "ET VOUS APPELEZ ÇA LA [[MALCHANCE]].",
+          "role": "heading"
+        },
+        {
+          "text": "Et pourtant.",
+          "role": "body"
+        }
+      ],
+      "arrow": true
+    },
+    {
+      "lines": [
+        {
+          "text": "Ce n'est pas la malchance.",
+          "role": "body"
+        },
+        {
+          "text": "C'est un [[schéma]] que votre enfance a gravé.",
+          "role": "body"
+        }
+      ],
+      "arrow": true
+    },
+    {
+      "lines": [
+        {
+          "text": "LISEZ LA LÉGENDE",
+          "role": "cta"
+        }
+      ]
+    }
+  ]
+}

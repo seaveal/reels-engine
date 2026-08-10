@@ -1,0 +1,21 @@
+{
+  "slug": "timeline-six-mois",
+  "layout": "timeline",
+  "genre": "femme",
+  "hook": "La même peur, six mois plus tard.",
+  "cta": "LA SUITE DANS LA LÉGENDE",
+  "steps": [
+    {
+      "label": "MOIS 1",
+      "text": "Vous vérifiez son téléphone « juste une fois »."
+    },
+    {
+      "label": "MOIS 3",
+      "text": "Vous connaissez ses trajets par cœur."
+    },
+    {
+      "label": "MOIS 6",
+      "text": "Vous ne dormez plus tant qu'il n'a pas [[répondu]]."
+    }
+  ]
+}

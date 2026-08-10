@@ -1,0 +1,13 @@
+{
+  "slug": "liste-4-choses",
+  "layout": "liste",
+  "genre": "femme",
+  "hook": "4 choses à arrêter quand il ne répond pas.",
+  "cta": "LISEZ LA LÉGENDE",
+  "items": [
+    "Retenir votre [[souffle]].",
+    "Relire la conversation.",
+    "Poser le téléphone face visible.",
+    "Chercher ce que vous avez « mal fait »."
+  ]
+}

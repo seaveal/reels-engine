@@ -1,0 +1,146 @@
+import { AbsoluteFill, Series, useVideoConfig, staticFile } from 'remotion';
+import { Background } from './Background.jsx';
+import { TextStack } from './TextStack.jsx';
+import { PageStack } from './PageStack.jsx';
+import { ListPage } from './ListPage.jsx';
+import { HandEmoji } from './HandEmoji.jsx';
+import { LegendCta } from './LegendCta.jsx';
+import { ProfileBadge } from './ProfileBadge.jsx';
+import { MessageReel } from './MessageReel.jsx';
+import { safeBox, safeBoxLong, COLORS, STAGGER_LEAD_IN_SEC, STAGGER_GAP_SEC, ALL_AT_ONCE_DELAY_SEC, FPS, FADE_SEC, HAND_EMOJI_DELAY_AFTER_LAST_SEC, computePageHoldFrames, CAPTION_TAP_X, CAPTION_TAP_Y } from './constants.js';
+import { normaliseSegments } from './segments.js';
+import { normalisePages } from './pages.js';
+
+// Audit V3 #4 — Embed Oswald local (TTF dans public/fonts/) au lieu de
+// @remotion/google-fonts/Oswald qui télécharge depuis fonts.gstatic.com au bundle.
+// Élimine la dépendance externe : si Google Fonts est down, le rendu fonctionne quand même.
+// Police 400/700 livrée par Cyrille 2026-05-24 (Oswald.zip Google Fonts officiel).
+const OSWALD_FONT_FACE = `
+@font-face {
+  font-family: 'Oswald';
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+  src: url(${JSON.stringify(staticFile('fonts/Oswald-Regular.ttf'))}) format('truetype');
+}
+@font-face {
+  font-family: 'Oswald';
+  font-weight: 700;
+  font-style: normal;
+  font-display: block;
+  src: url(${JSON.stringify(staticFile('fonts/Oswald-Bold.ttf'))}) format('truetype');
+}
+`;
+
+// Quand hand_emoji=true, on réserve une bande verticale (16% de la safe height)
+// en bas de la safe box pour l'emoji 👆, et on rétrécit la zone texte d'autant.
+// Garantit qu'aucun glyphe (ni texte ni emoji) ne sort de la safe box.
+const HAND_BAND_RATIO = 0.16;
+// Bande basse réservée au footer « lisez la légende » + flèche animée vers la légende.
+const LEGEND_BAND_RATIO = 0.18;
+
+export const Reel = (props) => {
+  const { width, height } = useVideoConfig();
+  const safe = safeBox(width, height);
+
+  // FORMAT MESSAGE (layout:"message") — conversation reconstituée en bulles.
+  // ADDITIF : délègue entièrement à MessageReel, ne touche pas aux formats existants.
+  if (props.layout === 'message') {
+    return <MessageReel {...props} />;
+  }
+
+  // FORMAT LONG (layout:"long") — paging / replace. Chaque page occupe sa propre
+  // fenêtre temporelle (Series) ; la page suivante remplace la précédente.
+  // ADDITIF : le format court (ci-dessous) reste strictement inchangé.
+  if (props.layout === 'list') {
+    // FORMAT LIST (liste numérotée / antithèse). Pages = { number, blocks[], footer? }.
+    const safeLong = safeBoxLong(width, height);
+    const pages = props.pages ?? [];
+    const holdFrames = computePageHoldFrames(props);
+    return (
+      <AbsoluteFill style={{ backgroundColor: COLORS.black }}>
+        <style dangerouslySetInnerHTML={{ __html: OSWALD_FONT_FACE }} />
+        <Background name={props.background} />
+        <ProfileBadge width={width} height={height} />
+        <Series>
+          {pages.map((page, i) => (
+            <Series.Sequence key={i} durationInFrames={holdFrames[i] ?? 1}>
+              <ListPage page={page} safe={safeLong} width={width} height={height} />
+            </Series.Sequence>
+          ))}
+        </Series>
+      </AbsoluteFill>
+    );
+  }
+
+  if (props.layout === 'long') {
+    // Le format long utilise sa PROPRE safe box (marges mesurées sur originaux),
+    // distincte du court → on n'altère pas le rendu court (non-régression).
+    const safeLong = safeBoxLong(width, height);
+    const pages = normalisePages(props.pages ?? []);
+    // v4 : frames par page = EXACTEMENT ce que somme computeDurationFrames pour la
+    // composition → la dernière page tient jusqu'à la dernière frame (pas de queue vide).
+    const holdFrames = computePageHoldFrames(props);
+    return (
+      <AbsoluteFill style={{ backgroundColor: COLORS.black }}>
+        <style dangerouslySetInnerHTML={{ __html: OSWALD_FONT_FACE }} />
+        <Background name={props.background} />
+        <ProfileBadge width={width} height={height} />
+        <Series>
+          {pages.map((page, i) => (
+            <Series.Sequence
+              key={page.id}
+              durationInFrames={holdFrames[i] ?? 1}
+            >
+              <PageStack page={page} safe={safeLong} />
+            </Series.Sequence>
+          ))}
+        </Series>
+      </AbsoluteFill>
+    );
+  }
+
+  // FORMAT COURT. Le CTA « lisez la légende » n'est PLUS dans le bloc auto-fit
+  // (sinon taille énorme) : il devient un footer dédié (petit) + flèche animée vers la légende.
+  const allSegments = normaliseSegments(props.segments ?? []);
+  const ctaSeg = allSegments.find((s) => s.role === 'cta');
+  const segments = allSegments.filter((s) => s.role !== 'cta');
+  const ctaText = ctaSeg ? ctaSeg.lines.map((l) => l.text).join(' ') : '';
+
+  const handBand = props.hand_emoji ? Math.round(safe.height * HAND_BAND_RATIO) : 0;
+  const legendBand = ctaText ? Math.round(safe.height * LEGEND_BAND_RATIO) : 0;
+  // Espace VIDE garanti entre le corps et le footer légende (sinon le texte colle au CTA).
+  const legendGap = ctaText ? Math.round(safe.height * 0.06) : 0;
+  const textSafe = { ...safe, height: safe.height - handBand - legendBand - legendGap };
+  const handZone = props.hand_emoji
+    ? { x: safe.x, y: safe.y + safe.height - handBand, width: safe.width, height: handBand }
+    : null;
+  // La zone légende part du footer et DESCEND jusqu'au point de tap de la légende IG
+  // (bas-GAUCHE) → la flèche plonge réellement là où l'utilisateur tape.
+  const legendTop = safe.y + safe.height - handBand - legendBand;
+  const captionTarget = { x: Math.round(width * CAPTION_TAP_X), y: Math.round(height * CAPTION_TAP_Y) };
+  const legendZone = ctaText
+    ? { x: safe.x, y: legendTop, width: safe.width, height: Math.round(captionTarget.y + 30) - legendTop }
+    : null;
+
+  // Frame de démarrage des éléments de bas (main / footer légende) : juste après le dernier segment de texte.
+  const lastSegStartSec = props.reveal === 'staggered'
+    ? STAGGER_LEAD_IN_SEC + Math.max(0, segments.length - 1) * STAGGER_GAP_SEC
+    : ALL_AT_ONCE_DELAY_SEC;
+  const handStartFrame = Math.round((lastSegStartSec + FADE_SEC + HAND_EMOJI_DELAY_AFTER_LAST_SEC) * FPS);
+
+  return (
+    <AbsoluteFill style={{ backgroundColor: COLORS.black }}>
+      <style dangerouslySetInnerHTML={{ __html: OSWALD_FONT_FACE }} />
+      <Background name={props.background} />
+      <ProfileBadge width={width} height={height} />
+      <TextStack segments={segments} reveal={props.reveal} safe={textSafe} />
+      {ctaText && (
+        <LegendCta text={ctaText} zone={legendZone} target={captionTarget} startSec={lastSegStartSec + FADE_SEC} />
+      )}
+      {props.hand_emoji && (
+        <HandEmoji zone={handZone} startFrame={handStartFrame} />
+      )}
+    </AbsoluteFill>
+  );
+};

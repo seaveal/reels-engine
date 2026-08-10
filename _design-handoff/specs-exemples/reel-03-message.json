@@ -1,0 +1,30 @@
+{
+  "slug": "message-il-repond-enfin",
+  "layout": "message",
+  "genre": "femme",
+  "hook": "L'échange qu'on relit à [[2h du matin]].",
+  "cta": "LISEZ LA LÉGENDE",
+  "messages": [
+    {
+      "side": "out",
+      "text": "Tu dors ?",
+      "time": "02:14"
+    },
+    {
+      "side": "in",
+      "text": "Non. Je pensais à nous."
+    },
+    {
+      "side": "out",
+      "text": "Mon ventre se serre chaque fois que tu t'éloignes."
+    },
+    {
+      "side": "in",
+      "text": "…"
+    },
+    {
+      "side": "out",
+      "text": "Et je confonds ça avec de l'amour depuis dix ans."
+    }
+  ]
+}
