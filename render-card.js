@@ -35,13 +35,16 @@ function hashDirContent(dir) {
 
 const args = process.argv.slice(2);
 if (args.length === 0 || args[0].startsWith('-')) {
-  console.error('usage: node render-card.js path/to/cards.json [--outdir=out/cards] [--scale=1|2]');
+  console.error('usage: node render-card.js path/to/cards.json [--outdir=out/cards] [--scale=1|2] [--comp=Carte|CartePub]');
   process.exit(64);
 }
 const specPath = resolve(args[0]);
 const outdirArg = args.find((a) => a.startsWith('--outdir='));
 const scaleArg = args.find((a) => a.startsWith('--scale='));
 const scale = scaleArg ? parseInt(scaleArg.slice('--scale='.length), 10) : 1;
+// --comp=CartePub : statique PUB 4:5 (1080×1350) avec pied « objet + prix » (studio de pub 2026-08-16).
+const compArg = args.find((a) => a.startsWith('--comp='));
+const compId = compArg ? compArg.slice('--comp='.length) : null;
 
 const spec = JSON.parse(readFileSync(specPath, 'utf-8'));
 if (!spec.slug || !Array.isArray(spec.cards) || spec.cards.length === 0) {
@@ -83,8 +86,8 @@ if (existsSync(sentinel)) {
 
 const written = [];
 for (let i = 0; i < cards.length; i++) {
-  const inputProps = { text: cards[i].text, handle: cards[i].handle || '@CyrilleNovou' };
-  const composition = await selectComposition({ serveUrl: bundleLocation, id: 'Carte', inputProps });
+  const inputProps = { text: cards[i].text, handle: cards[i].handle || '@CyrilleNovou', footer: cards[i].footer || spec.footer || '' };
+  const composition = await selectComposition({ serveUrl: bundleLocation, id: compId || spec.comp || 'Carte', inputProps });
   const outPath = join(outDir, `${spec.slug}-${i + 1}.png`);
   await renderStill({
     composition, serveUrl: bundleLocation, output: outPath, inputProps,

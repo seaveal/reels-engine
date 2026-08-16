@@ -32,7 +32,7 @@ const fontSizeFor = (chars) => {
   return 46;
 };
 
-export const Carte = ({ text = 'EXEMPLE DE [[CARTE]]', handle = '@CyrilleNovou' }) => {
+export const Carte = ({ text = 'EXEMPLE DE [[CARTE]]', handle = '@CyrilleNovou', footer = '' }) => {
   const raw = String(text || '');
   const stripped = raw.replace(/\[\[([^\]]+)\]\]/g, '$1');
   const fontSize = fontSizeFor(stripped.length);
@@ -49,7 +49,7 @@ export const Carte = ({ text = 'EXEMPLE DE [[CARTE]]', handle = '@CyrilleNovou' 
       {/* punchline centrée */}
       <AbsoluteFill style={{
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        padding: '120px 116px 150px',
+        padding: footer ? '120px 116px 230px' : '120px 116px 150px',
       }}>
         <div style={{
           fontFamily: FONT_FAMILY, fontWeight: 700, fontSize, lineHeight: 1.1,
@@ -61,6 +61,15 @@ export const Carte = ({ text = 'EXEMPLE DE [[CARTE]]', handle = '@CyrilleNovou' 
           ))}
         </div>
       </AbsoluteFill>
+      {/* pied « objet + prix » (statiques PUB 4:5, studio de pub 2026-08-16 — R-PUB-3 : la pub nomme
+          l'objet vendu et son prix). Vide par défaut : les cartes FB/Circle ne changent pas. */}
+      {footer ? (
+        <div style={{ position: 'absolute', bottom: 118, left: 96, right: 96, textAlign: 'center',
+          fontFamily: FONT_FAMILY, fontWeight: 400, fontSize: 32, lineHeight: 1.25, letterSpacing: '0.02em',
+          color: COLORS.cream, opacity: 0.95 }}>
+          {String(footer).replace(/ €/g, '\u00a0€')}
+        </div>
+      ) : null}
       {/* handle en pied */}
       <div style={{ position: 'absolute', bottom: 66, left: 0, right: 0, textAlign: 'center',
         fontFamily: FONT_FAMILY, fontWeight: 400, fontSize: 30, letterSpacing: '0.06em',

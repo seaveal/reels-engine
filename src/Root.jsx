@@ -40,6 +40,18 @@ export const RemotionRoot = () => (
       height={1080}
       defaultProps={{ text: 'EXEMPLE DE [[CARTE]]', handle: '@CyrilleNovou' }}
     />
+    {/* Carte PUB (still PNG 1080×1350, 4:5 feed Meta) — studio de pub, ADR 2026-08-16.
+        Même composant que Carte, avec un pied « objet + prix » (R-PUB-3). */}
+    <Composition
+      id="CartePub"
+      component={Carte}
+      durationInFrames={1}
+      fps={FPS}
+      width={1080}
+      height={1350}
+      defaultProps={{ text: 'LA TÊTE COMPREND. [[LE CORPS RÉPARE.]]', handle: '@CyrilleNovou',
+        footer: '« Vous avez tout compris. Rien n\'a changé. » — Pack Numérique 39,90 €, à lire et à écouter' }}
+    />
     {/* Slide de carrousel IG (still PNG 1080×1350, 4:5) — chantier 3 contenu v2. */}
     <Composition
       id="Slide"
