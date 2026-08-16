@@ -50,7 +50,8 @@ export const RemotionRoot = () => (
       width={1080}
       height={1350}
       defaultProps={{ text: 'LA TÊTE COMPREND. [[LE CORPS RÉPARE.]]', handle: '@CyrilleNovou',
-        footer: '« Vous avez tout compris. Rien n\'a changé. » — Pack Numérique 39,90 €, à lire et à écouter' }}
+        // Doctrine pubs v1 : le titre de l'ouvrage (qui contient « vous ») n'apparaît JAMAIS plein cadre.
+        footer: 'Le livre de Cyrille Novou — 386 pages · Pack Numérique 39,90 €, à lire et à écouter' }}
     />
     {/* Slide de carrousel IG (still PNG 1080×1350, 4:5) — chantier 3 contenu v2. */}
     <Composition
