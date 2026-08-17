@@ -55,6 +55,9 @@ export const Carte = ({ text = 'EXEMPLE DE [[CARTE]]', handle = '@CyrilleNovou',
           fontFamily: FONT_FAMILY, fontWeight: 700, fontSize, lineHeight: 1.1,
           color: COLORS.white, textAlign: 'center', textTransform: 'uppercase',
           letterSpacing: '-0.01em', width: '100%', wordBreak: 'break-word',
+          // Un « \n » dans le texte = un saut de ligne voulu (respiration, impact) ; les cartes
+          // sans « \n » ne changent pas (studio de pub, corrections Cyrille 2026-08-17).
+          whiteSpace: 'pre-line',
         }}>
           {pieces.map((p, i) => (
             <span key={i} style={{ color: p.yellow ? COLORS.cream : COLORS.white }}>{p.text}</span>
