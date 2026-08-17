@@ -67,10 +67,10 @@ export const Carte = ({ text = 'EXEMPLE DE [[CARTE]]', handle = '@CyrilleNovou',
       {/* pied « objet + prix » (statiques PUB 4:5, studio de pub 2026-08-16 — R-PUB-3 : la pub nomme
           l'objet vendu et son prix). Vide par défaut : les cartes FB/Circle ne changent pas. */}
       {footer ? (
-        <div style={{ position: 'absolute', bottom: 122, left: 72, right: 72, textAlign: 'center',
+        <div style={{ position: 'absolute', bottom: 122, left: 56, right: 56, textAlign: 'center',
           // 32 → 44 px : à 1080 px de large, 32 px = ~11 px sur un téléphone, illisible
           // (retour Cyrille 2026-08-17 sur le lot C1). Plancher : ~44 px pour ~15 px à l'écran.
-          fontFamily: FONT_FAMILY, fontWeight: 500, fontSize: 46, lineHeight: 1.22, letterSpacing: '0.01em',
+          fontFamily: FONT_FAMILY, fontWeight: 500, fontSize: 42, lineHeight: 1.22, letterSpacing: '0.01em',
           color: COLORS.cream, opacity: 0.97, whiteSpace: 'pre-line' }}>
           {String(footer).replace(/ €/g, '\u00a0€')}
         </div>
