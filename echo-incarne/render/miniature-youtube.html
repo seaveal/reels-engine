@@ -1,0 +1,88 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Miniature YouTube — signature H3C</title>
+<!--
+  Gabarit de miniature YouTube, 1280×720.
+
+  Pourquoi composer le texte ICI plutôt que de le faire générer avec l'image : un modèle
+  d'image rend « une grasse condensée », jamais Anton. Il place le texte où il veut, à la
+  taille qu'il veut, et recommence différemment à chaque vignette. Une signature de chaîne
+  suppose l'inverse — la même police, la même place, la même barre, sur les 59.
+
+  L'image générée ne porte donc AUCUN texte : elle apporte le visage, l'émotion, la
+  lumière. Tout le lettrage vient de ce gabarit, avec les polices embarquées de
+  « L'Écho Incarné » (Anton, Archivo) et sa palette. Même identité que les réels et les
+  carrousels : une chaîne ne se reconnaît pas si chaque canal a sa typographie.
+
+  Les valeurs sont injectées par `render-miniature.mjs` :
+    __IMAGE__  chemin de fond          __TITRE__  lettrage principal
+    __ACCENT__ segment mis en terracotta (facultatif, doit exister dans __TITRE__)
+-->
+<link rel="stylesheet" href="../fonts/echo-incarne-fonts.css">
+<style>
+  :root {
+    --terra: #A8432B;      /* accent canonique H3C, identique aux CTA et aux carrousels */
+    --encre: #2A211A;
+    --creme: #F0E7D6;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1280px; height: 720px; overflow: hidden; background: var(--encre); }
+
+  .scene { position: relative; width: 1280px; height: 720px; }
+  .fond  { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+
+  /* Voile porté à gauche : le lettrage doit tenir même si l'image y est claire.
+     Dégradé plutôt qu'aplat, sinon la bordure du voile se voit comme une couture. */
+  .voile {
+    position: absolute; inset: 0;
+    background: linear-gradient(100deg,
+      rgba(16,12,10,.94) 0%, rgba(16,12,10,.90) 34%,
+      rgba(16,12,10,.55) 50%, rgba(16,12,10,0) 66%);
+  }
+
+  .bloc {
+    position: absolute; left: 64px; top: 50%; transform: translateY(-50%);
+    width: 620px;
+  }
+
+  /* Anton, capitales, interlignage serré : c'est ce qui reste lisible à la largeur d'un
+     pouce, la seule contrainte qui compte vraiment sur une miniature. */
+  .titre {
+    font-family: 'Anton', sans-serif;
+    font-size: 92px; line-height: .96; letter-spacing: -.5px;
+    color: #fff; text-transform: uppercase;
+    text-shadow: 0 4px 28px rgba(0,0,0,.55);
+  }
+  /* Une ligne par PHRASE, jamais un retour à la ligne automatique : la coupe naturelle
+     laissait « 17 QUESTIONS. 9 » sur la première ligne et « MINUTES. » sur la seconde,
+     avec un chiffre orphelin. Le sens porte la coupe, pas la largeur du bloc. */
+  .ligne { display: block; white-space: nowrap; }
+  .titre .accent { color: var(--terra); }
+
+  /* Barre de signature : le seul élément purement graphique, identique partout. */
+  .barre {
+    width: 96px; height: 9px; background: var(--terra);
+    margin-bottom: 26px; border-radius: 2px;
+  }
+
+  /* Le nom, présent sur TOUTES les vignettes — c'est la demande qui a lancé ce gabarit.
+     Discret par construction : il signe, il ne concurrence pas le titre. */
+  .signature {
+    position: absolute; left: 64px; bottom: 44px;
+    font-family: 'Archivo', sans-serif; font-weight: 700;
+    font-size: 21px; letter-spacing: 3.4px; text-transform: uppercase;
+    color: var(--creme); opacity: .93;
+    text-shadow: 0 2px 12px rgba(0,0,0,.6);
+  }
+  .signature em { font-style: normal; color: var(--terra); }
+</style>
+
+<div class="scene">
+  <img class="fond" src="__IMAGE__" alt="">
+  <div class="voile"></div>
+  <div class="bloc">
+    <div class="barre"></div>
+    <div class="titre">__TITRE__</div>
+  </div>
+  <div class="signature">Cyrille <em>Novou</em></div>
+</div>
