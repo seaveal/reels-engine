@@ -41,38 +41,50 @@
   }
 
   .bloc {
-    position: absolute; left: 64px; top: 50%; transform: translateY(-50%);
-    width: 620px;
+    position: absolute; left: 58px; top: 50%; transform: translateY(-50%);
+    /* Bloc élargi : à 620 px le lettrage se réduisait trop vite sur les titres longs.
+       Une miniature se lit à ~168 px de large — tout ce qui n'est pas énorme disparaît. */
+    width: 720px;
   }
 
   /* Anton, capitales, interlignage serré : c'est ce qui reste lisible à la largeur d'un
      pouce, la seule contrainte qui compte vraiment sur une miniature. */
   .titre {
     font-family: 'Anton', sans-serif;
-    font-size: 92px; line-height: .96; letter-spacing: -.5px;
+    /* Interlignage à .96 et non .86 : Anton a des capitales très hautes, et à 172 px
+       les lignes se touchaient presque (retour Cyrille, 2026-08-17). L'air entre les
+       lignes fait partie de la lisibilité — un pavé compact se lit moins bien qu'un
+       pavé un peu plus petit qui respire. L'ajustement en hauteur s'en charge ensuite. */
+    font-size: 172px; line-height: .96; letter-spacing: -2px;
     color: #fff; text-transform: uppercase;
     text-shadow: 0 4px 28px rgba(0,0,0,.55);
   }
-  /* Une ligne par PHRASE, jamais un retour à la ligne automatique : la coupe naturelle
-     laissait « 17 QUESTIONS. 9 » sur la première ligne et « MINUTES. » sur la seconde,
-     avec un chiffre orphelin. Le sens porte la coupe, pas la largeur du bloc. */
-  .ligne { display: block; white-space: nowrap; }
+  /* Une PHRASE par bloc — la coupe naturelle laissait « 17 QUESTIONS. 9 » puis
+     « MINUTES. », avec un chiffre orphelin. Le sens porte la coupe.
+     Mais la phrase, elle, peut se replier sur plusieurs lignes : interdire le repli
+     obligeait à réduire le corps dès qu'un titre était long, et un lettrage réduit ne
+     se lit plus à la largeur d'un pouce. Mieux vaut trois lignes énormes qu'une ligne
+     petite (retour Cyrille, 2026-08-17). */
+  .ligne { display: block; }
   .titre .accent { color: var(--terra); }
 
   /* Barre de signature : le seul élément purement graphique, identique partout. */
   .barre {
-    width: 96px; height: 9px; background: var(--terra);
-    margin-bottom: 26px; border-radius: 2px;
+    width: 150px; height: 14px; background: var(--terra);
+    margin-bottom: 28px; border-radius: 2px;
   }
 
   /* Le nom, présent sur TOUTES les vignettes — c'est la demande qui a lancé ce gabarit.
      Discret par construction : il signe, il ne concurrence pas le titre. */
   .signature {
-    position: absolute; left: 64px; bottom: 44px;
-    font-family: 'Archivo', sans-serif; font-weight: 700;
-    font-size: 21px; letter-spacing: 3.4px; text-transform: uppercase;
-    color: var(--creme); opacity: .93;
-    text-shadow: 0 2px 12px rgba(0,0,0,.6);
+    position: absolute; left: 58px; bottom: 46px;
+    /* Le nom doit se LIRE à la largeur d'un pouce : à 21 px il disparaissait purement
+       et simplement (retour Cyrille 2026-08-17). Une signature qu'on ne voit pas ne
+       signe rien. Archivo 900, corps doublé, contre-filet pour tenir sur toute image. */
+    font-family: 'Archivo', sans-serif; font-weight: 900;
+    font-size: 40px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--creme); opacity: 1;
+    text-shadow: 0 3px 18px rgba(0,0,0,.75);
   }
   .signature em { font-style: normal; color: var(--terra); }
 </style>

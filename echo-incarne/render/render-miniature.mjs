@@ -65,11 +65,15 @@ try {
   // qui contraindrait l'écriture pour une raison purement typographique.
   await page.evaluate(() => {
     const bloc = document.querySelector('.titre');
-    const largeurMax = document.querySelector('.bloc').clientWidth;
-    let corps = 92;
-    const trop = () => Array.from(document.querySelectorAll('.ligne'))
-      .some((l) => l.scrollWidth > largeurMax);
-    while (trop() && corps > 44) { corps -= 2; bloc.style.fontSize = corps + 'px'; }
+    const cadre = document.querySelector('.bloc');
+    // On part TRÈS grand et on ne réduit qu'au strict nécessaire. La contrainte n'est
+    // plus la largeur d'une ligne — une phrase peut se replier — mais la HAUTEUR de
+    // l'ensemble : le pavé ne doit ni sortir de l'image ni recouvrir le visage.
+    const hauteurMax = 540;   // sur 720, laisse la barre et la signature respirer
+    let corps = 172;
+    const deborde = () => bloc.scrollHeight > hauteurMax
+      || Array.from(bloc.querySelectorAll('.ligne')).some((l) => l.scrollWidth > cadre.clientWidth);
+    while (deborde() && corps > 104) { corps -= 4; bloc.style.fontSize = corps + 'px'; }
   });
   await page.screenshot({ path: resolve(sortie), type: 'jpeg', quality: 92 });
   console.log('miniature →', resolve(sortie));
