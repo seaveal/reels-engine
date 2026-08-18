@@ -43,12 +43,21 @@ const segments = (accent || '').split('|').map((s) => s.trim()).filter(Boolean);
 // On échappe AVANT de poser les balises, et on cherche le segment échappé dans le titre
 // échappé : chercher dans le texte brut puis échapper détruirait les balises posées, et
 // une apostrophe typographique suffirait à tout décaler.
+// Bornes de mot, et non simple sous-chaîne : « PAS » ne doit pas allumer la moitié de
+// « PASSER ». `\b` de JavaScript ne connaît pas les accents — il verrait une frontière au
+// milieu de « ÉNERGIE » — d'où la classe explicite. L'apostrophe n'en fait pas partie,
+// et c'est voulu : dans « L'AMOUR », le mot fort est « AMOUR ».
+const LETTRE = "A-Za-zÀ-ÖØ-öø-ÿ0-9";
+const echapperRegex = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 const surligner = (ligne) => {
   let html = echapper(ligne);
   for (const segment of segments) {
     const cible = echapper(segment);
-    if (!html.includes(cible)) continue;
-    html = html.split(cible).join(`<span class="accent">${cible}</span>`);
+    const motif = new RegExp(`(?<![${LETTRE}])${echapperRegex(cible)}(?![${LETTRE}])`, 'g');
+    if (!motif.test(html)) continue;
+    motif.lastIndex = 0;
+    html = html.replace(motif, `<span class="accent">${cible}</span>`);
   }
   return html;
 };
