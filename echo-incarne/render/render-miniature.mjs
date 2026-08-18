@@ -51,7 +51,9 @@ const LETTRE = "A-Za-zÀ-ÖØ-öø-ÿ0-9";
 const echapperRegex = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 const surligner = (ligne) => {
-  let html = echapper(ligne);
+  // Un nombre reste collé au mot qui le suit : « ÇA 8 / FOIS » laissait le chiffre
+  // orphelin en fin de ligne (2026-08-18). L'espace insécable force « 8 FOIS » ensemble.
+  let html = echapper(ligne).replace(/(\d+)\s+(?=[A-Za-zÀ-ÖØ-öø-ÿ])/g, '$1\u00A0');
   for (const segment of segments) {
     const cible = echapper(segment);
     const motif = new RegExp(`(?<![${LETTRE}])${echapperRegex(cible)}(?![${LETTRE}])`, 'g');

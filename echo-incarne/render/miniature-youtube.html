@@ -49,9 +49,11 @@
 
   .bloc {
     position: absolute; left: 58px; top: 50%; transform: translateY(-50%);
-    /* Bloc élargi : à 620 px le lettrage se réduisait trop vite sur les titres longs.
-       Une miniature se lit à ~168 px de large — tout ce qui n'est pas énorme disparaît. */
-    width: 720px;
+    /* 580 px = la moitié GAUCHE de l'image (58 + 580 < 640). Le sujet est commandé sur
+       la moitié droite ; à 720 px le pavé débordait dessus et barrait le visage
+       (« IL FAIT ÇA 8 FOIS », retour Cyrille 2026-08-18). Un titre long se replie sur
+       trois lignes et se réduit en hauteur si besoin — jamais sur le visage. */
+    width: 580px;
   }
 
   /* Anton, capitales, interlignage serré : c'est ce qui reste lisible à la largeur d'un
