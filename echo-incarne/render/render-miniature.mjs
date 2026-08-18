@@ -1,6 +1,6 @@
 // Rend une miniature YouTube 1280×720 : image générée en fond, lettrage H3C par-dessus.
 //
-//   node render-miniature.mjs <image.png> "<TITRE>" <sortie.jpg> ["<segment accentué>"]
+//   node render-miniature.mjs <image.png> "<TITRE>" <sortie.jpg> ["MOT FORT|AUTRE MOT"]
 //
 // Le lettrage n'est PAS généré avec l'image. Un modèle d'image rend « une grasse
 // condensée », jamais Anton, et il le place où il veut : sur 59 vignettes, cela ne fait
@@ -18,7 +18,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const [image, titre, sortie, accent] = process.argv.slice(2);
 
 if (!image || !titre || !sortie) {
-  console.error('usage: render-miniature.mjs <image> "<TITRE>" <sortie.jpg> ["<accent>"]');
+  console.error('usage: render-miniature.mjs <image> "<TITRE>" <sortie.jpg> ["MOT|MOT"]');
   process.exit(2);
 }
 const imageAbs = resolve(image);
@@ -27,18 +27,44 @@ if (!existsSync(imageAbs)) { console.error('image introuvable :', imageAbs); pro
 const echapper = (s) => String(s)
   .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-// Le segment accentué est mis en terracotta DANS le titre. Il doit exister tel quel,
-// sinon on l'ignore : mieux vaut un titre uni qu'un remplacement approximatif.
+// Les mots forts sont surlignés en jaune DANS le titre — plusieurs segments possibles,
+// séparés par « | ». C'est le geste que Cyrille fait à la main sur Instagram : l'œil
+// attrape deux mots, pas une phrase.
+//
+// L'accent portait auparavant sur une PHRASE entière, et seulement si elle correspondait
+// exactement. Sur « IL COPIE VOTRE DOUTE », qui est d'un bloc, il n'y avait donc rien à
+// accentuer : la vignette sortait uniformément blanche sans que rien ne le signale.
+//
+// Un segment qui ne figure pas dans le titre est IGNORÉ, et on le dit sur la sortie
+// d'erreur : une faute de frappe dans un mot fort produirait sinon une vignette unie,
+// exactement comme si l'accent n'avait jamais été demandé.
+const segments = (accent || '').split('|').map((s) => s.trim()).filter(Boolean);
+
+// On échappe AVANT de poser les balises, et on cherche le segment échappé dans le titre
+// échappé : chercher dans le texte brut puis échapper détruirait les balises posées, et
+// une apostrophe typographique suffirait à tout décaler.
+const surligner = (ligne) => {
+  let html = echapper(ligne);
+  for (const segment of segments) {
+    const cible = echapper(segment);
+    if (!html.includes(cible)) continue;
+    html = html.split(cible).join(`<span class="accent">${cible}</span>`);
+  }
+  return html;
+};
+
+for (const segment of segments) {
+  if (!echapper(titre).includes(echapper(segment))) {
+    console.error(`mot fort absent du titre, ignoré : « ${segment} »`);
+  }
+}
+
 // Une ligne par phrase. Le point est la seule coupe qui ait du sens dans un titre de
 // miniature : « 17 QUESTIONS. » puis « 9 MINUTES. », jamais un chiffre orphelin en fin
 // de ligne. Sans phrase, on garde le titre d'un bloc.
 const lignes = titre.split(/(?<=[.?!])\s+/).map((l) => l.trim()).filter(Boolean);
-const titreHtml = (lignes.length ? lignes : [titre]).map((ligne) => {
-  const estAccent = accent && ligne === accent.trim();
-  const contenu = estAccent
-    ? `<span class="accent">${echapper(ligne)}</span>` : echapper(ligne);
-  return `<span class="ligne">${contenu}</span>`;
-}).join('');
+const titreHtml = (lignes.length ? lignes : [titre])
+  .map((ligne) => `<span class="ligne">${surligner(ligne)}</span>`).join('');
 
 // `replaceAll` et non `replace` : les marqueurs sont documentés dans le commentaire en
 // tête du gabarit, et `replace` ne remplaçait que cette PREMIÈRE occurrence — la page

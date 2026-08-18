@@ -16,12 +16,19 @@
 
   Les valeurs sont injectées par `render-miniature.mjs` :
     __IMAGE__  chemin de fond          __TITRE__  lettrage principal
-    __ACCENT__ segment mis en terracotta (facultatif, doit exister dans __TITRE__)
+    __ACCENT__ mots forts surlignés en jaune (facultatif, plusieurs séparés par « | »)
 -->
 <link rel="stylesheet" href="../fonts/echo-incarne-fonts.css">
 <style>
   :root {
     --terra: #A8432B;      /* accent canonique H3C, identique aux CTA et aux carrousels */
+    /* Le jaune n'est PAS une seconde couleur de marque : c'est un surligneur.
+       Le terracotta sur fond sombre plafonne à 2,5:1 de contraste — sur une vignette
+       vue à la largeur d'un pouce, le mot accentué disparaissait au lieu de ressortir
+       (constat Cyrille, 2026-08-18). Ce jaune monte à 15:1 sur le même voile. Il ne
+       sert qu'aux mots forts du titre et à la signature ; la barre reste terracotta,
+       et c'est elle qui porte l'identité. */
+    --jaune: #FFD400;
     --encre: #2A211A;
     --creme: #F0E7D6;
   }
@@ -66,7 +73,7 @@
      se lit plus à la largeur d'un pouce. Mieux vaut trois lignes énormes qu'une ligne
      petite (retour Cyrille, 2026-08-17). */
   .ligne { display: block; }
-  .titre .accent { color: var(--terra); }
+  .titre .accent { color: var(--jaune); }
 
   /* Barre de signature : le seul élément purement graphique, identique partout. */
   .barre {
@@ -86,7 +93,7 @@
     color: var(--creme); opacity: 1;
     text-shadow: 0 3px 18px rgba(0,0,0,.75);
   }
-  .signature em { font-style: normal; color: var(--terra); }
+  .signature em { font-style: normal; color: var(--jaune); }
 </style>
 
 <div class="scene">
