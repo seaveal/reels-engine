@@ -34,6 +34,9 @@ const outDir = opt('out', 'out/reels');
 // Moteur de rendu (2026-07-16) : défaut = Écho Incarné historique ; --template=moteur-braise.html
 // (ou -fracture / -manifeste) pour les 3 nouvelles directions. Les 4 exposent la même interface.
 const template = opt('template', 'reel-render.html');
+// Piste audio (layout:audio, 2026-08-20) : WAV de l'extrait du livre audio, muxé en AAC
+// dans le mp4 (-shortest). Sans --audio le mp4 reste muet (-an) comme avant.
+const audioPath = opt('audio', '');
 await mkdir(outDir, { recursive: true });
 
 const spec = JSON.parse(await readFile(specPath, 'utf8'));
@@ -105,11 +108,14 @@ async function renderPlatform(platform) {
     deviceScaleFactor: 1,
     recordVideo: { dir: outDir, size: { width: 1080, height: 1920 } },
   });
+  const recStart = Date.now(); // l'enregistrement démarre avec le contexte : sert à caler l'audio
   const page = await ctx.newPage();
   await page.goto(pageUrl);
   await page.evaluate(() => document.fonts.ready);
   await page.evaluate(({ s, o }) => window.loadReel(s, o), { s: spec, o: { platform, theme } });
   await page.waitForTimeout(1200); // pose du chrome (pastille, handle)
+  // Délai vidéo → début du karaoké : lead mesuré + amorce interne de playAudio (AUDIO_LEAD_MS).
+  const leadMs = (Date.now() - recStart) + (await page.evaluate(() => window.AUDIO_LEAD_MS || 0));
   await page.evaluate(() => window.playReel());
   await page.waitForTimeout(800);  // laisse le CTA respirer en fin
   const video = page.video();
@@ -120,8 +126,12 @@ async function renderPlatform(platform) {
 
   if (hasFfmpeg) {
     const mp4 = webm.replace(/\.webm$/, '.mp4');
-    const r = spawnSync('ffmpeg', ['-y', '-i', webm, '-c:v', 'libx264', '-pix_fmt', 'yuv420p',
-      '-r', '30', '-movflags', '+faststart', '-an', mp4], { stdio: 'ignore' });
+    const ffArgs = audioPath
+      ? ['-y', '-i', webm, '-i', audioPath, '-map', '0:v:0', '-map', '1:a:0', '-c:v', 'libx264', '-pix_fmt', 'yuv420p',
+         '-r', '30', '-af', `adelay=${Math.max(0, Math.round(leadMs))}:all=1,apad`, '-c:a', 'aac', '-b:a', '160k',
+         '-shortest', '-movflags', '+faststart', mp4]
+      : ['-y', '-i', webm, '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-r', '30', '-movflags', '+faststart', '-an', mp4];
+    const r = spawnSync('ffmpeg', ffArgs, { stdio: 'ignore' });
     if (r.status !== 0) {
       process.exitCode = 1; // le pipeline attend les .mp4 : échec ffmpeg = run en échec (2026-07-07)
       console.error(`✗ conversion mp4 échouée, webm conservé : ${webm}`);

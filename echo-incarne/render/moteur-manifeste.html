@@ -120,7 +120,7 @@ window.loadReel=function(spec,opts={}){
     </div>
     ${CFG.guides?guidesHtml(Z):''}`;
   fitCapsule(Z);
-  const B={message:buildMessage,confrontation:buildConfrontation,avantapres:buildAvantApres,timeline:buildTimeline,liste:buildListe,citation:buildCitation,notes:buildNotes,calendrier:buildCalendrier}[spec.layout];
+  const B={message:buildMessage,confrontation:buildConfrontation,avantapres:buildAvantApres,timeline:buildTimeline,liste:buildListe,citation:buildCitation,notes:buildNotes,calendrier:buildCalendrier,page:buildPage,audio:buildAudio}[spec.layout];
   if(B) B(spec,T);
   return true;
 };
@@ -302,7 +302,7 @@ async function playCitation(){
 function buildNotes(spec, T) {
   const page = document.getElementById('page');
   page.style.flex = '1'; page.style.minHeight = '0'; page.style.justifyContent = 'center';
-  const AC = T.accent || T.chip || '#A8432B', EC = T.echo || T.bubbleIn || 'rgba(168,67,43,.12)';
+  const AC = T.accent || T.chip || '#A8432B', EC = T.echo || T.hi || 'rgba(168,67,43,.10)';
   const items = (spec.items || []).slice(0, 8).map(it => (it && typeof it === 'object') ? String(it.text || '') : String(it || ''));
   const last = items.length - 1;
   page.innerHTML = hookHtml(spec, T, 46) +
@@ -332,7 +332,7 @@ async function playNotes() {
 function buildCalendrier(spec, T) {
   const page = document.getElementById('page');
   page.style.flex = '1'; page.style.minHeight = '0'; page.style.justifyContent = 'center';
-  const AC = T.accent || T.chip || '#A8432B', EC = T.echo || T.bubbleIn || 'rgba(168,67,43,.12)';
+  const AC = T.accent || T.chip || '#A8432B', EC = T.echo || T.hi || 'rgba(168,67,43,.10)';
   const blocks = (spec.blocks || []).slice(0, 8);
   page.innerHTML = hookHtml(spec, T, 40) +
     (spec.pov ? `<div class="calFit" style="font-family:var(--mono);font-size:28px;letter-spacing:.14em;text-transform:uppercase;color:${AC};margin-bottom:26px;">${pivot(spec.pov,T)}</div>` : '') +
@@ -359,6 +359,113 @@ async function playCalendrier() {
     await wait(readMs(blocks[i].title, 24, 1300, 2400) + (i === blocks.length - 1 ? 1000 : 0));
   }
   revealCta(); await wait(1800); return true;
+}
+
+// =============================================================== mode page surlignée (dérivé pub T48 — 2026-08-20)
+// Une page du livre, VERBATIM (Règle 8). Le marqueur balaie les [[passages]] pendant la lecture.
+window.AUDIO_LEAD_MS = window.AUDIO_LEAD_MS || 800;
+const PG_PAPER = 'data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20width=%22220%22%20height=%22220%22%3E%3Cfilter%20id=%22p%22%3E%3CfeTurbulence%20type=%22fractalNoise%22%20baseFrequency=%220.9%22%20numOctaves=%223%22%20stitchTiles=%22stitch%22/%3E%3CfeColorMatrix%20values=%220%200%200%200%200.45%200%200%200%200%200.40%200%200%200%200%200.33%200%200%200%200.10%200%22/%3E%3C/filter%3E%3Crect%20width=%22100%25%22%20height=%22100%25%22%20filter=%22url(%23p)%22/%3E%3C/svg%3E';
+function pgHtml(text, AC) {
+  return esc(text).replace(/\[\[([^\]]+)\]\]/g, `<span class="pgMark" style="background-image:linear-gradient(104deg,${AC}33 0%,${AC}66 45%,${AC}33 100%);background-repeat:no-repeat;background-size:0% 100%;transition:background-size 1.1s ease;-webkit-box-decoration-break:clone;box-decoration-break:clone;padding:.04em .14em;margin:0 -.14em;border-radius:3px;">$1</span>`);
+}
+function buildPage(spec, T) {
+  const page = document.getElementById('page');
+  page.style.flex = '1'; page.style.minHeight = '0'; page.style.justifyContent = 'center';
+  const AC = T.accent || T.chip || '#A8432B';
+  const paras = (spec.paras || []).slice(0, 4);
+  page.innerHTML = hookHtml(spec, T, 42) +
+    `<div id="pgSheet" style="position:relative;background:linear-gradient(168deg,#F7F2E8 0%,#EFE8D9 55%,#E9E2D4 100%);color:#241F1A;border-radius:6px;padding:52px 58px 60px;box-shadow:0 24px 70px rgba(0,0,0,.28),0 2px 0 rgba(255,255,255,.6) inset;opacity:0;transform:translateY(26px) rotate(-.4deg);transition:opacity .9s ease,transform 1.1s ease;overflow:hidden;">
+      <div style="position:absolute;inset:0;background-image:url('${PG_PAPER}');opacity:.55;pointer-events:none;"></div>
+      <div style="position:relative;display:flex;justify-content:space-between;font-family:var(--mono);font-size:22px;letter-spacing:.16em;text-transform:uppercase;color:#241F1A;opacity:.5;margin-bottom:28px;gap:24px;"><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(spec.head || 'Vous avez tout compris. Rien n\'a changé.')}</span><span>Cyrille Novou</span></div>
+      <div style="position:relative;text-align:center;color:${AC};font-size:22px;letter-spacing:.6em;margin:0 0 30px;">◆ ◆ ◆</div>
+      <div id="pgBody" style="position:relative;font-family:var(--serif);font-size:38px;line-height:1.42;text-align:justify;hyphens:auto;-webkit-hyphens:auto;">` +
+    paras.map((p, i) => `<p class="pgPara" id="pg${i}" lang="fr" style="margin:0 0 .55em;text-indent:${(i === 0 && p.first) ? 0 : '1.6em'};opacity:0;transition:opacity .8s ease;">${pgHtml(p.text || '', AC)}</p>`).join('') +
+    `</div></div>`;
+  // auto-fit dédié : la page peut descendre à 28 px (fitPage s'arrête à 36)
+  const avail = 1920 - CFG.Z.top - CFG.Z.bottom - 300;
+  const body = document.getElementById('pgBody');
+  let fs = 38, guard = 0;
+  const pf = page.style.flex; page.style.flex = 'none';
+  while (page.scrollHeight > avail && fs > 28 && guard++ < 20) { fs -= 2; body.style.fontSize = fs + 'px'; }
+  page.style.flex = pf;
+}
+async function playPage() {
+  const paras = (CFG.spec.paras || []).slice(0, 4);
+  await wait(400);
+  const sheet = document.getElementById('pgSheet'); if (sheet) { sheet.style.opacity = '1'; sheet.style.transform = 'none'; }
+  await wait(900);
+  for (let i = 0; i < paras.length; i++) {
+    const el = document.getElementById('pg' + i); if (el) el.style.opacity = '1';
+    await wait(500);
+    const marks = el ? Array.from(el.querySelectorAll('.pgMark')) : [];
+    for (const m of marks) { m.style.backgroundSize = '100% 100%'; await wait(1200); }
+    await wait(Math.max(900, readMs(paras[i].text, 30, 2500, 6000) - 500 - marks.length * 1200));
+  }
+  if (sheet) sheet.style.transform = 'translateY(-10px)';
+  revealCta(); await wait(1800); return true;
+}
+
+// =============================================================== mode extrait audio (dérivé pub T49 — 2026-08-20)
+// La voix de Cyrille (muxée par export-reel --audio) + transcription VERBATIM en karaoké calé sur
+// l'horloge réelle. Onde déterministe (PRNG graine fixe) : identique à chaque rendu.
+function auWave(n) {
+  let s = 7; const rnd = () => { s = (s * 9301 + 49297) % 233280; return s / 233280; };
+  const out = []; for (let i = 0; i < n; i++) { const r = rnd(); out.push(18 + Math.pow(Math.sin((i / n) * Math.PI), .6) * (40 + r * 62)); }
+  return out;
+}
+function auFmt(sec) { sec = Math.max(0, Math.round(sec)); return Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0'); }
+function buildAudio(spec, T) {
+  const page = document.getElementById('page');
+  page.style.flex = '1'; page.style.minHeight = '0'; page.style.justifyContent = 'center';
+  const AC = T.accent || T.chip || '#A8432B', EC = T.echo || T.hi || 'rgba(168,67,43,.10)';
+  const words = spec.words || [];
+  const total = Math.max(1, Number(spec.t1 || 0) - Number(spec.t0 || 0));
+  const bars = auWave(58);
+  page.innerHTML = hookHtml(spec, T, 42) +
+    `<div style="background:${EC};border-radius:30px;padding:44px 46px 40px;">
+      <div style="font-family:var(--mono);font-size:22px;letter-spacing:.18em;text-transform:uppercase;color:${AC};margin-bottom:10px;">${esc(spec.kicker || 'Extrait · livre audio')}</div>
+      <div style="font-family:var(--sans);font-weight:800;font-size:34px;line-height:1.1;color:${T.text};margin-bottom:30px;">Lu par Cyrille Novou</div>
+      <div style="display:flex;align-items:center;gap:26px;margin-bottom:14px;">
+        <div id="auPlay" style="flex:none;width:104px;height:104px;border-radius:50%;background:${AC};display:flex;align-items:center;justify-content:center;box-shadow:0 12px 34px rgba(0,0,0,.22);"><div style="width:0;height:0;border-top:20px solid transparent;border-bottom:20px solid transparent;border-left:34px solid #F5EDDD;margin-left:8px;"></div></div>
+        <div id="auBars" style="flex:1;display:flex;align-items:center;gap:6px;height:120px;">` +
+    bars.map(h => `<div class="auBar" style="flex:1;height:${h.toFixed(0)}px;border-radius:4px;background:${T.text};opacity:.22;transition:opacity .2s,background .2s;"></div>`).join('') +
+    `</div></div>
+      <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:24px;color:${T.text};opacity:.55;margin-bottom:30px;"><span id="auNow">0:00</span><span>${auFmt(total)}</span></div>
+      <div id="auText" class="auFit" style="font-family:var(--serif);font-size:44px;line-height:1.38;color:${T.text};">` +
+    words.map((w, i) => `<span class="auW" id="auw${i}" style="opacity:.42;transition:opacity .25s,color .25s;">${esc(w.w)}</span>`).join(' ') +
+    `</div></div>`;
+  fitPage(page, '.auFit');
+}
+async function playAudio() {
+  const spec = CFG.spec, words = spec.words || [];
+  const AC = (CFG.T && (CFG.T.accent || CFG.T.chip)) || '#A8432B';
+  const total = Math.max(1, Number(spec.t1 || 0) - Number(spec.t0 || 0)) * 1000;
+  const bars = Array.from(document.querySelectorAll('.auBar'));
+  await wait(window.AUDIO_LEAD_MS);
+  const play = document.getElementById('auPlay'); if (play) play.style.transform = 'scale(.94)';
+  const start = performance.now();
+  await new Promise(resolve => {
+    let cur = -1;
+    const tick = () => {
+      const el = performance.now() - start;
+      const sec = el / 1000;
+      let idx = -1;
+      for (let i = 0; i < words.length; i++) { if (words[i].t0 <= sec) idx = i; else break; }
+      if (idx !== cur) {
+        for (let i = Math.max(0, cur); i <= idx; i++) { const w = document.getElementById('auw' + i); if (w) { w.style.opacity = '1'; w.style.color = ''; w.style.fontWeight = ''; } }
+        const now = document.getElementById('auw' + idx); if (now) { now.style.color = AC; now.style.fontWeight = '600'; }
+        const prev = document.getElementById('auw' + cur); if (prev && cur !== idx) { prev.style.color = ''; prev.style.fontWeight = ''; prev.style.opacity = '.78'; }
+        cur = idx;
+      }
+      const frac = Math.min(1, el / total);
+      const lit = Math.floor(frac * bars.length);
+      for (let i = 0; i < bars.length; i++) { if (i < lit && bars[i].dataset.on !== '1') { bars[i].style.opacity = '1'; bars[i].style.background = AC; bars[i].dataset.on = '1'; } }
+      const nowEl = document.getElementById('auNow'); if (nowEl) nowEl.textContent = auFmt(sec);
+      if (el < total) requestAnimationFrame(tick); else resolve();
+    };
+    requestAnimationFrame(tick);
+  });
+  revealCta(); await wait(1600); return true;
 }
 
 // ============================================================ message (bulles)
@@ -416,6 +523,8 @@ window.playReel=async function(){
   if(spec.layout==='citation')return playCitation();
   if(spec.layout==='notes')return playNotes();
   if(spec.layout==='calendrier')return playCalendrier();
+  if(spec.layout==='page')return playPage();
+  if(spec.layout==='audio')return playAudio();
   for(let i=0;i<spec.segments.length;i++){
     const seg=spec.segments[i];
     showSegment(i);
@@ -444,6 +553,8 @@ window.reelDurationMs=spec=>{
   :spec.layout==='citation'?500+3400+(spec.dev?3000:0)+1600
   :spec.layout==='notes'?(spec.items || []).slice(0, 8).reduce((a, it) => a + readMs((it && typeof it === 'object') ? it.text : it, 24, 1500, 2600), 0) + 500 + 900 + 1700
   :spec.layout==='calendrier'?(spec.blocks || []).slice(0, 8).reduce((a, b) => a + readMs(b.title, 24, 1300, 2400), 0) + 500 + 1000 + 1800
+  :spec.layout==='page'?(spec.paras || []).slice(0, 4).reduce((a, p) => a + readMs(p.text, 30, 2500, 6000), 0) + 400 + 900 + 1800
+  :spec.layout==='audio'?Math.max(1, Number(spec.t1 || 0) - Number(spec.t0 || 0)) * 1000 + (window.AUDIO_LEAD_MS || 800) + 1600
   :(spec.segments||[]).reduce((a,s)=>a+holdMs(s),0);
 };
 
@@ -534,6 +645,11 @@ const DEMOS={
     {time:'12h',title:'Annuler le déjeuner pour l\'aider.',kind:'repete'},{time:'14h',title:'Relire son message en réunion.',kind:'repete'},
     {time:'17h',title:'Demain, je pense à moi.',kind:'promesse'},{time:'19h',title:'Cuisiner ce qu\'elle aime.',kind:'repete'},
     {time:'21h',title:'Écouter, encore, sans rien dire.',kind:'repete'},{time:'23h',title:'La [[mâchoire]] serrée depuis 7h du matin.',kind:'bascule'}]},
+  page:{slug:'demo-page',layout:'page',hook:"La page qu'on [[photographie]].",cta:'LISEZ LA LÉGENDE',head:'Chapitre 1 · Le ventre se souvient',paras:[
+    {text:"Première séance. Dix minutes qu'elle parlait, dix minutes que les mots sortaient en rafale. Je l'ai interrompue avec cette question, une seule, et [[le silence qui a suivi l'a surprise]].",first:true},
+    {text:"Elle a réfléchi. Longtemps. Puis [[sa main droite s'est posée sur son ventre]]."}]},
+  audio:{slug:'demo-audio',layout:'audio',hook:"Écoutez ce que dit le [[ventre]].",cta:'LA SUITE DANS LA LÉGENDE',kicker:'Extrait · livre audio',section:'ch01',t0:0,t1:6,words:[
+    {w:'Pascale',t0:.4,t1:.8},{w:"s'est",t0:.8,t1:1.1},{w:'arrêtée.',t0:1.1,t1:1.5},{w:'Ses',t0:1.9,t1:2.1},{w:'mains',t0:2.1,t1:2.5},{w:'tremblaient.',t0:2.5,t1:3.3},{w:'Le',t0:4,t1:4.2},{w:'ventre.',t0:4.2,t1:5}]},
   citation:{slug:'demo-citation',layout:'citation',cta:'LISEZ LA LÉGENDE',
     quote:"Vous n'êtes pas trop intense. Vous êtes seule depuis trop [[longtemps]].",
     dev:"Et votre corps le crie là où les mots n'osent pas : la gorge, le sternum."},

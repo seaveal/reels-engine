@@ -1,0 +1,17 @@
+{
+  "slug": "exemple-page",
+  "layout": "page",
+  "hook": "La page qu'on [[photographie]].",
+  "cta": "LISEZ LA LÉGENDE",
+  "head": "Chapitre 1 · Le ventre se souvient",
+  "section": "ch01",
+  "paras": [
+    {
+      "text": "Première séance. Dix minutes qu'elle parlait, dix minutes que les mots sortaient en rafale. Je l'ai interrompue avec cette question, une seule, et [[le silence qui a suivi l'a surprise]]. Elle ne s'attendait pas à ça.",
+      "first": true
+    },
+    {
+      "text": "Elle a réfléchi. Longtemps. Puis [[sa main droite s'est posée sur son ventre]]."
+    }
+  ]
+}
