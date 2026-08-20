@@ -117,7 +117,7 @@ window.loadReel=function(spec,opts={}){
     </div>
     ${CFG.guides?guidesHtml(Z):''}`;
   fitCapsule(Z);
-  const B={message:buildMessage,confrontation:buildConfrontation,avantapres:buildAvantApres,timeline:buildTimeline,liste:buildListe,citation:buildCitation}[spec.layout];
+  const B={message:buildMessage,confrontation:buildConfrontation,avantapres:buildAvantApres,timeline:buildTimeline,liste:buildListe,citation:buildCitation,notes:buildNotes,calendrier:buildCalendrier}[spec.layout];
   if(B) B(spec,T);
   return true;
 };
@@ -293,6 +293,70 @@ async function playCitation(){
   revealCta();await wait(1600);return true;
 }
 
+// =============================================================== mode notes (carnet, dérivé pub T42 — 2026-08-20)
+// Une note qu'on relit : titre + 5-8 lignes, la DERNIÈRE = la bascule (accent). Aucun chrome de plateforme.
+function buildNotes(spec, T) {
+  const page = document.getElementById('page');
+  page.style.flex = '1'; page.style.minHeight = '0'; page.style.justifyContent = 'center';
+  const AC = T.accent || T.chip || '#A8432B', EC = T.echo || T.bubbleIn || 'rgba(168,67,43,.12)';
+  const items = (spec.items || []).slice(0, 8).map(it => (it && typeof it === 'object') ? String(it.text || '') : String(it || ''));
+  const last = items.length - 1;
+  page.innerHTML = hookHtml(spec, T, 46) +
+    `<div style="background:${EC};border-radius:28px;padding:46px 50px 38px;border:1px solid ${AC}22;">
+      <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:24px;letter-spacing:.14em;text-transform:uppercase;color:${T.text};opacity:.45;margin-bottom:22px;"><span>Notes</span><span>23:14</span></div>
+      ${spec.title ? `<div class="ntFit" style="font-family:var(--sans);font-weight:800;font-size:54px;line-height:1.08;color:${T.text};margin-bottom:30px;">${pivot(spec.title,T)}</div>` : ''}
+      <div style="display:flex;flex-direction:column;">` +
+    items.map((t, i) => `<div id="nt${i}" style="display:flex;gap:22px;align-items:flex-start;padding:18px 0;border-top:1px solid ${T.text}1f;opacity:0;transform:translateY(10px);transition:opacity .45s ease,transform .45s ease;">
+        <div style="flex:none;width:18px;height:18px;margin-top:16px;border-radius:4px;${i === last ? `background:${AC};` : `border:2px solid ${T.text};opacity:.35;`}"></div>
+        <div class="ntFit" style="font-family:var(--serif);font-size:${i === last ? 52 : 46}px;font-weight:${i === last ? 600 : 400};line-height:1.22;color:${T.text};">${pivot(t,T)}</div></div>`).join('') +
+    `</div></div>`;
+  fitPage(page, '.ntFit');
+}
+async function playNotes() {
+  const items = (CFG.spec.items || []).slice(0, 8);
+  await wait(500);
+  for (let i = 0; i < items.length; i++) {
+    const el = document.getElementById('nt' + i); if (el) { el.style.opacity = '1'; el.style.transform = 'none'; }
+    const t = (items[i] && typeof items[i] === 'object') ? items[i].text : items[i];
+    await wait(readMs(t, 24, 1500, 2600) + (i === items.length - 1 ? 900 : 0));
+  }
+  revealCta(); await wait(1700); return true;
+}
+
+// =============================================================== mode calendrier (POV, dérivé pub T44 — 2026-08-20)
+// 8 créneaux : 6 répétitions, 1 promesse (fine, italique), 1 bascule (dernier, accent).
+function buildCalendrier(spec, T) {
+  const page = document.getElementById('page');
+  page.style.flex = '1'; page.style.minHeight = '0'; page.style.justifyContent = 'center';
+  const AC = T.accent || T.chip || '#A8432B', EC = T.echo || T.bubbleIn || 'rgba(168,67,43,.12)';
+  const blocks = (spec.blocks || []).slice(0, 8);
+  page.innerHTML = hookHtml(spec, T, 40) +
+    (spec.pov ? `<div class="calFit" style="font-family:var(--mono);font-size:28px;letter-spacing:.14em;text-transform:uppercase;color:${AC};margin-bottom:26px;">${pivot(spec.pov,T)}</div>` : '') +
+    `<div style="display:flex;flex-direction:column;gap:8px;">` +
+    blocks.map((b, i) => {
+      const k = String(b.kind || 'repete');
+      const box = k === 'bascule' ? `background:${EC};border-left:8px solid ${AC};`
+        : k === 'promesse' ? `border-left:3px dashed ${T.text}66;`
+        : `border-left:8px solid ${T.text}33;`;
+      const txt = k === 'bascule' ? `font-family:var(--serif);font-weight:600;font-size:44px;`
+        : k === 'promesse' ? `font-family:var(--serif);font-style:italic;font-size:36px;opacity:.7;`
+        : `font-family:var(--sans);font-weight:500;font-size:36px;`;
+      return `<div id="cal${i}" style="display:flex;gap:26px;align-items:center;padding:10px 22px;${box}opacity:0;transform:translateX(-14px);transition:opacity .45s ease,transform .45s ease;">
+        <div style="flex:none;width:120px;font-family:var(--mono);font-size:28px;letter-spacing:.06em;color:${T.text};opacity:.55;">${esc(b.time || '')}</div>
+        <div class="calFit" style="${txt}line-height:1.18;color:${T.text};">${pivot(b.title || "",T)}</div></div>`;
+    }).join('') + `</div>`;
+  fitPage(page, '.calFit');
+}
+async function playCalendrier() {
+  const blocks = (CFG.spec.blocks || []).slice(0, 8);
+  await wait(500);
+  for (let i = 0; i < blocks.length; i++) {
+    const el = document.getElementById('cal' + i); if (el) { el.style.opacity = '1'; el.style.transform = 'none'; }
+    await wait(readMs(blocks[i].title, 24, 1300, 2400) + (i === blocks.length - 1 ? 1000 : 0));
+  }
+  revealCta(); await wait(1800); return true;
+}
+
 // ============================================================ message (bulles)
 const msgList=spec=>spec.messages||[];
 function buildMessage(spec,T){
@@ -346,6 +410,8 @@ window.playReel=async function(){
   if(spec.layout==='timeline')return playTimeline();
   if(spec.layout==='liste')return playListe();
   if(spec.layout==='citation')return playCitation();
+  if(spec.layout==='notes')return playNotes();
+  if(spec.layout==='calendrier')return playCalendrier();
   for(let i=0;i<spec.segments.length;i++){
     const seg=spec.segments[i];
     showSegment(i);
@@ -372,6 +438,8 @@ window.reelDurationMs=spec=>{
   :spec.layout==='timeline'?400+(spec.steps||[]).slice(0,4).reduce((a,s)=>a+readMs(s.text,22,2000,3400),0)+1600
   :spec.layout==='liste'?500+(spec.items||[]).slice(0,6).reduce((a,it)=>a+readMs(it,24,1500,2600),0)+1700
   :spec.layout==='citation'?500+3400+(spec.dev?3000:0)+1600
+  :spec.layout==='notes'?(spec.items || []).slice(0, 8).reduce((a, it) => a + readMs((it && typeof it === 'object') ? it.text : it, 24, 1500, 2600), 0) + 500 + 900 + 1700
+  :spec.layout==='calendrier'?(spec.blocks || []).slice(0, 8).reduce((a, b) => a + readMs(b.title, 24, 1300, 2400), 0) + 500 + 1000 + 1800
   :(spec.segments||[]).reduce((a,s)=>a+holdMs(s),0);
 };
 
@@ -452,6 +520,14 @@ const DEMOS={
     {label:'MOIS 6',text:"Vous ne dormez plus tant qu'il n'a pas [[répondu]]."}]},
   liste:{slug:'demo-liste',layout:'liste',hook:'4 choses à arrêter quand il ne répond pas.',cta:'LISEZ LA LÉGENDE',items:[
     'Retenir votre [[souffle]].','Relire la conversation.','Poser le téléphone face visible.','Chercher ce que vous avez « mal fait ».']},
+  notes:{slug:'demo-notes',layout:'notes',hook:"Ce que j'ai noté à [[23h14]].",cta:'LISEZ LA LÉGENDE',title:'Ce soir, encore',items:[
+    {text:"J'ai relu son message quatre fois."},{text:"J'ai dit « pas grave » en souriant."},{text:"J'ai rangé la cuisine pour ne pas penser."},
+    {text:"J'ai vérifié s'il était en ligne."},{text:"J'ai promis que demain j'arrêtais."},{text:"Mon [[ventre]] s'est serré avant que j'aie décidé quoi que ce soit."}]},
+  calendrier:{slug:'demo-calendrier',layout:'calendrier',hook:"La journée d'un [[Sauveur Épuisé]].",cta:'LA SUITE DANS LA LÉGENDE',pov:"POV : la journée d'un Sauveur Épuisé",blocks:[
+    {time:'07h',title:'Vérifier si elle a bien dormi.',kind:'repete'},{time:'09h',title:"Répondre « oui » à une demande de plus.",kind:'repete'},
+    {time:'12h',title:'Annuler le déjeuner pour l\'aider.',kind:'repete'},{time:'14h',title:'Relire son message en réunion.',kind:'repete'},
+    {time:'17h',title:'Demain, je pense à moi.',kind:'promesse'},{time:'19h',title:'Cuisiner ce qu\'elle aime.',kind:'repete'},
+    {time:'21h',title:'Écouter, encore, sans rien dire.',kind:'repete'},{time:'23h',title:'La [[mâchoire]] serrée depuis 7h du matin.',kind:'bascule'}]},
   citation:{slug:'demo-citation',layout:'citation',cta:'LISEZ LA LÉGENDE',
     quote:"Vous n'êtes pas trop intense. Vous êtes seule depuis trop [[longtemps]].",
     dev:"Et votre corps le crie là où les mots n'osent pas : la gorge, le sternum."},

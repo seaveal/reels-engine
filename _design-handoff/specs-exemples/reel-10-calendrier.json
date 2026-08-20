@@ -1,0 +1,49 @@
+{
+  "slug": "exemple-calendrier",
+  "layout": "calendrier",
+  "hook": "La journée d'un [[Sauveur Épuisé]].",
+  "cta": "LA SUITE DANS LA LÉGENDE",
+  "pov": "POV : la journée d'un Sauveur Épuisé",
+  "blocks": [
+    {
+      "time": "07h",
+      "title": "Vérifier si elle a bien dormi.",
+      "kind": "repete"
+    },
+    {
+      "time": "09h",
+      "title": "Répondre « oui » à une demande de plus.",
+      "kind": "repete"
+    },
+    {
+      "time": "12h",
+      "title": "Annuler le déjeuner pour l'aider.",
+      "kind": "repete"
+    },
+    {
+      "time": "14h",
+      "title": "Relire son message en réunion.",
+      "kind": "repete"
+    },
+    {
+      "time": "17h",
+      "title": "Demain, je pense à moi.",
+      "kind": "promesse"
+    },
+    {
+      "time": "19h",
+      "title": "Cuisiner ce qu'elle aime.",
+      "kind": "repete"
+    },
+    {
+      "time": "21h",
+      "title": "Écouter, encore, sans rien dire.",
+      "kind": "repete"
+    },
+    {
+      "time": "23h",
+      "title": "La [[mâchoire]] serrée depuis 7h du matin.",
+      "kind": "bascule"
+    }
+  ]
+}

@@ -55,7 +55,8 @@ if (!spec.segments && Array.isArray(spec.pages)) {
   }).filter(s => s.text);
 }
 
-const STRUCTURED = ['message', 'confrontation', 'avantapres', 'timeline', 'liste', 'citation'];
+const STRUCTURED = ['message', 'confrontation', 'avantapres', 'timeline', 'liste', 'citation',
+  'notes', 'calendrier', 'page', 'audio'];  // + dérivés pub (chantier 2026-08-20)
 const isMessage = spec.layout === 'message';
 const isConfrontation = spec.layout === 'confrontation';
 const isStructured = STRUCTURED.includes(spec.layout);
@@ -64,7 +65,8 @@ if (!isStructured && (!Array.isArray(spec.segments) || !spec.segments.length)) {
   process.exit(2);
 }
 // Validation minimale du champ porteur par layout structuré.
-const NEED = { message: 'messages', avantapres: 'avant', timeline: 'steps', liste: 'items', citation: 'quote' };
+const NEED = { message: 'messages', avantapres: 'avant', timeline: 'steps', liste: 'items', citation: 'quote',
+  notes: 'items', calendrier: 'blocks', page: 'paras', audio: 'words' };
 if (isConfrontation && !(spec.top && spec.bottom)) {
   console.error(`✗ spec layout:confrontation sans top/bottom : ${specPath}`); process.exit(2);
 }

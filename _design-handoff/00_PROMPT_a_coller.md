@@ -64,6 +64,10 @@ Ton moteur consomme ce JSON (tu ne l'inventes pas ; si ton design a besoin d'un 
 - timeline : `{ "layout":"timeline","hook":"…","steps":[{"label":"MOIS 1","text":"…"}],"cta":"…" }`
 - liste : `{ "layout":"liste","hook":"…","items":["…[[mot]]…","…"],"cta":"…" }`
 - citation : `{ "layout":"citation","quote":"…[[mot]]…","dev":"…","cta":"…" }`
+- notes (carnet, 2026-08-20) : `{ "layout":"notes","hook":"…","title":"…","items":[{"text":"…[[mot]]…"}],"cta":"…" }` — 5-8 items, le dernier = la bascule
+- calendrier (POV, 2026-08-20) : `{ "layout":"calendrier","hook":"…","pov":"POV : …","blocks":[{"time":"07h","title":"…","kind":"repete|promesse|bascule"}],"cta":"…" }` — EXACTEMENT 8 blocs, le dernier `bascule`
+- page (page surlignée, 2026-08-20) : `{ "layout":"page","hook":"…","head":"…","paras":[{"text":"verbatim …[[surligné]]…","first":false}],"cta":"…" }` — texte verbatim du manuscrit
+- audio (extrait lu, 2026-08-20) : `{ "layout":"audio","hook":"…","kicker":"Extrait · livre audio","section":"05_ch01","t0":12.3,"t1":41.8,"words":[{"w":"…","t0":12.3,"t1":12.6}],"cta":"…" }` — la voix réelle est muxée par export-reel (`--audio`)
 - image (carte/couverture) : `{ "slides":["…[[mot]]…", …] }` ou un objet `{variant, texte, …}` selon le moteur.
 
 De vrais specs à parcourir : `content-agent/reels-specs/*.json`. **Tout texte visible arrive du spec** — ta liberté est sur la MISE EN SCÈNE (typo, couleur, mouvement, hiérarchie, ambiance), pas sur le contenu.

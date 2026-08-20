@@ -1,0 +1,27 @@
+{
+  "slug": "exemple-notes",
+  "layout": "notes",
+  "hook": "Ce que j'ai noté à [[23h14]].",
+  "cta": "LISEZ LA LÉGENDE",
+  "title": "Ce soir, encore",
+  "items": [
+    {
+      "text": "J'ai relu son message quatre fois."
+    },
+    {
+      "text": "J'ai dit « pas grave » en souriant."
+    },
+    {
+      "text": "J'ai rangé la cuisine pour ne pas penser."
+    },
+    {
+      "text": "J'ai vérifié s'il était en ligne."
+    },
+    {
+      "text": "J'ai promis que demain j'arrêtais."
+    },
+    {
+      "text": "Mon [[ventre]] s'est serré avant que j'aie décidé quoi que ce soit."
+    }
+  ]
+}
