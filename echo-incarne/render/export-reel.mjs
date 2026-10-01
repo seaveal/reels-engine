@@ -116,7 +116,8 @@ async function renderPlatform(platform) {
     await document.fonts.ready;
   });
   await page.evaluate(({ s, o }) => window.loadReel(s, o), { s: spec, o: { platform, theme } });
-  await page.waitForTimeout(1200); // pose du chrome (pastille, handle)
+  // Start the hook immediately; the branded entry effect supplies the visual introduction.
+  await page.evaluate(() => new Promise(resolve => requestAnimationFrame(resolve)));
   // Délai vidéo → début du karaoké : lead mesuré + amorce interne de playAudio (AUDIO_LEAD_MS).
   const leadMs = (Date.now() - recStart) + (await page.evaluate(() => window.AUDIO_LEAD_MS || 0));
   await page.evaluate(() => window.playReel());

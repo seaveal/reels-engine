@@ -26,6 +26,7 @@
   <div id="stage"></div>
 
 <script src="fit-safe.js"></script>
+<script src="entry-fx.js"></script>
 <script>
 // =============================================================== thèmes & plateformes
 const THEMES = {
@@ -532,6 +533,7 @@ window.playMessageReel = async function() {
 
 window.playReel = async function() {
   const { spec } = CFG;
+  window.playReelEntry(CFG);
   if (spec.layout === 'message') return window.playMessageReel();
   if (spec.layout === 'confrontation') return window.playConfrontationReel();
   if (spec.layout === 'avantapres') return window.playAvantApres();

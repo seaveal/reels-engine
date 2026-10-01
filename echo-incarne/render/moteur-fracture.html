@@ -32,6 +32,7 @@
 <body>
 <div id="stage"></div>
 <script src="fit-safe.js"></script>
+<script src="entry-fx.js"></script>
 <script>
 // ============================================================ constantes
 const THEMES = {
@@ -501,6 +502,7 @@ async function playMessage(){
 // ============================================================ lecture & durée
 window.playReel=async function(){
   const {spec}=CFG;
+  window.playReelEntry(CFG);
   if(spec.layout==='message')return playMessage();
   if(spec.layout==='confrontation')return playConfrontation();
   if(spec.layout==='avantapres')return playAvantApres();
