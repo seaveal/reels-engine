@@ -60,7 +60,7 @@ const lineGaps=(seg,spec,n)=>{
   const uni=(seg.line_delay_ms!=null?seg.line_delay_ms:(spec.line_delay_ms!=null?spec.line_delay_ms:450));
   return Array.from({length:Math.max(0,n-1)},(_,i)=>Array.isArray(arr)?(arr[i]!=null?arr[i]:uni):uni);
 };
-const segLines=(text,T)=>String(text).split('\n').filter(l=>l.trim()).map(l=>`<div class="segLine" style="opacity:0;transform:translateY(16px);transition:opacity 0.4s ease,transform 0.4s ease;">${pivot(l,T)}</div>`).join('');
+const segLines=(text,T)=>String(text).replace(/\r\n?/g,'\n').split('\n').map((l,i,lines)=>l.trim()?`<div class="segLine" style="margin-top:${i>0&&!lines[i-1].trim()?'1em':'0'};opacity:0;transform:translateY(16px);transition:opacity 0.4s ease,transform 0.4s ease;">${pivot(l,T)}</div>`:'').join('');
 const readMs=(t,div,lo,hi)=>Math.min(hi,Math.max(lo,String(t||'').length/div*1000));
 const msgReadMs=t=>Math.min(4200,Math.max(1300,String(t).length/22*1000));
 const cfReadMs=spec=>Math.min(5200,Math.max(2600,String((spec.bottom||{}).text||'').length/20*1000));
@@ -74,7 +74,7 @@ function adaptSpec(spec){
       const lines=(p.lines||[]).filter(l=>String(l.text||'').trim());
       const isCta=lines.some(l=>String(l.role||'').toLowerCase()==='cta');
       const isHeading=lines.every(l=>String(l.role||'').toLowerCase()==='heading');
-      return{role:isCta?'cta':(i===0&&isHeading?'title':'block'),text:lines.map(l=>String(l.text)).join('\n')};
+      return{role:isCta?'cta':(i===0&&isHeading?'title':'block'),text:lines.map(l=>String(l.text)).join('\n\n')};
     }).filter(s=>s.text);
   }
   return spec;

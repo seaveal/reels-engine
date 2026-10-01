@@ -56,7 +56,7 @@ if (!spec.segments && Array.isArray(spec.pages)) {
     const isHeading = lines.every(l => String(l.role || '').toLowerCase() === 'heading');
     return {
       role: isCta ? 'cta' : (i === 0 && isHeading ? 'title' : 'block'),
-      text: lines.map(l => String(l.text)).join('\n'),
+      text: lines.map(l => String(l.text)).join('\n\n'),
     };
   }).filter(s => s.text);
 }
