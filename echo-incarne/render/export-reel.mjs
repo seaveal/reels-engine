@@ -119,7 +119,10 @@ async function renderPlatform(platform) {
   // Start the hook immediately; the branded entry effect supplies the visual introduction.
   await page.evaluate(() => new Promise(resolve => requestAnimationFrame(resolve)));
   // Délai vidéo → début du karaoké : lead mesuré + amorce interne de playAudio (AUDIO_LEAD_MS).
-  const leadMs = (Date.now() - recStart) + (await page.evaluate(() => window.AUDIO_LEAD_MS || 0));
+  const audioLeadMs = await page.evaluate(() => window.AUDIO_LEAD_MS || 0);
+  const visualLeadMs = Date.now() - recStart;
+  // Discard browser/font-loading frames so the published video opens on the effect.
+  const leadMs = audioLeadMs;
   await page.evaluate(() => window.playReel());
   await page.waitForTimeout(800);  // laisse le CTA respirer en fin
   const video = page.video();
@@ -131,10 +134,10 @@ async function renderPlatform(platform) {
   if (hasFfmpeg) {
     const mp4 = webm.replace(/\.webm$/, '.mp4');
     const ffArgs = audioPath
-      ? ['-y', '-i', webm, '-i', audioPath, '-map', '0:v:0', '-map', '1:a:0', '-c:v', 'libx264', '-pix_fmt', 'yuv420p',
+      ? ['-y', '-ss', (visualLeadMs / 1000).toFixed(3), '-i', webm, '-i', audioPath, '-map', '0:v:0', '-map', '1:a:0', '-c:v', 'libx264', '-pix_fmt', 'yuv420p',
          '-r', '30', '-af', `adelay=${Math.max(0, Math.round(leadMs))}:all=1,apad`, '-c:a', 'aac', '-b:a', '160k',
          '-shortest', '-movflags', '+faststart', mp4]
-      : ['-y', '-i', webm, '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-r', '30', '-movflags', '+faststart', '-an', mp4];
+      : ['-y', '-ss', (visualLeadMs / 1000).toFixed(3), '-i', webm, '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-r', '30', '-movflags', '+faststart', '-an', mp4];
     const r = spawnSync('ffmpeg', ffArgs, { stdio: 'ignore' });
     if (r.status !== 0) {
       process.exitCode = 1; // le pipeline attend les .mp4 : échec ffmpeg = run en échec (2026-07-07)
