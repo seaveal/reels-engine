@@ -25,6 +25,7 @@
 <body>
   <div id="stage"></div>
 
+<script src="fit-safe.js"></script>
 <script>
 // =============================================================== thèmes & plateformes
 const THEMES = {
@@ -226,13 +227,7 @@ function showSegment(i) {
   const page = document.getElementById('page');
   if (!isCta) {
     page.innerHTML = `<div style="font-family:var(--serif);font-weight:${isTitle?500:400};font-size:${isTitle?116:84}px;line-height:${isTitle?1.05:1.2};letter-spacing:${isTitle?'-0.01em':'0'};opacity:${isTitle?1:.92};animation:eiRise .8s ease both;white-space:pre-line;">${pivot(displaySeg.text, T.accent)}</div>`;
-    // Auto-fit (fix réels longs, audit 2026-07-07) : les pages denses des specs
-    // `layout: long` (plusieurs lignes concaténées) débordaient de la safe zone à
-    // fonte fixe. Rétrécit jusqu'à tenir dans la zone utile (chrome + CTA réservés).
-    const el = page.firstElementChild;
-    const avail = 1920 - Z.top - Z.bottom - 340;
-    let fs = isTitle ? 116 : 84;
-    while (el.scrollHeight > avail && fs > 44) { fs -= 4; el.style.fontSize = fs + 'px'; }
+    window.fitReelSegment(page, page.firstElementChild);
   }
   const cta = document.getElementById('ctaRow');
   cta.style.opacity = isCta ? '1' : '0';

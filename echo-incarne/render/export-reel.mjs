@@ -111,7 +111,10 @@ async function renderPlatform(platform) {
   const recStart = Date.now(); // l'enregistrement démarre avec le contexte : sert à caler l'audio
   const page = await ctx.newPage();
   await page.goto(pageUrl);
-  await page.evaluate(() => document.fonts.ready);
+  await page.evaluate(async () => {
+    await Promise.all(Array.from(document.fonts, face => face.load()));
+    await document.fonts.ready;
+  });
   await page.evaluate(({ s, o }) => window.loadReel(s, o), { s: spec, o: { platform, theme } });
   await page.waitForTimeout(1200); // pose du chrome (pastille, handle)
   // Délai vidéo → début du karaoké : lead mesuré + amorce interne de playAudio (AUDIO_LEAD_MS).

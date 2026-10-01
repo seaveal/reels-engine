@@ -31,6 +31,7 @@
 </head>
 <body>
 <div id="stage"></div>
+<script src="fit-safe.js"></script>
 <script>
 // ============================================================ constantes
 const THEMES = {
@@ -171,9 +172,7 @@ function showSegment(i){
       <div class="segFit" style="font-family:var(--sans);font-weight:900;font-size:${isTitle?130:98}px;line-height:${isTitle?.97:1.04};letter-spacing:-.02em;text-transform:uppercase;">${segLines(displaySeg.text,T)}</div>
     </div>`;
     const el=page.querySelector('.segFit');
-    const avail=1920-Z.top-Z.bottom-340;
-    let fs=isTitle?130:98;
-    while(el.scrollHeight>avail&&fs>44){fs-=4;el.style.fontSize=fs+'px';}
+    window.fitReelSegment(page, el);
   }
   const cta=document.getElementById('ctaRow');
   cta.style.opacity=isCta?'1':'0';

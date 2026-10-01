@@ -18,6 +18,7 @@ try {
    for(const platform of ['instagram','tiktok','youtube']){
     const page=await browser.newPage({viewport:{width:1080,height:1920}});
     await page.goto(pathToFileURL(path.join(dir,template)).href+'?norun=1');
+    await page.evaluate(async()=>{await Promise.all(Array.from(document.fonts,face=>face.load()));});
     await page.evaluate(({spec,platform})=>{window.loadReel(spec,{platform});showSegment(0);},{spec,platform});
     await page.evaluate(()=>document.fonts.ready);
     await page.evaluate(()=>{showSegment(0);document.querySelectorAll('#page .segLine').forEach(el=>{el.style.opacity='1';el.style.transform='none';});});
@@ -25,8 +26,15 @@ try {
     const metrics=await page.evaluate(()=>{
       const page=document.getElementById('page'),content=page.querySelector('.segFit')||page.firstElementChild;
       const r=content.getBoundingClientRect(),bounds=page.getBoundingClientRect();
-      return {text:content.textContent,fontSize:parseFloat(getComputedStyle(content).fontSize),height:content.scrollHeight,width:content.scrollWidth,clientWidth:content.clientWidth,top:r.top,bottom:r.bottom,pageBottom:bounds.bottom,ctaTop:document.getElementById('ctaRow').offsetTop,safeBottom:1920-parseFloat(getComputedStyle(page.parentElement).paddingBottom),lines:[...page.querySelectorAll('.segLine')].map(el=>({text:el.textContent,margin:parseFloat(getComputedStyle(el).marginTop)})),whiteSpace:getComputedStyle(content).whiteSpace};
+      const availableHeight=Number(content.dataset.availableHeight), availableWidth=Number(content.dataset.availableWidth);
+      const chosen=parseFloat(getComputedStyle(content).fontSize),wrapper=page.firstElementChild;
+      content.style.fontSize=(chosen+1)+'px';
+      const largerFits=wrapper.scrollHeight<=availableHeight&&wrapper.scrollWidth<=availableWidth;
+      content.style.fontSize=chosen+'px';
+      return {availableHeight,availableWidth,largerFits,text:content.textContent,fontSize:parseFloat(getComputedStyle(content).fontSize),height:content.scrollHeight,width:content.scrollWidth,clientWidth:content.clientWidth,top:r.top,bottom:r.bottom,pageBottom:bounds.bottom,ctaTop:document.getElementById('ctaRow').offsetTop,safeBottom:1920-parseFloat(getComputedStyle(page.parentElement).paddingBottom),lines:[...page.querySelectorAll('.segLine')].map(el=>({text:el.textContent,margin:parseFloat(getComputedStyle(el).marginTop)})),whiteSpace:getComputedStyle(content).whiteSpace};
     });
+    assert.ok(metrics.availableHeight>0);
+    assert.equal(metrics.largerFits,false,template+' must use maximum size');
     assert.ok(metrics.width<=metrics.clientWidth+1,template+' width');
     assert.ok(metrics.bottom<=Math.min(metrics.safeBottom,metrics.ctaTop-24),template+' height '+JSON.stringify(metrics));
     if(template==='reel-render.html'){
