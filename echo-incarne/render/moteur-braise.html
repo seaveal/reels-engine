@@ -108,14 +108,14 @@ window.loadReel=function(spec,opts={}){
         <div style="font-family:var(--mono);font-size:33px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:${T.text};">@le<span style="color:${T.accent}">corps</span>ne<span style="color:${T.accent}">triche</span>jamais</div>
       </div>
       <div id="page" style="min-height:640px;display:flex;flex-direction:column;justify-content:center;"></div>
-      <div id="ctaRow" style="display:flex;align-items:flex-start;justify-content:${Z.ctaAlign};gap:34px;opacity:0;transform:translateY(36px);transition:opacity .55s ease,transform .55s ease;">
+      <div id="ctaRow" style="display:flex;align-items:flex-start;justify-content:${Z.ctaAlign};gap:34px;opacity:0;transform:translateY(-36px);transition:opacity .55s ease,transform .55s ease;">
         ${Z.arrow==='up-right'?'':`<div style="font-size:70px;line-height:1;color:${T.accent};transform:translateY(46px);">↓</div>`}
         <div id="ctaCapsule" style="display:inline-flex;align-items:center;background:${T.accent};color:${T.capText};border-radius:6px;padding:30px 48px;font-family:var(--mono);font-size:34px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;box-shadow:0 14px 44px rgba(0,0,0,.35);">${esc(ctaLabel)}</div>
         ${Z.arrow==='up-right'?`<div style="font-size:70px;line-height:1;color:${T.accent};transform:translateY(-44px);">↑</div>`:''}
       </div>
     </div>
     ${CFG.guides?guidesHtml(Z):''}`;
-  fitCapsule(Z);
+  window.fitReelCta(Z);
   const B={message:buildMessage,confrontation:buildConfrontation,avantapres:buildAvantApres,timeline:buildTimeline,liste:buildListe,citation:buildCitation,notes:buildNotes,calendrier:buildCalendrier,page:buildPage,audio:buildAudio}[spec.layout];
   if(B) B(spec,T);
   return true;
@@ -127,15 +127,6 @@ function guidesHtml(Z){
     <div style="position:absolute;top:${Z.top-30}px;bottom:${Z.bottom-30}px;right:${Z.right-20}px;border-right:2px dashed rgba(255,84,60,.6)"></div>
     <div style="position:absolute;top:${Z.top-72}px;left:${Z.left}px;font-size:24px;">${Z.label} — safe zone</div>
   </div>`;
-}
-function fitCapsule(Z){
-  const c=document.getElementById('ctaCapsule');
-  if(!c)return;
-  const zone=1080-Z.left-Z.right-(70+34);
-  let fs=34;
-  while(c.scrollWidth>zone&&fs>20){fs-=2;c.style.fontSize=fs+'px';}
-  if(c.scrollWidth>zone)c.style.letterSpacing='.03em';
-  if(c.scrollWidth>zone)c.style.padding='24px 30px';
 }
 function fitPage(page,sel){
   // Mesure le CONTENU, pas la boîte flex : #page a flex:1, son scrollHeight vaut
@@ -175,7 +166,7 @@ function showSegment(i){
   }
   const cta=document.getElementById('ctaRow');
   cta.style.opacity=isCta?'1':'0';
-  cta.style.transform=isCta?'translateY(0)':'translateY(36px)';
+  cta.style.transform=isCta?'translateY(0)':'translateY(-36px)';
 }
 
 // ============================================================ confrontation

@@ -1,0 +1,57 @@
+import assert from 'node:assert/strict';
+import {readFileSync,writeFileSync} from 'node:fs';
+import path from 'node:path';
+import {fileURLToPath,pathToFileURL} from 'node:url';
+import {chromium} from 'playwright';
+const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
+const render=path.join(root,'echo-incarne/render');
+const browser=await chromium.launch();
+const results=[];
+try {
+ const page=await browser.newPage({viewport:{width:1080,height:1920}});
+ await page.goto(pathToFileURL(path.join(render,'moteur-manifeste.html')).href+'?norun=1');
+ const samples=await page.evaluate(()=>Object.values(DEMOS));
+ for(const file of process.argv.slice(2)) samples.push(JSON.parse(readFileSync(file,'utf8')));
+ samples.push({slug:'cta-long',segments:[{role:'block',text:'Un texte court.'},{role:'cta',text:'La suite de cette histoire vous attend dans la légende'}]});
+ for(const template of ['moteur-manifeste.html','moteur-braise.html','moteur-fracture.html','reel-render.html']){
+  await page.goto(pathToFileURL(path.join(render,template)).href+'?norun=1');
+  await page.evaluate(async()=>{await Promise.all(Array.from(document.fonts,face=>face.load()));});
+  for(const theme of ['papier','nuit']) for(const platform of ['instagram','tiktok','youtube']) for(const source of samples){
+   const spec=structuredClone(source);
+   if(!spec.segments&&spec.pages) spec.segments=spec.pages.map(p=>({role:p.lines.some(l=>l.role==='cta')?'cta':'block',text:p.lines.map(l=>l.text).join('\n\n')}));
+   await page.evaluate(({spec,platform,theme})=>{
+    window.loadReel(spec,{platform,theme});
+    if(spec.segments) showSegment(0);
+    const row=document.getElementById('ctaRow');
+    row.style.transition='none';row.style.opacity='1';row.style.transform='none';
+   },{spec,platform,theme});
+   const m=await page.evaluate(()=>{
+    const row=document.getElementById('ctaRow'),cap=document.getElementById('ctaCapsule');
+    const rect=el=>{const r=el.getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height};};
+    const chosen=parseFloat(getComputedStyle(cap).fontSize),available=Number(cap.dataset.availableWidth);
+    const r=rect(cap),range=document.createRange();range.selectNodeContents(cap);
+    const text=rect({getBoundingClientRect:()=>range.getBoundingClientRect()});
+    cap.style.fontSize=(chosen+1)+'px';const largerFits=cap.getBoundingClientRect().width<=available;cap.style.fontSize=chosen+'px';
+    return {zone:CFG.Z,cap:r,text,children:[...row.children].map(rect),fontSize:chosen,largerFits,whiteSpace:getComputedStyle(cap).whiteSpace,label:cap.textContent,spacers:document.querySelectorAll('#ctaSpace').length};
+   });
+   const label=`${template} ${platform} ${theme} ${source.slug}`;
+   assert.equal(m.spacers,1,label+' duplicate spacer');
+   assert.equal(m.whiteSpace,'nowrap',label+' wrapping');
+   assert.equal(m.largerFits,false,label+' maximum size');
+   assert.ok(Math.abs(m.cap.bottom-(1920-m.zone.bottom))<.1,label+' safe bottom');
+   for(const r of [...m.children,m.text]){
+    assert.ok(r.left>=m.zone.left-.1 && r.right<=1080-m.zone.right+.1,label+' safe width');
+    assert.ok(r.top>=m.zone.top-.1 && r.bottom<=1920-m.zone.bottom+.1,label+' safe height');
+   }
+   assert.ok(m.text.height< m.fontSize*1.5,label+' text must have one line');
+   results.push({template,platform,theme,slug:source.slug,...m});
+   if(process.env.CTA_EVIDENCE && source.slug.startsWith('ig-hook-') && theme==='papier'){
+    await page.evaluate(()=>document.querySelectorAll('#page .segLine').forEach(el=>{el.style.opacity='1';el.style.transform='none';}));
+    await page.waitForTimeout(950);
+    await page.screenshot({path:path.join(process.env.CTA_EVIDENCE,source.slug+'-'+template+'-'+platform+'.png')});
+   }
+  }
+ }
+ console.log(JSON.stringify({passed:results.length}));
+ if(process.env.CTA_EVIDENCE)writeFileSync(path.join(process.env.CTA_EVIDENCE,'cta-check.json'),JSON.stringify(results,null,2));
+} finally {await browser.close();}

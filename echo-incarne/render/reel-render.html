@@ -93,7 +93,7 @@ window.loadReel = function(spec, opts = {}) {
 
       <div id="page" style="min-height:640px;display:flex;flex-direction:column;justify-content:center;"></div>
 
-      <div id="ctaRow" style="display:flex;align-items:flex-start;justify-content:${Z.ctaAlign};gap:34px;opacity:0;transform:translateY(36px);transition:opacity .7s ease, transform .7s ease;">
+      <div id="ctaRow" style="display:flex;align-items:flex-start;justify-content:${Z.ctaAlign};gap:34px;opacity:0;transform:translateY(-36px);transition:opacity .7s ease, transform .7s ease;">
         ${Z.arrow==='up-right' ? '' : `<div style="font-size:72px;line-height:1;color:${T.accent};transform:translateY(52px);">↓</div>`}
         <div id="ctaCapsule" style="display:inline-flex;align-items:center;background:${T.accent};color:#F5EDDD;border-radius:999px;padding:32px 54px;font-family:var(--mono);font-size:36px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;box-shadow:0 12px 44px rgba(0,0,0,.22);">${esc(ctaLabel)}</div>
         ${Z.arrow==='up-right' ? `<div style="font-size:72px;line-height:1;color:${T.accent};transform:translateY(-46px);">↑</div>` : ''}
@@ -106,18 +106,7 @@ window.loadReel = function(spec, opts = {}) {
       <div style="position:absolute;top:${Z.top-30}px;bottom:${Z.bottom-30}px;right:${Z.right-20}px;border-right:2px dashed rgba(255,84,60,.6)"></div>
       <div style="position:absolute;top:${Z.top-72}px;left:${Z.left}px;font-size:24px;">${Z.label} — safe zone</div>
     </div>` : ''}`;
-  // Auto-fit capsule CTA (fix 2026-07-07) : les libellés longs venant du segment cta
-  // du spec (« LA SOLUTION EST DANS LA DESCRIPTION ») débordaient de la safe zone.
-  // Fonte 36 -> 20 px puis letter-spacing/padding réduits jusqu'à tenir dans la
-  // zone utile (largeur - marges plateforme - flèche - gap).
-  const capsule = document.getElementById('ctaCapsule');
-  if (capsule) {
-    const zone = 1080 - Z.left - Z.right - (72 + 34);
-    let fs = 36;
-    while (capsule.scrollWidth > zone && fs > 20) { fs -= 2; capsule.style.fontSize = fs + 'px'; }
-    if (capsule.scrollWidth > zone) capsule.style.letterSpacing = '.03em';
-    if (capsule.scrollWidth > zone) capsule.style.padding = '26px 34px';
-  }
+  window.fitReelCta(Z);
   if (spec.layout === 'message') buildMessageChat(spec, T);
   if (spec.layout === 'confrontation') buildConfrontation(spec, T);
   if (spec.layout === 'avantapres') buildAvantApres(spec, T);
@@ -231,7 +220,7 @@ function showSegment(i) {
   }
   const cta = document.getElementById('ctaRow');
   cta.style.opacity = isCta ? '1' : '0';
-  cta.style.transform = isCta ? 'translateY(0)' : 'translateY(36px)';
+  cta.style.transform = isCta ? 'translateY(0)' : 'translateY(-36px)';
 }
 
 // ---- helpers partagés des layouts structurés ----
