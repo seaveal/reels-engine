@@ -1,5 +1,5 @@
 // Visuels chartrés des posts Facebook / LinkedIn — 1080×1350 PNG (Cyrille 2026-10-02).
-// Usage : node echo-incarne/render/export-visuel-post.mjs <lot.json> [--out=out/visuels-posts]
+// Usage : node echo-incarne/render/export-visuel-post.mjs <lot.json> [--out=out/visuels-posts] [--ext=png|jpg]
 // lot.json : [{ "slug": "...", "s1": "...", "s2": "...", "s2Italique": "..." }]
 import {chromium} from 'playwright';
 import {readFile, mkdir} from 'node:fs/promises';
@@ -9,6 +9,7 @@ import path from 'node:path';
 const args = process.argv.slice(2);
 const lotPath = args.find(a => !a.startsWith('--'));
 const outDir = (args.find(a => a.startsWith('--out=')) || '--out=out/visuels-posts').slice(6);
+const ext = (args.find(a => a.startsWith('--ext=')) || '--ext=png').slice(6) === 'jpg' ? 'jpg' : 'png';
 if (!lotPath) { console.error('usage: node export-visuel-post.mjs <lot.json> [--out=dir]'); process.exit(1); }
 const lot = JSON.parse(await readFile(lotPath, 'utf8'));
 await mkdir(outDir, {recursive: true});
@@ -21,8 +22,9 @@ try {
   for (const v of lot) {
     const taille = await p.evaluate(v => window.renderVisuel(v), v);
     await p.waitForFunction(() => [...document.images].every(i => i.complete && i.naturalWidth > 0));
-    const out = path.join(outDir, `${v.slug}.png`);
-    await p.locator('#visuel').screenshot({path: out});
+    const out = path.join(outDir, `${v.slug}.${ext}`);
+    // JPEG : le format que sert le kit Studio (/api/li-image) ; qualité haute, le texte reste net.
+    await p.locator('#visuel').screenshot(ext === 'jpg' ? {path: out, type: 'jpeg', quality: 92} : {path: out});
     console.log(`✓ ${out} (${taille} px)`);
   }
 } finally { await browser.close(); }
