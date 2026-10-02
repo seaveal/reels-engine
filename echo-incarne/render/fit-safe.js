@@ -96,8 +96,16 @@ window.fitReelCta = function (zone, size) {
 // Chaque moteur réserve la place des bandes dans son empilement (#platformBands) : sous l'onde, les
 // cercles et le grain, pour que « l'onde qui se répand » de L'Écho Incarné reste visible jusque sur
 // les bandes ; à défaut de réserve, juste avant le cadre de contenu.
-const BANDE_COLONNE_X = 932, BANDE_BARRE_Y = 1640;
-window.addPlatformBands = function () {
+// Réglages par réseau (Cyrille 2026-10-02, vu sur son téléphone) : sur Instagram, colonne élargie de
+// 2 px et arrêtée juste au-dessus du cœur des « j'aime », barre arrêtée juste au-dessus de la photo
+// de profil. TikTok et YouTube gardent la colonne pleine hauteur et la barre à 1640 px.
+const BANDES = {
+  instagram: {colonneX: 930, colonneHaut: 1140, barreHaut: 1690},
+  tiktok:    {colonneX: 932, colonneHaut: 0,    barreHaut: 1640},
+  youtube:   {colonneX: 932, colonneHaut: 0,    barreHaut: 1640},
+};
+window.addPlatformBands = function (platform) {
+  const B = BANDES[platform] || BANDES.instagram;
   const stage = document.getElementById('stage');
   if (!stage) return;
   let bands = document.getElementById('platformBands');
@@ -113,6 +121,6 @@ window.addPlatformBands = function () {
   bands.setAttribute('aria-hidden', 'true');
   bands.style.cssText = 'position:absolute;inset:0;pointer-events:none;';
   bands.innerHTML =
-    `<div style="position:absolute;top:0;bottom:0;left:${BANDE_COLONNE_X}px;right:0;background:#2A211A;"></div>` +
-    `<div style="position:absolute;left:0;right:0;top:${BANDE_BARRE_Y}px;bottom:0;background:#2A211A;"></div>`;
+    `<div style="position:absolute;top:${B.colonneHaut}px;bottom:0;left:${B.colonneX}px;right:0;background:#2A211A;"></div>` +
+    `<div style="position:absolute;left:0;right:0;top:${B.barreHaut}px;bottom:0;background:#2A211A;"></div>`;
 };

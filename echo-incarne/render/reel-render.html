@@ -109,7 +109,7 @@ window.loadReel = function(spec, opts = {}) {
       <div style="position:absolute;top:${Z.top-72}px;left:${Z.left}px;font-size:24px;">${Z.label} — safe zone</div>
     </div>` : ''}`;
   window.fitReelCta(Z);
-  window.addPlatformBands(); // colonne + barre encre : icônes et début de légende visibles (Cyrille 2026-10-02)
+  window.addPlatformBands(opts.platform); // colonne + barre encre : icônes et début de légende visibles (Cyrille 2026-10-02)
   if (spec.layout === 'message') buildMessageChat(spec, T);
   if (spec.layout === 'confrontation') buildConfrontation(spec, T);
   if (spec.layout === 'avantapres') buildAvantApres(spec, T);

@@ -38,8 +38,10 @@ try {
    assert.equal(m.spacers,1,label+' duplicate spacer');
    // Bandes encre (Cyrille 2026-10-02) : colonne à droite, barre en bas, jamais sous le bouton.
    assert.ok(m.bands&&m.bands.length===2,label+' ink bands');
-   assert.ok(Math.abs(m.bands[0].left-932)<.5&&Math.abs(m.bands[1].top-1640)<.5,label+' bands position');
-   assert.ok(m.cap.right<=932&&m.cap.bottom<=1640,label+' button clear of bands');
+   // Instagram : colonne à 930 px depuis 1140 px (au-dessus du cœur), barre à 1690 ; TikTok/YouTube : 932, pleine hauteur, 1640.
+   const B=platform==='instagram'?{x:930,haut:1140,barre:1690}:{x:932,haut:0,barre:1640};
+   assert.ok(Math.abs(m.bands[0].left-B.x)<.5&&Math.abs(m.bands[0].top-B.haut)<.5&&Math.abs(m.bands[1].top-B.barre)<.5,label+' bands position');
+   assert.ok(m.cap.right<=B.x&&m.cap.bottom<=B.barre,label+' button clear of bands');
    const segmented=!!m.segSize;
    if(segmented){
     // Réel à segments : le bouton prend la taille du texte, plusieurs lignes permises.

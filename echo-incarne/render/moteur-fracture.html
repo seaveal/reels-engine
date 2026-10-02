@@ -120,7 +120,7 @@ window.loadReel=function(spec,opts={}){
     </div>
     ${CFG.guides?guidesHtml(Z):''}`;
   window.fitReelCta(Z);
-  window.addPlatformBands(); // colonne + barre encre : icônes et début de légende visibles (Cyrille 2026-10-02)
+  window.addPlatformBands(opts.platform); // colonne + barre encre : icônes et début de légende visibles (Cyrille 2026-10-02)
   const B={message:buildMessage,confrontation:buildConfrontation,avantapres:buildAvantApres,timeline:buildTimeline,liste:buildListe,citation:buildCitation,notes:buildNotes,calendrier:buildCalendrier,page:buildPage,audio:buildAudio}[spec.layout];
   if(B) B(spec,T);
   return true;
