@@ -2,9 +2,9 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<title>Écho Incarné — visuel de post Facebook / LinkedIn (1080×1350)</title>
+<title>Écho Incarné — visuel de post Facebook / LinkedIn (carré 1080×1080 ou 1080×1350)</title>
 <!-- Visuel chartré des posts FB/LinkedIn validés (Cyrille 2026-10-02, modèle des visuels du 01/10).
-     Rendu par export-visuel-post.mjs : window.renderVisuel({s1, s2, s2Italique}). -->
+     Rendu par export-visuel-post.mjs : window.renderVisuel({s1, s2, s2Italique, format}), format « carre » = 1080×1080. -->
 <link href="../fonts/echo-incarne-fonts.css" rel="stylesheet">
 <style>
   :root{ --creme:#F0E7D6; --terra:#A8432B; --encre:#2A211A;
@@ -26,6 +26,12 @@
   #texte em{font-style:italic;color:var(--terra);}
   .pied{position:absolute;left:90px;right:90px;bottom:96px;border-top:1.5px solid rgba(42,33,26,.35);padding-top:24px;
         display:flex;justify-content:space-between;font-family:var(--mono);font-size:25px;color:rgba(42,33,26,.8);}
+  /* Carré 1080×1080 : format des posts Facebook et LinkedIn (Cyrille 2026-10-02). */
+  #visuel.carre{height:1080px;}
+  #visuel.carre .entete{top:78px;}
+  #visuel.carre .portrait{top:54px;width:196px;height:196px;padding:8px;}
+  #visuel.carre #texte{top:290px;bottom:150px;}
+  #visuel.carre .pied{bottom:70px;padding-top:20px;}
 </style>
 </head>
 <body>
@@ -46,7 +52,8 @@ document.getElementById('grain').style.backgroundImage = "url(\"data:image/svg+x
 const esc = s => String(s || '').replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))
   .replace(/« /g, '«\u00a0').replace(/ ([»?!:;])/g, '\u00a0$1');
 // s1 : première phrase ; s2 : début de la seconde ; s2Italique : sa chute, en italique terracotta.
-window.renderVisuel = function ({s1, s2, s2Italique}) {
+window.renderVisuel = function ({s1, s2, s2Italique, format}) {
+  document.getElementById('visuel').classList.toggle('carre', format === 'carre');
   const box = document.getElementById('texte');
   box.innerHTML = `<p>${esc(s1)}</p><p>${esc(s2)}${s2 && s2Italique ? ' ' : ''}<em>${esc(s2Italique)}</em></p>`;
   // Plus grande taille qui tient dans la zone (hauteur et largeur), plafonnée à 150 px.

@@ -1,5 +1,6 @@
-// Visuels chartrés des posts Facebook / LinkedIn — 1080×1350 PNG (Cyrille 2026-10-02).
+// Visuels chartrés des posts Facebook / LinkedIn (Cyrille 2026-10-02).
 // Usage : node echo-incarne/render/export-visuel-post.mjs <lot.json> [--out=out/visuels-posts] [--ext=png|jpg]
+// Format : champ `format` de chaque entrée, « carre » = 1080×1080 (Facebook et LinkedIn), sinon 1080×1350.
 // lot.json : [{ "slug": "...", "s1": "...", "s2": "...", "s2Italique": "..." }]
 import {chromium} from 'playwright';
 import {readFile, mkdir} from 'node:fs/promises';
