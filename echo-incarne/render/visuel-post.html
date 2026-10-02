@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Écho Incarné — visuel de post Facebook / LinkedIn (1080×1350)</title>
+<!-- Visuel chartré des posts FB/LinkedIn validés (Cyrille 2026-10-02, modèle des visuels du 01/10).
+     Rendu par export-visuel-post.mjs : window.renderVisuel({s1, s2, s2Italique}). -->
+<link href="../fonts/echo-incarne-fonts.css" rel="stylesheet">
+<style>
+  :root{ --creme:#F0E7D6; --terra:#A8432B; --encre:#2A211A;
+    --serif:'Cormorant Garamond',serif; --mono:'IBM Plex Mono',monospace; }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{background:var(--creme);}
+  #visuel{width:1080px;height:1350px;position:relative;overflow:hidden;background:var(--creme);color:var(--encre);}
+  .grain{position:absolute;inset:0;opacity:.10;mix-blend-mode:multiply;background-size:190px 190px;}
+  .lueur{position:absolute;inset:0;background:radial-gradient(circle at 30% 45%, rgba(255,248,235,.85), transparent 62%);}
+  .cercle{position:absolute;border-radius:50%;border:1.5px solid rgba(168,67,43,.22);}
+  .entete{position:absolute;left:90px;top:96px;font-family:var(--mono);font-size:27px;letter-spacing:.24em;color:rgba(42,33,26,.55);}
+  .entete b{color:var(--terra);font-weight:700;}
+  .portrait{position:absolute;right:90px;top:70px;width:236px;height:236px;border-radius:50%;background:var(--terra);padding:9px;}
+  .portrait div{width:100%;height:100%;border-radius:50%;background:var(--creme);padding:6px;}
+  .portrait img{width:100%;height:100%;border-radius:50%;object-fit:cover;filter:grayscale(1) contrast(1.03);display:block;}
+  #texte{position:absolute;left:90px;right:90px;top:380px;bottom:190px;display:flex;flex-direction:column;justify-content:center;}
+  #texte p{font-family:var(--serif);font-weight:700;line-height:1.02;letter-spacing:-.012em;text-wrap:balance;}
+  #texte p + p{margin-top:.42em;}
+  #texte em{font-style:italic;color:var(--terra);}
+  .pied{position:absolute;left:90px;right:90px;bottom:96px;border-top:1.5px solid rgba(42,33,26,.35);padding-top:24px;
+        display:flex;justify-content:space-between;font-family:var(--mono);font-size:25px;color:rgba(42,33,26,.8);}
+</style>
+</head>
+<body>
+<div id="visuel">
+  <div class="lueur"></div>
+  <div class="grain" id="grain"></div>
+  <div class="cercle" style="width:520px;height:520px;right:-52px;top:-72px;"></div>
+  <div class="cercle" style="width:700px;height:700px;right:-142px;top:-162px;"></div>
+  <div class="cercle" style="width:880px;height:880px;right:-232px;top:-252px;opacity:.6;"></div>
+  <div class="entete"><b>SOUVERAIN</b>AU<b>QUOTIDIEN</b>.COM</div>
+  <div class="portrait"><div><img src="../uploads/cyrille-novou-new-ok.jpg" alt=""></div></div>
+  <div id="texte"></div>
+  <div class="pied"><span>Cyrille NOVOU</span><span>La méthode H3C</span></div>
+</div>
+<script>
+document.getElementById('grain').style.backgroundImage = "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")";
+// Espaces insécables de la typographie française : jamais « » » ni « ? » en début de ligne.
+const esc = s => String(s || '').replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))
+  .replace(/« /g, '«\u00a0').replace(/ ([»?!:;])/g, '\u00a0$1');
+// s1 : première phrase ; s2 : début de la seconde ; s2Italique : sa chute, en italique terracotta.
+window.renderVisuel = function ({s1, s2, s2Italique}) {
+  const box = document.getElementById('texte');
+  box.innerHTML = `<p>${esc(s1)}</p><p>${esc(s2)}${s2 && s2Italique ? ' ' : ''}<em>${esc(s2Italique)}</em></p>`;
+  // Plus grande taille qui tient dans la zone (hauteur et largeur), plafonnée à 150 px.
+  const fits = px => { box.style.fontSize = px + 'px';
+    return box.scrollHeight <= box.clientHeight && [...box.children].every(p => p.scrollWidth <= box.clientWidth); };
+  let lo = 40, hi = 150;
+  while (lo < hi) { const mid = Math.ceil((lo + hi) / 2); if (fits(mid)) lo = mid; else hi = mid - 1; }
+  fits(lo);
+  return lo;
+};
+</script>
+</body>
+</html>
