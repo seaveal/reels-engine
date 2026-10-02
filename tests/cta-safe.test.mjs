@@ -38,8 +38,8 @@ try {
    assert.equal(m.spacers,1,label+' duplicate spacer');
    // Bandes encre (Cyrille 2026-10-02) : colonne à droite, barre en bas, jamais sous le bouton.
    assert.ok(m.bands&&m.bands.length===2,label+' ink bands');
-   assert.ok(Math.abs(m.bands[0].left-932)<.5&&Math.abs(m.bands[1].top-1500)<.5,label+' bands position');
-   assert.ok(m.cap.right<=932&&m.cap.bottom<=1500,label+' button clear of bands');
+   assert.ok(Math.abs(m.bands[0].left-932)<.5&&Math.abs(m.bands[1].top-1640)<.5,label+' bands position');
+   assert.ok(m.cap.right<=932&&m.cap.bottom<=1640,label+' button clear of bands');
    const segmented=!!m.segSize;
    if(segmented){
     // Réel à segments : le bouton prend la taille du texte, plusieurs lignes permises.

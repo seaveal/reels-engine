@@ -79,6 +79,7 @@ window.loadReel = function(spec, opts = {}) {
   document.getElementById('stage').innerHTML = `
     <div style="position:absolute;inset:0;background:${T.bg}"></div>
     <div style="position:absolute;inset:-20%;background:radial-gradient(circle at 50% 43%, ${T.glow}, transparent 62%);animation:eiDrift 26s ease-in-out infinite;"></div>
+    <div id="platformBands"></div>
     ${[0,3.25,6.5,9.75].map(d=>`<div class="ripple" style="border-color:${T.echo};animation-delay:${d}s"></div>`).join('')}
     <div style="position:absolute;inset:-10%;background-image:url(${GRAIN});background-size:190px 190px;opacity:${T.grainOp};mix-blend-mode:${T.gb};animation:eiGrain 7s steps(6) infinite;pointer-events:none;"></div>
 

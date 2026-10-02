@@ -89,21 +89,30 @@ window.fitReelCta = function (zone, size) {
 };
 
 // Bandes encre (Cyrille 2026-10-02) : sur le fond crème, les icônes blanches des réseaux
-// (j'aime, commenter, partager, enregistrer), le nom du compte et le début de la légende
-// sont invisibles. Une colonne encre à droite porte les icônes ; une barre encre en bas porte
-// le nom et le début de la légende (« … plus », là où l'on tape pour l'ouvrir). Sous le texte
-// et le bouton, au-dessus du fond : on les pose juste avant le cadre de contenu.
+// (j'aime, commenter, partager, enregistrer), la photo de profil, le nom du compte et le début de
+// la légende sont invisibles. Une colonne encre à droite porte les icônes ; une barre encre en bas
+// porte la ligne de la photo de profil et le début de la légende, sans monter au-delà (retour de
+// Cyrille : à 1500 px, elle était beaucoup trop haute).
+// Chaque moteur réserve la place des bandes dans son empilement (#platformBands) : sous l'onde, les
+// cercles et le grain, pour que « l'onde qui se répand » de L'Écho Incarné reste visible jusque sur
+// les bandes ; à défaut de réserve, juste avant le cadre de contenu.
+const BANDE_COLONNE_X = 932, BANDE_BARRE_Y = 1640;
 window.addPlatformBands = function () {
   const stage = document.getElementById('stage');
-  let frame = document.getElementById('ctaRow');
-  while (frame && frame.parentElement !== stage) frame = frame.parentElement;
-  if (!stage || !frame || document.getElementById('platformBands')) return;
-  const bands = document.createElement('div');
-  bands.id = 'platformBands';
+  if (!stage) return;
+  let bands = document.getElementById('platformBands');
+  if (!bands) {
+    let frame = document.getElementById('ctaRow');
+    while (frame && frame.parentElement !== stage) frame = frame.parentElement;
+    if (!frame) return;
+    bands = document.createElement('div');
+    bands.id = 'platformBands';
+    stage.insertBefore(bands, frame);
+  }
+  if (bands.childElementCount) return;
   bands.setAttribute('aria-hidden', 'true');
   bands.style.cssText = 'position:absolute;inset:0;pointer-events:none;';
   bands.innerHTML =
-    '<div style="position:absolute;top:0;bottom:0;left:932px;right:0;background:#2A211A;"></div>' +
-    '<div style="position:absolute;left:0;right:0;top:1500px;bottom:0;background:#2A211A;"></div>';
-  stage.insertBefore(bands, frame);
+    `<div style="position:absolute;top:0;bottom:0;left:${BANDE_COLONNE_X}px;right:0;background:#2A211A;"></div>` +
+    `<div style="position:absolute;left:0;right:0;top:${BANDE_BARRE_Y}px;bottom:0;background:#2A211A;"></div>`;
 };

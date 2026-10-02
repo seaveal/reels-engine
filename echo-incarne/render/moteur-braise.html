@@ -97,6 +97,7 @@ window.loadReel=function(spec,opts={}){
   stage.innerHTML=`
     <div style="position:absolute;inset:0;background:${T.bg}"></div>
     <div style="position:absolute;inset:-25%;background:radial-gradient(circle at 50% 78%, ${T.glow}, transparent 58%);animation:brGlow 22s ease-in-out infinite;"></div>
+    <div id="platformBands"></div>
     <div style="position:absolute;inset:0;background:radial-gradient(circle at 50% 30%, transparent 55%, rgba(0,0,0,.28));"></div>
     <div style="position:absolute;inset:-10%;background-image:url(${GRAIN});background-size:190px 190px;opacity:${T.grainOp};mix-blend-mode:${T.gb};animation:brGrain 7s steps(6) infinite;pointer-events:none;"></div>
     <div style="position:absolute;inset:0;padding:${Z.top}px ${Z.right}px ${Z.bottom}px ${Z.left}px;display:flex;flex-direction:column;justify-content:space-between;color:${T.text};">
