@@ -111,12 +111,13 @@ window.loadReel=function(spec,opts={}){
       <div id="page" style="min-height:640px;display:flex;flex-direction:column;justify-content:center;"></div>
       <div id="ctaRow" style="display:flex;align-items:flex-start;justify-content:${Z.ctaAlign};gap:34px;opacity:0;transform:translateY(-36px);transition:opacity .55s ease,transform .55s ease;">
         ${Z.arrow==='up-right'?'':`<div style="font-size:70px;line-height:1;color:${T.accent};transform:translateY(46px);">↓</div>`}
-        <div id="ctaCapsule" style="display:inline-flex;align-items:center;background:${T.accent};color:${T.capText};border-radius:6px;padding:30px 48px;font-family:var(--mono);font-size:34px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;box-shadow:0 14px 44px rgba(0,0,0,.35);">${esc(ctaLabel)}</div>
+        <div id="ctaCapsule" data-cta-weight="400" style="display:inline-flex;align-items:center;background:${T.accent};color:${T.capText};border-radius:6px;padding:30px 48px;font-family:var(--mono);font-size:34px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;box-shadow:0 14px 44px rgba(0,0,0,.35);">${esc(ctaLabel)}</div>
         ${Z.arrow==='up-right'?`<div style="font-size:70px;line-height:1;color:${T.accent};transform:translateY(-44px);">↑</div>`:''}
       </div>
     </div>
     ${CFG.guides?guidesHtml(Z):''}`;
   window.fitReelCta(Z);
+  window.addPlatformBands(); // colonne + barre encre : icônes et début de légende visibles (Cyrille 2026-10-02)
   const B={message:buildMessage,confrontation:buildConfrontation,avantapres:buildAvantApres,timeline:buildTimeline,liste:buildListe,citation:buildCitation,notes:buildNotes,calendrier:buildCalendrier,page:buildPage,audio:buildAudio}[spec.layout];
   if(B) B(spec,T);
   return true;

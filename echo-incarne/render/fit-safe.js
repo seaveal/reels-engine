@@ -8,32 +8,39 @@ window.fitReelSegment = function (page, text) {
   document.getElementById('ctaRow').style.flexShrink = '0';
   Object.assign(page.style, {flex:'1 1 0px', minHeight:'0', margin:'24px 0', minWidth:'0'});
   Object.assign(wrapper.style, {flexShrink:'0', minWidth:'0'});
-  const availableHeight = page.clientHeight - 2;
   const availableWidth = page.clientWidth - 4;
   // A few pixels protect italic overhang and inline highlighting at the right edge.
   wrapper.style.width = availableWidth + 'px';
+  // Le bouton suit la taille du texte : sa hauteur (une ou plusieurs lignes) se déduit à chaque essai.
   const fits = size => {
     text.style.fontSize = size + 'px';
-    return wrapper.scrollHeight <= availableHeight && wrapper.scrollWidth <= availableWidth;
+    if (window.__ctaZone) window.fitReelCta(window.__ctaZone, size);
+    return wrapper.scrollHeight <= page.clientHeight - 2 && wrapper.scrollWidth <= availableWidth;
   };
-  let lo = 1, hi = Math.ceil(availableHeight * 2);
+  let lo = 1, hi = Math.ceil(page.clientHeight * 2);
   while (lo < hi) {
     const mid = Math.ceil((lo + hi) / 2);
     if (fits(mid)) lo = mid; else hi = mid - 1;
   }
   fits(lo);
   text.dataset.maxFontSize = String(lo);
-  text.dataset.availableHeight = String(availableHeight);
+  text.dataset.availableHeight = String(page.clientHeight - 2);
   text.dataset.availableWidth = String(availableWidth);
 };
 
 
-// Shared by every reel layout. Pin the capsule and its arrow to the safe bottom,
-// reserve their height in the content flow, and fit the label on exactly one line.
-window.fitReelCta = function (zone) {
+// Shared by every reel layout. Pin the capsule and its arrow to the safe bottom and
+// reserve their height in the content flow.
+// Cyrille 2026-10-02 : le bouton garde la place la plus basse de la zone sûre, mais son texte
+// est AUSSI GROS que le texte du réel, quitte à passer sur deux lignes ou plus. L'ancienne règle
+// « une seule ligne » réduisait le libellé à 15-25 px pour un texte de 60-80 px : personne ne le voyait.
+// `size` (px) vient de fitReelSegment ; sans lui (layouts structurés), comportement d'avant :
+// libellé maximisé sur une ligne.
+window.fitReelCta = function (zone, size) {
   const row = document.getElementById('ctaRow');
   const capsule = document.getElementById('ctaCapsule');
   if (!row || !capsule) return;
+  window.__ctaZone = zone;
   Object.assign(row.style, {
     position:'absolute', left:zone.left+'px', right:zone.right+'px',
     bottom:zone.bottom+'px', alignItems:'flex-end', gap:'20px', flexShrink:'0',
@@ -42,30 +49,61 @@ window.fitReelCta = function (zone) {
     if (arrow === capsule) continue;
     Object.assign(arrow.style, {transform:'none', flexShrink:'0'});
   }
-  // Compact padding preserves the capsule while giving its label more width.
-  Object.assign(capsule.style, {
-    padding:'16px 24px', lineHeight:'1.1', whiteSpace:'nowrap',
-    flexShrink:'0', width:'max-content', maxWidth:'none',
-  });
   const arrowsWidth = [...row.children].filter(el => el !== capsule)
     .reduce((sum, el) => sum + el.getBoundingClientRect().width, 0);
   const availableWidth = row.clientWidth - arrowsWidth - 20 * (row.children.length - 1);
-  const fits = size => {
-    capsule.style.fontSize = size + 'px';
-    return capsule.getBoundingClientRect().width <= availableWidth;
-  };
-  let lo = 1, hi = Math.ceil(availableWidth * 2);
-  while (lo < hi) {
-    const mid = Math.ceil((lo + hi) / 2);
-    if (fits(mid)) lo = mid; else hi = mid - 1;
-  }
-  fits(lo);
   capsule.dataset.availableWidth = String(availableWidth);
-  capsule.dataset.maxFontSize = String(lo);
+  if (size) {
+    Object.assign(capsule.style, {
+      // Police d'affichage du moteur (Archivo gras ; Anton pour Braise), plus lisible que la mono.
+      fontFamily:'var(--sans)', fontWeight:capsule.dataset.ctaWeight || '700',
+      padding:'.3em .6em', lineHeight:'1.12', whiteSpace:'normal', textAlign:'center',
+      letterSpacing:'.02em', borderRadius:'.5em', flexShrink:'1', minWidth:'0',
+      width:'max-content', maxWidth:availableWidth+'px', fontSize:size+'px',
+    });
+    capsule.dataset.maxFontSize = String(size);
+  } else {
+    // Compact padding preserves the capsule while giving its label more width.
+    Object.assign(capsule.style, {
+      padding:'16px 24px', lineHeight:'1.1', whiteSpace:'nowrap',
+      flexShrink:'0', width:'max-content', maxWidth:'none',
+    });
+    const fits = s => {
+      capsule.style.fontSize = s + 'px';
+      return capsule.getBoundingClientRect().width <= availableWidth;
+    };
+    let lo = 1, hi = Math.ceil(availableWidth * 2);
+    while (lo < hi) {
+      const mid = Math.ceil((lo + hi) / 2);
+      if (fits(mid)) lo = mid; else hi = mid - 1;
+    }
+    fits(lo);
+    capsule.dataset.maxFontSize = String(lo);
+  }
   let spacer = document.getElementById('ctaSpace');
   if (!spacer) {
     spacer = document.createElement('div'); spacer.id = 'ctaSpace';
     spacer.setAttribute('aria-hidden', 'true'); row.after(spacer);
   }
   Object.assign(spacer.style, {height:row.getBoundingClientRect().height+'px', flexShrink:'0'});
+};
+
+// Bandes encre (Cyrille 2026-10-02) : sur le fond crème, les icônes blanches des réseaux
+// (j'aime, commenter, partager, enregistrer), le nom du compte et le début de la légende
+// sont invisibles. Une colonne encre à droite porte les icônes ; une barre encre en bas porte
+// le nom et le début de la légende (« … plus », là où l'on tape pour l'ouvrir). Sous le texte
+// et le bouton, au-dessus du fond : on les pose juste avant le cadre de contenu.
+window.addPlatformBands = function () {
+  const stage = document.getElementById('stage');
+  let frame = document.getElementById('ctaRow');
+  while (frame && frame.parentElement !== stage) frame = frame.parentElement;
+  if (!stage || !frame || document.getElementById('platformBands')) return;
+  const bands = document.createElement('div');
+  bands.id = 'platformBands';
+  bands.setAttribute('aria-hidden', 'true');
+  bands.style.cssText = 'position:absolute;inset:0;pointer-events:none;';
+  bands.innerHTML =
+    '<div style="position:absolute;top:0;bottom:0;left:932px;right:0;background:#2A211A;"></div>' +
+    '<div style="position:absolute;left:0;right:0;top:1500px;bottom:0;background:#2A211A;"></div>';
+  stage.insertBefore(bands, frame);
 };

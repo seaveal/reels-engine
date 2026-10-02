@@ -108,6 +108,7 @@ window.loadReel = function(spec, opts = {}) {
       <div style="position:absolute;top:${Z.top-72}px;left:${Z.left}px;font-size:24px;">${Z.label} — safe zone</div>
     </div>` : ''}`;
   window.fitReelCta(Z);
+  window.addPlatformBands(); // colonne + barre encre : icônes et début de légende visibles (Cyrille 2026-10-02)
   if (spec.layout === 'message') buildMessageChat(spec, T);
   if (spec.layout === 'confrontation') buildConfrontation(spec, T);
   if (spec.layout === 'avantapres') buildAvantApres(spec, T);
@@ -216,7 +217,7 @@ function showSegment(i) {
   const isTitle = displaySeg.role === 'title';
   const page = document.getElementById('page');
   if (!isCta) {
-    page.innerHTML = `<div style="font-family:var(--serif);font-weight:${isTitle?500:400};font-size:${isTitle?116:84}px;line-height:${isTitle?1.05:1.2};letter-spacing:${isTitle?'-0.01em':'0'};opacity:${isTitle?1:.92};animation:eiRise .8s ease both;white-space:pre-line;">${pivot(displaySeg.text, T.accent)}</div>`;
+    page.innerHTML = `<div style="font-family:var(--serif);font-weight:700;font-size:${isTitle?116:84}px;line-height:${isTitle?1.05:1.2};letter-spacing:${isTitle?'-0.01em':'0'};opacity:${isTitle?1:.92};animation:eiRise .8s ease both;white-space:pre-line;">${pivot(displaySeg.text, T.accent)}</div>`;
     window.fitReelSegment(page, page.firstElementChild);
   }
   const cta = document.getElementById('ctaRow');

@@ -122,6 +122,7 @@ window.loadReel=function(spec,opts={}){
     </div>
     ${CFG.guides?guidesHtml(Z):''}`;
   window.fitReelCta(Z);
+  window.addPlatformBands(); // colonne + barre encre : icônes et début de légende visibles (Cyrille 2026-10-02)
   const B={message:buildMessage,confrontation:buildConfrontation,avantapres:buildAvantApres,timeline:buildTimeline,liste:buildListe,citation:buildCitation,notes:buildNotes,calendrier:buildCalendrier,page:buildPage,audio:buildAudio}[spec.layout];
   if(B) B(spec,T);
   return true;
@@ -165,7 +166,7 @@ function showSegment(i){
   if(!isCta){
     page.innerHTML=`<div>
       ${isTitle?`<div style="font-family:var(--mono);font-size:26px;letter-spacing:.2em;text-transform:uppercase;color:${T.accent};margin-bottom:36px;">— MANIFESTE</div>`:''}
-      <div class="segFit" style="font-family:var(--serif);font-weight:${isTitle?600:400};font-size:${isTitle?126:94}px;line-height:${isTitle?1.02:1.16};letter-spacing:${isTitle?'-.015em':'0'};">${segLines(displaySeg.text,T)}</div>
+      <div class="segFit" style="font-family:var(--serif);font-weight:700;font-size:${isTitle?126:94}px;line-height:${isTitle?1.02:1.16};letter-spacing:${isTitle?'-.015em':'0'};">${segLines(displaySeg.text,T)}</div>
     </div>`;
     const el=page.querySelector('.segFit');
     window.fitReelSegment(page, el);

@@ -21,7 +21,7 @@ try {
    if(!spec.segments&&spec.pages) spec.segments=spec.pages.map(p=>({role:p.lines.some(l=>l.role==='cta')?'cta':'block',text:p.lines.map(l=>l.text).join('\n\n')}));
    await page.evaluate(({spec,platform,theme})=>{
     window.loadReel(spec,{platform,theme});
-    if(spec.segments) showSegment(0);
+    if(spec.segments) for(let i=0;i<spec.segments.length;i++) showSegment(i);
     const row=document.getElementById('ctaRow');
     row.style.transition='none';row.style.opacity='1';row.style.transform='none';
    },{spec,platform,theme});
@@ -32,18 +32,29 @@ try {
     const r=rect(cap),range=document.createRange();range.selectNodeContents(cap);
     const text=rect({getBoundingClientRect:()=>range.getBoundingClientRect()});
     cap.style.fontSize=(chosen+1)+'px';const largerFits=cap.getBoundingClientRect().width<=available;cap.style.fontSize=chosen+'px';
-    return {zone:CFG.Z,cap:r,text,children:[...row.children].map(rect),fontSize:chosen,largerFits,whiteSpace:getComputedStyle(cap).whiteSpace,label:cap.textContent,spacers:document.querySelectorAll('#ctaSpace').length};
+    const seg=document.querySelector('#page [data-max-font-size]');const bands=document.getElementById('platformBands');return {zone:CFG.Z,cap:r,text,children:[...row.children].map(rect),fontSize:chosen,largerFits,whiteSpace:getComputedStyle(cap).whiteSpace,label:cap.textContent,spacers:document.querySelectorAll('#ctaSpace').length,segSize:seg?Number(seg.dataset.maxFontSize):null,bands:bands?[...bands.children].map(rect):null};
    });
    const label=`${template} ${platform} ${theme} ${source.slug}`;
    assert.equal(m.spacers,1,label+' duplicate spacer');
-   assert.equal(m.whiteSpace,'nowrap',label+' wrapping');
-   assert.equal(m.largerFits,false,label+' maximum size');
+   // Bandes encre (Cyrille 2026-10-02) : colonne à droite, barre en bas, jamais sous le bouton.
+   assert.ok(m.bands&&m.bands.length===2,label+' ink bands');
+   assert.ok(Math.abs(m.bands[0].left-932)<.5&&Math.abs(m.bands[1].top-1500)<.5,label+' bands position');
+   assert.ok(m.cap.right<=932&&m.cap.bottom<=1500,label+' button clear of bands');
+   const segmented=!!m.segSize;
+   if(segmented){
+    // Réel à segments : le bouton prend la taille du texte, plusieurs lignes permises.
+    assert.equal(m.whiteSpace,'normal',label+' wrapping allowed');
+    assert.equal(m.fontSize,m.segSize,label+' button as large as reel text');
+   } else {
+    assert.equal(m.whiteSpace,'nowrap',label+' wrapping');
+    assert.equal(m.largerFits,false,label+' maximum size');
+   }
    assert.ok(Math.abs(m.cap.bottom-(1920-m.zone.bottom))<.1,label+' safe bottom');
    for(const r of [...m.children,m.text]){
     assert.ok(r.left>=m.zone.left-.1 && r.right<=1080-m.zone.right+.1,label+' safe width');
     assert.ok(r.top>=m.zone.top-.1 && r.bottom<=1920-m.zone.bottom+.1,label+' safe height');
    }
-   assert.ok(m.text.height< m.fontSize*1.5,label+' text must have one line');
+   if(!segmented) assert.ok(m.text.height< m.fontSize*1.5,label+' text must have one line');
    results.push({template,platform,theme,slug:source.slug,...m});
    if(process.env.CTA_EVIDENCE && source.slug.startsWith('ig-hook-') && theme==='papier'){
     await page.evaluate(()=>document.querySelectorAll('#page .segLine').forEach(el=>{el.style.opacity='1';el.style.transform='none';}));
