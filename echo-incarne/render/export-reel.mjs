@@ -22,7 +22,7 @@ const args = process.argv.slice(2);
 const specPath = args.find(a => !a.startsWith('--'));
 const opt = (name, dflt) => (args.find(a => a.startsWith(`--${name}=`)) || '').split('=')[1] || dflt;
 if (!specPath) {
-  console.error('usage: node render/export-reel.mjs <spec.json> [--platform=instagram|tiktok|youtube|all] [--theme=papier|nuit] [--out=dir]');
+  console.error('usage: node render/export-reel.mjs <spec.json> [--platform=instagram|tiktok|youtube|all] [--theme=papier|nuit] [--out=dir] [--story]');
   process.exit(1);
 }
 
@@ -37,6 +37,9 @@ const template = opt('template', 'reel-render.html');
 // Piste audio (layout:audio, 2026-08-20) : WAV de l'extrait du livre audio, muxé en AAC
 // dans le mp4 (-shortest). Sans --audio le mp4 reste muet (-an) comme avant.
 const audioPath = opt('audio', '');
+// Story mantra (2026-10-04) : --story rend l'écran d'une story (zone sûre de story, ni colonne ni
+// barre encre). Le fichier garde son nom de plateforme (<slug>-instagram.mp4).
+const story = args.includes('--story');
 await mkdir(outDir, { recursive: true });
 
 const spec = JSON.parse(await readFile(specPath, 'utf8'));
@@ -115,7 +118,7 @@ async function renderPlatform(platform) {
     await Promise.all(Array.from(document.fonts, face => face.load()));
     await document.fonts.ready;
   });
-  await page.evaluate(({ s, o }) => window.loadReel(s, o), { s: spec, o: { platform, theme } });
+  await page.evaluate(({ s, o }) => window.loadReel(s, o), { s: spec, o: { platform: story ? 'story' : platform, theme } });
   // Start the hook immediately; the branded entry effect supplies the visual introduction.
   await page.evaluate(() => new Promise(resolve => requestAnimationFrame(resolve)));
   // Délai vidéo → début du karaoké : lead mesuré + amorce interne de playAudio (AUDIO_LEAD_MS).

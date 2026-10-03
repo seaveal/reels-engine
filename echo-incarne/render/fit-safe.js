@@ -12,10 +12,14 @@ window.fitReelSegment = function (page, text) {
   // A few pixels protect italic overhang and inline highlighting at the right edge.
   wrapper.style.width = availableWidth + 'px';
   // Le bouton suit la taille du texte : sa hauteur (une ou plusieurs lignes) se déduit à chaque essai.
+  // Son libellé ne déborde jamais de la capsule : sur un texte très court, un mot du bouton plus large
+  // que la zone (« LÉGENDE » à 180 px) sortait du bouton et passait sous la colonne (2026-10-04).
+  const capsule = document.getElementById('ctaCapsule');
   const fits = size => {
     text.style.fontSize = size + 'px';
     if (window.__ctaZone) window.fitReelCta(window.__ctaZone, size);
-    return wrapper.scrollHeight <= page.clientHeight - 2 && wrapper.scrollWidth <= availableWidth;
+    return wrapper.scrollHeight <= page.clientHeight - 2 && wrapper.scrollWidth <= availableWidth
+      && (!window.__ctaZone || capsule.scrollWidth <= capsule.clientWidth + 1);
   };
   let lo = 1, hi = Math.ceil(page.clientHeight * 2);
   while (lo < hi) {
@@ -103,16 +107,40 @@ window.fitReelCta = function (zone, size) {
 // Chaque moteur réserve la place des bandes dans son empilement (#platformBands) : sous l'onde, les
 // cercles et le grain, pour que « l'onde qui se répand » de L'Écho Incarné reste visible jusque sur
 // les bandes ; à défaut de réserve, juste avant le cadre de contenu.
-// Réglages par réseau (Cyrille 2026-10-02, vu sur son téléphone) : sur Instagram, colonne élargie de
-// 2 px et arrêtée juste au-dessus du cœur des « j'aime », barre arrêtée juste au-dessus de la photo
-// de profil. TikTok et YouTube gardent la colonne pleine hauteur et la barre à 1640 px.
+// Réglages par réseau. TikTok et YouTube (Cyrille 2026-10-02) : colonne pleine hauteur, barre à 1640 px.
+// Instagram, proportions harmonieuses (Cyrille 2026-10-04, sur la capture de son iPhone, 1290×2796 :
+// la vidéo y est affichée à l'échelle 1,3262 et rognée de 54 px de chaque côté).
+// Unité D = diamètre du médaillon d'en-tête (112 px dans l'Écho et le Manifeste, 116 dans Braise et
+// Fracture : la table est commune, on prend l'Écho de la capture). Tous les rapports sont en φ.
+const PHI = (1 + Math.sqrt(5)) / 2, D = 112;
+const IG_BORD_VISIBLE = 1026;           // capture : bord droit de l'écran (au-delà, hors champ)
+const IG_COEUR_HAUT = 1113;             // capture : sommet du cœur des « j'aime »
+const IG_BARRE = D * PHI;               // épaisseur de la barre, SEUL réglage : D·φ ≈ 181 (avant 230 ≈ D·φ^1,5)
+const IG_COLONNE = D * Math.sqrt(PHI);  // largeur VISIBLE de la colonne : D·√φ ≈ 142 (barre/colonne = √φ),
+                                        // icônes (centre x 957) centrées à 2 px près dans la partie visible
+const IG_MARGE = D / PHI ** 2;          // ≈ 43 : de part et d'autre des icônes, au-dessus du cœur, texte↔colonne
+const IG_ECART_CTA = D;                 // bas du bouton → barre : D (barre/écart = φ)
 const BANDES = {
-  instagram: {colonneX: 930, colonneHaut: 1140, barreHaut: 1690},
+  instagram: {
+    colonneX: Math.round(IG_BORD_VISIBLE - IG_COLONNE),   // 884 (avant 930)
+    colonneHaut: Math.round(IG_COEUR_HAUT - IG_MARGE),    // 1070 (avant 1140, au milieu du cœur)
+    barreHaut: Math.round(1920 - IG_BARRE),               // 1739 (avant 1690)
+  },
   tiktok:    {colonneX: 932, colonneHaut: 0,    barreHaut: 1640},
   youtube:   {colonneX: 932, colonneHaut: 0,    barreHaut: 1640},
+  story:     null,   // story mantra (2026-10-04) : ni colonne ni barre, l'écran d'une story n'a ni icônes ni légende
 };
+// Zone du texte et du bouton sur Instagram, déduite des bandes : le bouton se pose à IG_ECART_CTA
+// au-dessus de la barre (bas à 1627, avant 1370) ; texte et bouton s'arrêtent à IG_MARGE de la colonne.
+window.ZONE_INSTAGRAM = {
+  bottom: Math.round(IG_BARRE + IG_ECART_CTA),                      // 293 (avant 550)
+  right: Math.round(1080 - BANDES.instagram.colonneX + IG_MARGE),   // 239 (avant 180)
+};
+// Story Instagram : rien d'utile dans les ~250 px du haut ni les ~340 px du bas ; pas de rail à droite.
+window.ZONE_STORY = {top: 280, right: 104, bottom: Math.round(340 + IG_MARGE), left: 104};
 window.addPlatformBands = function (platform) {
-  const B = BANDES[platform] || BANDES.instagram;
+  const B = platform in BANDES ? BANDES[platform] : BANDES.instagram;
+  if (!B) return;
   const stage = document.getElementById('stage');
   if (!stage) return;
   let bands = document.getElementById('platformBands');

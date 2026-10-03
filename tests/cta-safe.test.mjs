@@ -32,16 +32,20 @@ try {
     const r=rect(cap),range=document.createRange();range.selectNodeContents(cap);
     const text=rect({getBoundingClientRect:()=>range.getBoundingClientRect()});
     cap.style.fontSize=(chosen+1)+'px';const largerFits=cap.getBoundingClientRect().width<=available;cap.style.fontSize=chosen+'px';
-    const seg=document.querySelector('#page [data-max-font-size]');const bands=document.getElementById('platformBands');return {zone:CFG.Z,cap:r,text,children:[...row.children].map(rect),fontSize:chosen,largerFits,whiteSpace:getComputedStyle(cap).whiteSpace,label:cap.textContent,spacers:document.querySelectorAll('#ctaSpace').length,segSize:seg?Number(seg.dataset.maxFontSize):null,bands:bands?[...bands.children].map(rect):null};
+    const seg=document.querySelector('#page [data-max-font-size]');const bands=document.getElementById('platformBands');return {zone:CFG.Z,capOverflow:cap.scrollWidth-cap.clientWidth,cap:r,text,children:[...row.children].map(rect),fontSize:chosen,largerFits,whiteSpace:getComputedStyle(cap).whiteSpace,label:cap.textContent,spacers:document.querySelectorAll('#ctaSpace').length,segSize:seg?Number(seg.dataset.maxFontSize):null,bands:bands?[...bands.children].map(rect):null};
    });
    const label=`${template} ${platform} ${theme} ${source.slug}`;
    assert.equal(m.spacers,1,label+' duplicate spacer');
    // Bandes encre (Cyrille 2026-10-02) : colonne à droite, barre en bas, jamais sous le bouton.
    assert.ok(m.bands&&m.bands.length===2,label+' ink bands');
-   // Instagram : colonne à 930 px depuis 1140 px (au-dessus du cœur), barre à 1690 ; TikTok/YouTube : 932, pleine hauteur, 1640.
-   const B=platform==='instagram'?{x:930,haut:1140,barre:1690}:{x:932,haut:0,barre:1640};
+   // Instagram (capture de Cyrille du 2026-10-04, unité D = 112 px, médaillon d'en-tête ; φ = nombre d'or) :
+   // colonne x = 1026 − D·√φ = 884 depuis y = 1113 − D/φ² = 1070 (au-dessus du cœur), barre y = 1920 − D·φ = 1739 ;
+   // bouton à D/φ² = 43 px de la colonne et à D = 112 px au-dessus de la barre. TikTok/YouTube : 932, pleine hauteur, 1640.
+   const B=platform==='instagram'?{x:884,haut:1070,barre:1739,marge:43,ecart:112}:{x:932,haut:0,barre:1640,marge:0,ecart:0};
    assert.ok(Math.abs(m.bands[0].left-B.x)<.5&&Math.abs(m.bands[0].top-B.haut)<.5&&Math.abs(m.bands[1].top-B.barre)<.5,label+' bands position');
-   assert.ok(m.cap.right<=B.x&&m.cap.bottom<=B.barre,label+' button clear of bands');
+   assert.ok(m.cap.right<=B.x-B.marge+.5&&m.cap.bottom<=B.barre-B.ecart+.5,label+' button clear of bands');
+   assert.ok(1080-m.zone.right<=B.x-B.marge+.5,label+' text zone clear of column');
+   assert.ok(m.capOverflow<=1,label+' button label inside its capsule');
    const segmented=!!m.segSize;
    if(segmented){
     // Réel à segments : le bouton prend la taille du texte, plusieurs lignes permises.

@@ -33,5 +33,30 @@ try {
       n++;
     }
   }
+  // Story mantra (2026-10-04) : la plateforme `story` ne pose ni colonne ni barre, garde une zone sûre de
+  // story (≥ 250 px en haut, ≥ 340 px en bas, marges égales) et dure 3,9 s sans bouton (5,5 s avec).
+  // Contrôle positif : la même page en `instagram` pose bien ses deux bandes.
+  for (const template of ['moteur-manifeste.html', 'moteur-braise.html', 'moteur-fracture.html', 'reel-render.html']) {
+    await page.goto(pathToFileURL(path.join(render, template)).href + '?norun=1');
+    for (const platform of ['story', 'instagram']) {
+      const m = await page.evaluate(({spec, platform}) => {
+        window.loadReel(spec, {platform});
+        return {bands: document.getElementById('platformBands').childElementCount, Z: CFG.Z,
+          display: getComputedStyle(document.getElementById('ctaRow')).display,
+          ms: window.reelDurationMs(spec), msCta: window.reelDurationMs({...spec, cta: 'Lisez la légende'})};
+      }, {spec: sans, platform});
+      const label = `${template} ${platform}`;
+      if (platform === 'story') {
+        assert.equal(m.bands, 0, label + ' : aucune bande');
+        assert.equal(m.display, 'none', label + ' : aucun bouton');
+        assert.ok(m.Z.top >= 250 && m.Z.bottom >= 340 && m.Z.left === m.Z.right, label + ' : zone sûre de story ' + JSON.stringify(m.Z));
+        assert.equal(m.ms, 3900, label + ' : durée sans bouton');
+        assert.equal(m.msCta, 5500, label + ' : durée avec bouton');
+      } else {
+        assert.equal(m.bands, 2, label + ' : contrôle positif, deux bandes');
+      }
+      n++;
+    }
+  }
   console.log(JSON.stringify({passed: n}));
 } finally { await browser.close(); }

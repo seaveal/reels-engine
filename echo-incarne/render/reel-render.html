@@ -41,7 +41,10 @@ const THEMES = {
 // - youtube (Shorts) : rail droit ~192px (le plus large), bas ~450px (titre chaîne +
 //   musique + gros bouton s'abonner bas-gauche). CTA aligné à GAUCHE, flèche ↓ à gauche.
 const PLATFORMS = {
-  instagram: { top:280, right:180, bottom:550, left:104, ctaAlign:'flex-end',   arrow:'down-left',  cta:"D'où ça vient — en légende",     label:'Instagram Reels' },
+  // Instagram : bas et droite déduits des bandes (fit-safe.js, proportions D·φ, Cyrille 2026-10-04).
+  instagram: { top:280, right:ZONE_INSTAGRAM.right, bottom:ZONE_INSTAGRAM.bottom, left:104, ctaAlign:'flex-end', arrow:'down-left', cta:"D'où ça vient — en légende", label:'Instagram Reels' },
+  // Story mantra (2026-10-04) : zone sûre d'une story, sans bandes ni bouton.
+  story:     { ...ZONE_STORY, ctaAlign:'flex-end', arrow:'down-left', cta:'', label:'Instagram Story' },
   tiktok:    { top:280, right:184, bottom:560, left:104, ctaAlign:'flex-start', arrow:'down-left',  cta:"D'où ça vient — en légende",     label:'TikTok' },
   // YouTube Shorts : la DESCRIPTION s'ouvre en HAUT À DROITE -> flèche ↑ à droite de la capsule
   youtube:   { top:300, right:212, bottom:530, left:104, ctaAlign:'flex-end',   arrow:'up-right',   cta:"D'où ça vient — en description", label:'YouTube Shorts' },
@@ -325,7 +328,9 @@ window.playCitation = async function() {
   const q = document.getElementById('ct0'); if (q) { q.style.opacity = '1'; q.style.transform = 'none'; }
   await msgWait(3400);
   const d = document.getElementById('ct1'); if (d) { d.style.opacity = '1'; d.style.transform = 'none'; await msgWait(3000); }
-  revealCta(); await msgWait(1600); return true;
+  // Sans bouton (story mantra, 2026-10-04) : aucune attente du CTA, la story dure ~5 s.
+  if (document.getElementById('ctaRow').style.display !== 'none') { revealCta(); await msgWait(1600); }
+  return true;
 };
 
 // =============================================================== mode notes (carnet, dérivé pub T42 — 2026-08-20)
@@ -505,7 +510,7 @@ window.reelDurationMs = spec =>
   : spec.layout === 'avantapres' ? 400 + 2400 + 2600 + 3000 + 1600
   : spec.layout === 'timeline' ? 400 + (spec.steps || []).slice(0, 4).reduce((a, s) => a + readMs(s.text, 22, 2000, 3400), 0) + 1600
   : spec.layout === 'liste' ? 500 + (spec.items || []).slice(0, 6).reduce((a, it) => a + readMs(it, 24, 1500, 2600), 0) + 1700
-  : spec.layout === 'citation' ? 500 + 3400 + (spec.dev ? 3000 : 0) + 1600
+  : spec.layout === 'citation' ? 500 + 3400 + (spec.dev ? 3000 : 0) + (spec.cta||(spec.segments||[]).some(s=>s.role==='cta')?1600:0)
   : spec.layout === 'notes' ? (spec.items || []).slice(0, 8).reduce((a, it) => a + readMs((it && typeof it === 'object') ? it.text : it, 24, 1500, 2600), 0) + 500 + 900 + 1700
   : spec.layout === 'calendrier' ? (spec.blocks || []).slice(0, 8).reduce((a, b) => a + readMs(b.title, 24, 1300, 2400), 0) + 500 + 1000 + 1800
   : spec.layout === 'page' ? (spec.paras || []).slice(0, 4).reduce((a, p) => a + readMs(p.text, 30, 2500, 6000), 0) + 400 + 900 + 1800
