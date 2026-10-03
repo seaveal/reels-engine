@@ -32,7 +32,8 @@ try {
       content.style.fontSize=(chosen+1)+'px';
       if(window.__ctaZone) window.fitReelCta(window.__ctaZone,chosen+1);
       const cap=document.getElementById('ctaCapsule');
-      const largerFits=wrapper.scrollHeight<=page.clientHeight-2&&wrapper.scrollWidth<=availableWidth&&(!window.__ctaZone||cap.scrollWidth<=cap.clientWidth+1);
+      const cs=getComputedStyle(cap),lab=document.createRange();lab.selectNodeContents(cap);
+      const largerFits=wrapper.scrollHeight<=page.clientHeight-2&&wrapper.scrollWidth<=availableWidth&&(!window.__ctaZone||lab.getBoundingClientRect().width<=cap.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight)+1);
       content.style.fontSize=chosen+'px';
       if(window.__ctaZone) window.fitReelCta(window.__ctaZone,chosen);
       return {availableHeight,availableWidth,largerFits,text:content.textContent,fontSize:parseFloat(getComputedStyle(content).fontSize),height:content.scrollHeight,width:content.scrollWidth,clientWidth:content.clientWidth,top:r.top,bottom:r.bottom,pageBottom:bounds.bottom,ctaTop:document.getElementById('ctaRow').offsetTop,safeBottom:1920-parseFloat(getComputedStyle(page.parentElement).paddingBottom),lines:[...page.querySelectorAll('.segLine')].map(el=>({text:el.textContent,margin:parseFloat(getComputedStyle(el).marginTop)})),whiteSpace:getComputedStyle(content).whiteSpace};

@@ -14,12 +14,20 @@ window.fitReelSegment = function (page, text) {
   // Le bouton suit la taille du texte : sa hauteur (une ou plusieurs lignes) se déduit à chaque essai.
   // Son libellé ne déborde jamais de la capsule : sur un texte très court, un mot du bouton plus large
   // que la zone (« LÉGENDE » à 180 px) sortait du bouton et passait sous la colonne (2026-10-04).
+  // Mesure : la ligne la plus large du libellé tient dans la boîte de contenu (rembourrage exclu).
   const capsule = document.getElementById('ctaCapsule');
+  const label = document.createRange();
+  const labelFits = () => {
+    const cs = getComputedStyle(capsule);
+    label.selectNodeContents(capsule);
+    return label.getBoundingClientRect().width
+      <= capsule.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) + 1;
+  };
   const fits = size => {
     text.style.fontSize = size + 'px';
     if (window.__ctaZone) window.fitReelCta(window.__ctaZone, size);
     return wrapper.scrollHeight <= page.clientHeight - 2 && wrapper.scrollWidth <= availableWidth
-      && (!window.__ctaZone || capsule.scrollWidth <= capsule.clientWidth + 1);
+      && (!window.__ctaZone || labelFits());
   };
   let lo = 1, hi = Math.ceil(page.clientHeight * 2);
   while (lo < hi) {
@@ -110,31 +118,34 @@ window.fitReelCta = function (zone, size) {
 // Réglages par réseau. TikTok et YouTube (Cyrille 2026-10-02) : colonne pleine hauteur, barre à 1640 px.
 // Instagram, proportions harmonieuses (Cyrille 2026-10-04, sur la capture de son iPhone, 1290×2796 :
 // la vidéo y est affichée à l'échelle 1,3262 et rognée de 54 px de chaque côté).
-// Unité D = diamètre du médaillon d'en-tête (112 px dans l'Écho et le Manifeste, 116 dans Braise et
-// Fracture : la table est commune, on prend l'Écho de la capture). Tous les rapports sont en φ.
-const PHI = (1 + Math.sqrt(5)) / 2, D = 112;
+// Unité U = « ma vignette » : la photo de profil qu'Instagram affiche en bas à gauche, mesurée sur la
+// capture (81 px de diamètre, sommet y 1685, centre 1726). Tous les rapports sont en U et φ.
+const PHI = (1 + Math.sqrt(5)) / 2, U = 81;
+const IG_VIGNETTE_HAUT = 1685;          // capture : sommet de la photo de profil
 const IG_BORD_VISIBLE = 1026;           // capture : bord droit de l'écran (au-delà, hors champ)
 const IG_COEUR_HAUT = 1113;             // capture : sommet du cœur des « j'aime »
-const IG_BARRE = D * PHI;               // épaisseur de la barre, SEUL réglage : D·φ ≈ 181 (avant 230 ≈ D·φ^1,5)
-const IG_COLONNE = D * Math.sqrt(PHI);  // largeur VISIBLE de la colonne : D·√φ ≈ 142 (barre/colonne = √φ),
-                                        // icônes (centre x 957) centrées à 2 px près dans la partie visible
-const IG_MARGE = D / PHI ** 2;          // ≈ 43 : de part et d'autre des icônes, au-dessus du cœur, texte↔colonne
-const IG_ECART_CTA = D;                 // bas du bouton → barre : D (barre/écart = φ)
+// SEUL réglage de la barre : où son bord haut traverse la vignette, en fraction de U. 1/2 = au centre
+// (défaut, barre 194 px, avant 230) ; 0,06 = au ras du sommet (1690, réglage du 2026-10-02) ;
+// 1,15 = sous la vignette, à mi-chemin de la ligne de légende (1779). La légende (1791) reste sur le sombre.
+const IG_BARRE_DANS_VIGNETTE = 1 / 2;
+const IG_MARGE = U / PHI ** 2;          // ≈ 31 : au-dessus du cœur, entre texte et colonne
 const BANDES = {
   instagram: {
-    colonneX: Math.round(IG_BORD_VISIBLE - IG_COLONNE),   // 884 (avant 930)
-    colonneHaut: Math.round(IG_COEUR_HAUT - IG_MARGE),    // 1070 (avant 1140, au milieu du cœur)
-    barreHaut: Math.round(1920 - IG_BARRE),               // 1739 (avant 1690)
+    colonneX: Math.round(IG_BORD_VISIBLE - U * PHI),      // largeur visible U·φ ≈ 131 : 895 (avant 930) ;
+                                                          // icônes (centre x 957) centrées à 3 px près
+    colonneHaut: Math.round(IG_COEUR_HAUT - IG_MARGE),    // 1082 (avant 1140, au milieu du cœur)
+    barreHaut: Math.round(IG_VIGNETTE_HAUT + U * IG_BARRE_DANS_VIGNETTE),   // 1726 (avant 1690)
   },
   tiktok:    {colonneX: 932, colonneHaut: 0,    barreHaut: 1640},
   youtube:   {colonneX: 932, colonneHaut: 0,    barreHaut: 1640},
   story:     null,   // story mantra (2026-10-04) : ni colonne ni barre, l'écran d'une story n'a ni icônes ni légende
 };
-// Zone du texte et du bouton sur Instagram, déduite des bandes : le bouton se pose à IG_ECART_CTA
-// au-dessus de la barre (bas à 1627, avant 1370) ; texte et bouton s'arrêtent à IG_MARGE de la colonne.
+// Zone du texte et du bouton sur Instagram. Le bouton se pose U/2 au-dessus de la vignette (bas à 1644,
+// avant 1370), soit U au-dessus de la barre par défaut : ancré sur la vignette, il ne la chevauche dans
+// aucune position de la barre. Texte et bouton s'arrêtent à IG_MARGE de la colonne.
 window.ZONE_INSTAGRAM = {
-  bottom: Math.round(IG_BARRE + IG_ECART_CTA),                      // 293 (avant 550)
-  right: Math.round(1080 - BANDES.instagram.colonneX + IG_MARGE),   // 239 (avant 180)
+  bottom: Math.round(1920 - (IG_VIGNETTE_HAUT - U / 2)),            // 276 (avant 550)
+  right: Math.round(1080 - BANDES.instagram.colonneX + IG_MARGE),   // 216 (avant 180)
 };
 // Story Instagram : rien d'utile dans les ~250 px du haut ni les ~340 px du bas ; pas de rail à droite.
 window.ZONE_STORY = {top: 280, right: 104, bottom: Math.round(340 + IG_MARGE), left: 104};
