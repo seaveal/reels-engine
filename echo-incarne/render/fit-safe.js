@@ -40,6 +40,13 @@ window.fitReelCta = function (zone, size) {
   const row = document.getElementById('ctaRow');
   const capsule = document.getElementById('ctaCapsule');
   if (!row || !capsule) return;
+  // Aucun CTA dans la spec (story mantra, 2026-10-03 : « aucun renvoi, aucun lien, aucun appel ») :
+  // ni bouton, ni flèche, ni place réservée en bas. Seule l'absence de libellé déclenche ce cas.
+  if (!capsule.textContent.trim()) {
+    row.style.display = 'none';
+    window.__ctaZone = null;
+    return;
+  }
   window.__ctaZone = zone;
   Object.assign(row.style, {
     position:'absolute', left:zone.left+'px', right:zone.right+'px',

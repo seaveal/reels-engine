@@ -90,7 +90,7 @@ window.loadReel=function(spec,opts={}){
   CFG={spec,T,Z,guides:!!opts.guides};
   const ctaSeg=(spec.segments||[]).find(s=>s.role==='cta');
   let ctaLabel=spec.cta?String(spec.cta).replace(/^\s*\(|\)\s*$/g,'').replace(/\[\[|\]\]/g,'')
-    :(ctaSeg?ctaSeg.text.replace(/^\s*\(|\)\s*$/g,'').replace(/\[\[|\]\]/g,''):Z.cta);
+    :(ctaSeg?ctaSeg.text.replace(/^\s*\(|\)\s*$/g,'').replace(/\[\[|\]\]/g,''):''); // sans CTA dans la spec (story mantra) : aucun bouton (2026-10-03)
   if((opts.platform||'instagram')==='youtube') ctaLabel=ctaLabel.replace(/l[ée]gende/gi,'DESCRIPTION');
   const stage=document.getElementById('stage');
   stage.style.height='1920px';
