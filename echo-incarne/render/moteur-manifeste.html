@@ -173,7 +173,8 @@ function showSegment(i){
       <div class="segFit" style="font-family:var(--serif);font-weight:700;font-size:${isTitle?126:94}px;line-height:${isTitle?1.02:1.16};letter-spacing:${isTitle?'-.015em':'0'};">${segLines(displaySeg.text,T)}</div>
     </div>`;
     const el=page.querySelector('.segFit');
-    window.fitReelSegment(page, el);
+    // Page que le bouton accompagne : celle juste avant le segment cta (2026-10-04).
+    window.fitReelSegment(page, el, (spec.segments[i+1]||{}).role==='cta');
   }
   const cta=document.getElementById('ctaRow');
   cta.style.opacity=isCta?'1':'0';

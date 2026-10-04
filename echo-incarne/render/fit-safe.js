@@ -1,7 +1,7 @@
 /* Maximise segment text inside the platform's existing safe zone.
    Header, paragraph gaps and CTA keep their space. Fit after local fonts load. */
 'use strict';
-window.fitReelSegment = function (page, text) {
+window.fitReelSegment = function (page, text, porteBouton) {
   const wrapper = page.firstElementChild;
   const frame = page.parentElement;
   frame.firstElementChild.style.flexShrink = '0';
@@ -12,29 +12,30 @@ window.fitReelSegment = function (page, text) {
   // A few pixels protect italic overhang and inline highlighting at the right edge.
   wrapper.style.width = availableWidth + 'px';
   // Le bouton suit la taille du texte : sa hauteur (une ou plusieurs lignes) se déduit à chaque essai.
-  // Son libellé ne déborde jamais de la capsule : sur un texte très court, un mot du bouton plus large
-  // que la zone (« LÉGENDE » à 180 px) sortait du bouton et passait sous la colonne (2026-10-04).
-  // Mesure : la ligne la plus large du libellé tient dans la boîte de contenu (rembourrage exclu).
+  // `porteBouton` : cette page est celle que le bouton accompagne (la page juste avant le segment cta).
+  // Calcul d'origine d'abord (bouton à la taille du texte). Sur l'écran du bouton seulement, si le libellé
+  // y dépasse alors 2 lignes (3 au-delà de 28 caractères) ou sa capsule, second calcul avec le bouton borné
+  // (fitReelCta) : un écran déjà conforme et toutes les autres pages restent tels quels (2026-10-04).
   const capsule = document.getElementById('ctaCapsule');
-  const label = document.createRange();
-  const labelFits = () => {
-    const cs = getComputedStyle(capsule);
-    label.selectNodeContents(capsule);
-    return label.getBoundingClientRect().width
-      <= capsule.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) + 1;
-  };
+  let borne = false;
   const fits = size => {
     text.style.fontSize = size + 'px';
-    if (window.__ctaZone) window.fitReelCta(window.__ctaZone, size);
+    if (window.__ctaZone) window.fitReelCta(window.__ctaZone, size, borne);
     return wrapper.scrollHeight <= page.clientHeight - 2 && wrapper.scrollWidth <= availableWidth
-      && (!window.__ctaZone || labelFits());
+      && (!borne || capsule.dataset.tient === '1');
   };
-  let lo = 1, hi = Math.ceil(page.clientHeight * 2);
-  while (lo < hi) {
-    const mid = Math.ceil((lo + hi) / 2);
-    if (fits(mid)) lo = mid; else hi = mid - 1;
-  }
-  fits(lo);
+  const search = () => {
+    let lo = 1, hi = Math.ceil(page.clientHeight * 2);
+    while (lo < hi) {
+      const mid = Math.ceil((lo + hi) / 2);
+      if (fits(mid)) lo = mid; else hi = mid - 1;
+    }
+    fits(lo);
+    return lo;
+  };
+  let lo = search();
+  if (porteBouton && window.__ctaZone && !libelleTient(capsule)) { borne = true; lo = search(); }
+  text.dataset.bouton = borne ? 'borne' : 'texte';
   text.dataset.maxFontSize = String(lo);
   text.dataset.availableHeight = String(page.clientHeight - 2);
   text.dataset.availableWidth = String(availableWidth);
@@ -48,7 +49,19 @@ window.fitReelSegment = function (page, text) {
 // « une seule ligne » réduisait le libellé à 15-25 px pour un texte de 60-80 px : personne ne le voyait.
 // `size` (px) vient de fitReelSegment ; sans lui (layouts structurés), comportement d'avant :
 // libellé maximisé sur une ligne.
-window.fitReelCta = function (zone, size) {
+// `borne` (2026-10-04, fin d'écran ≤ 28 caractères = 2 lignes, décision du 2026-10-02) : sur l'écran qui
+// montre le bouton, le libellé tient sur 2 lignes au plus (3 au-delà de 28 caractères) et jamais hors de
+// la capsule. D'abord à la taille du texte ; sinon marges intérieures resserrées ; sinon police réduite
+// juste assez, jamais sous 80 % du texte. Si même là il ne tient pas, `data-tient="0"` : le texte rapetisse.
+function libelleTient(capsule) {
+  const max = capsule.textContent.trim().length <= 28 ? 2 : 3;
+  const cs = getComputedStyle(capsule), r = document.createRange();
+  r.selectNodeContents(capsule);
+  const lignes = new Set([...r.getClientRects()].map(x => Math.round(x.top))).size;
+  return lignes <= max && r.getBoundingClientRect().width
+    <= capsule.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) + 1;
+}
+window.fitReelCta = function (zone, size, borne) {
   const row = document.getElementById('ctaRow');
   const capsule = document.getElementById('ctaCapsule');
   if (!row || !capsule) return;
@@ -81,6 +94,26 @@ window.fitReelCta = function (zone, size) {
       width:'max-content', maxWidth:availableWidth+'px', fontSize:size+'px',
     });
     capsule.dataset.maxFontSize = String(size);
+    if (borne) {
+      const tient = () => libelleTient(capsule);
+      let ok = tient();
+      if (!ok) { capsule.style.padding = '.3em .35em'; ok = tient(); }
+      if (!ok) {
+        let lo = Math.ceil(size * .8), hi = size - 1;
+        capsule.style.fontSize = lo + 'px';
+        ok = tient();
+        if (ok) {
+          while (lo < hi) {
+            const mid = Math.ceil((lo + hi) / 2);
+            capsule.style.fontSize = mid + 'px';
+            if (tient()) lo = mid; else hi = mid - 1;
+          }
+          capsule.style.fontSize = lo + 'px';
+        }
+        capsule.dataset.maxFontSize = String(lo);
+      }
+      capsule.dataset.tient = ok ? '1' : '0';
+    }
   } else {
     // Compact padding preserves the capsule while giving its label more width.
     Object.assign(capsule.style, {
@@ -124,24 +157,26 @@ const PHI = (1 + Math.sqrt(5)) / 2, U = 81;
 const IG_VIGNETTE_HAUT = 1685;          // capture : sommet de la photo de profil
 const IG_BORD_VISIBLE = 1026;           // capture : bord droit de l'écran (au-delà, hors champ)
 const IG_COEUR_HAUT = 1113;             // capture : sommet du cœur des « j'aime »
-// SEUL réglage de la barre : où son bord haut traverse la vignette, en fraction de U. 1/2 = au centre
-// (défaut, barre 194 px, avant 230) ; 0,06 = au ras du sommet (1690, réglage du 2026-10-02) ;
-// 1,15 = sous la vignette, à mi-chemin de la ligne de légende (1779). La légende (1791) reste sur le sombre.
-const IG_BARRE_DANS_VIGNETTE = 1 / 2;
+// SEUL réglage de la barre : où son bord haut traverse la vignette, en fraction de U. 0 = au sommet de la
+// vignette (défaut, 1685, barre 235 px) : la photo ET le nom du compte (blanc, 1689 à 1718 sur la capture)
+// restent sur le sombre, raison d'être de la barre (Cyrille 2026-10-02). 0,06 = 1690, réglage du 02/10, qui
+// rogne déjà 1 px du nom ; 1/2 = centre (1726) et 1,15 = sous la vignette (1779) découvrent le nom, blanc
+// sur crème en Écho et Manifeste. La légende (1791) reste sur le sombre dans tous les cas.
+const IG_BARRE_DANS_VIGNETTE = 0;
 const IG_MARGE = U / PHI ** 2;          // ≈ 31 : au-dessus du cœur, entre texte et colonne
 const BANDES = {
   instagram: {
     colonneX: Math.round(IG_BORD_VISIBLE - U * PHI),      // largeur visible U·φ ≈ 131 : 895 (avant 930) ;
                                                           // icônes (centre x 957) centrées à 3 px près
     colonneHaut: Math.round(IG_COEUR_HAUT - IG_MARGE),    // 1082 (avant 1140, au milieu du cœur)
-    barreHaut: Math.round(IG_VIGNETTE_HAUT + U * IG_BARRE_DANS_VIGNETTE),   // 1726 (avant 1690)
+    barreHaut: Math.round(IG_VIGNETTE_HAUT + U * IG_BARRE_DANS_VIGNETTE),   // 1685 (avant 1690)
   },
   tiktok:    {colonneX: 932, colonneHaut: 0,    barreHaut: 1640},
   youtube:   {colonneX: 932, colonneHaut: 0,    barreHaut: 1640},
   story:     null,   // story mantra (2026-10-04) : ni colonne ni barre, l'écran d'une story n'a ni icônes ni légende
 };
 // Zone du texte et du bouton sur Instagram. Le bouton se pose U/2 au-dessus de la vignette (bas à 1644,
-// avant 1370), soit U au-dessus de la barre par défaut : ancré sur la vignette, il ne la chevauche dans
+// avant 1370), soit U/2 au-dessus de la barre par défaut : ancré sur la vignette, il ne la chevauche dans
 // aucune position de la barre. Texte et bouton s'arrêtent à IG_MARGE de la colonne.
 window.ZONE_INSTAGRAM = {
   bottom: Math.round(1920 - (IG_VIGNETTE_HAUT - U / 2)),            // 276 (avant 550)

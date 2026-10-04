@@ -32,26 +32,33 @@ try {
     const r=rect(cap),range=document.createRange();range.selectNodeContents(cap);
     const text=rect({getBoundingClientRect:()=>range.getBoundingClientRect()});
     cap.style.fontSize=(chosen+1)+'px';const largerFits=cap.getBoundingClientRect().width<=available;cap.style.fontSize=chosen+'px';
-    const seg=document.querySelector('#page [data-max-font-size]');const bands=document.getElementById('platformBands');const cs=getComputedStyle(cap);return {zone:CFG.Z,capOverflow:text.width-(cap.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight)),cap:r,text,children:[...row.children].map(rect),fontSize:chosen,largerFits,whiteSpace:getComputedStyle(cap).whiteSpace,label:cap.textContent,spacers:document.querySelectorAll('#ctaSpace').length,segSize:seg?Number(seg.dataset.maxFontSize):null,bands:bands?[...bands.children].map(rect):null};
+    const seg=document.querySelector('#page [data-max-font-size]');const bands=document.getElementById('platformBands');const cs=getComputedStyle(cap);const lh=parseFloat(cs.lineHeight)||chosen*1.12;return {zone:CFG.Z,lines:Math.round(text.height/lh),capOverflow:text.width-(cap.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight)),cap:r,text,children:[...row.children].map(rect),fontSize:chosen,largerFits,whiteSpace:getComputedStyle(cap).whiteSpace,label:cap.textContent,spacers:document.querySelectorAll('#ctaSpace').length,segSize:seg?Number(seg.dataset.maxFontSize):null,bands:bands?[...bands.children].map(rect):null};
    });
    const label=`${template} ${platform} ${theme} ${source.slug}`;
    assert.equal(m.spacers,1,label+' duplicate spacer');
    // Bandes encre (Cyrille 2026-10-02) : colonne à droite, barre en bas, jamais sous le bouton.
    assert.ok(m.bands&&m.bands.length===2,label+' ink bands');
-   // Instagram (capture de Cyrille du 2026-10-04, unité U = 81 px, sa photo de profil Instagram ; φ = nombre d'or) :
-   // colonne x = 1026 − U·φ = 895 depuis y = 1113 − U/φ² = 1082 (au-dessus du cœur), barre au centre de la
-   // vignette y = 1685 + U/2 = 1726 ; bouton à U/φ² = 31 px de la colonne, bas à 1685 − U/2 = 1644.
-   // TikTok/YouTube : 932, pleine hauteur, 1640.
-   const B=platform==='instagram'?{x:895,haut:1082,barre:1726,marge:31,basBouton:1644}:{x:932,haut:0,barre:1640,marge:0,basBouton:1640};
-   assert.ok(Math.abs(m.bands[0].left-B.x)<.5&&Math.abs(m.bands[0].top-B.haut)<.5&&Math.abs(m.bands[1].top-B.barre)<.5,label+' bands position');
-   assert.ok(m.cap.right<=B.x-B.marge+.5&&m.cap.bottom<=B.basBouton+.5,label+' button clear of bands');
-   assert.ok(1080-m.zone.right<=B.x-B.marge+.5,label+' text zone clear of column');
+   if(platform==='instagram'){
+    // Intention, mesurée sur la capture de Cyrille du 2026-10-04 (px vidéo), indépendante des cotes du code.
+    const [col,barre]=m.bands, CAP={coeurHaut:1113,iconesX:957.5,bordVisible:1026,vignetteHaut:1685,nomHaut:1689,U:81};
+    assert.ok(col.top<CAP.coeurHaut-10&&col.top>CAP.coeurHaut-CAP.U,label+' column starts just above the heart');
+    assert.ok(Math.abs((col.left+CAP.bordVisible)/2-CAP.iconesX)<=4,label+' icons centred in the visible column');
+    assert.ok(barre.top<=CAP.nomHaut&&barre.top>=CAP.vignetteHaut-10,label+' account name on the dark bar, bar not above the photo');
+    assert.ok(m.cap.bottom<=CAP.vignetteHaut-10&&m.cap.bottom>=CAP.vignetteHaut-CAP.U,label+' button set just above the profile photo');
+    assert.ok(m.cap.right<=col.left-10&&1080-m.zone.right<=col.left-10,label+' button and text clear of the column');
+   } else {
+    // TikTok/YouTube : réglages du 2026-10-02, inchangés (colonne 932 pleine hauteur, barre 1640).
+    assert.ok(Math.abs(m.bands[0].left-932)<.5&&m.bands[0].top===0&&Math.abs(m.bands[1].top-1640)<.5,label+' bands position');
+    assert.ok(m.cap.right<=932&&m.cap.bottom<=1640,label+' button clear of bands');
+   }
    assert.ok(m.capOverflow<=1,label+' button label inside its capsule');
    const segmented=!!m.segSize;
    if(segmented){
-    // Réel à segments : le bouton prend la taille du texte, plusieurs lignes permises.
+    // Réel à segments (Cyrille 2026-10-02) : bouton aussi gros que le texte, sur 2 lignes au plus pour un
+    // libellé de 28 caractères ou moins (3 au-delà) ; il ne descend jamais sous 80 % du texte.
     assert.equal(m.whiteSpace,'normal',label+' wrapping allowed');
-    assert.equal(m.fontSize,m.segSize,label+' button as large as reel text');
+    assert.ok(m.fontSize<=m.segSize&&m.fontSize>=Math.ceil(m.segSize*.8),label+` button 80-100 % of reel text (${m.fontSize}/${m.segSize})`);
+    assert.ok(m.lines<=(m.label.trim().length<=28?2:3),label+` button lines (${m.lines}, ${m.label.trim().length} car.)`);
    } else {
     assert.equal(m.whiteSpace,'nowrap',label+' wrapping');
     assert.equal(m.largerFits,false,label+' maximum size');

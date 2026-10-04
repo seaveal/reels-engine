@@ -45,6 +45,16 @@ try {
           display: getComputedStyle(document.getElementById('ctaRow')).display,
           ms: window.reelDurationMs(spec), msCta: window.reelDurationMs({...spec, cta: 'Lisez la légende'})};
       }, {spec: sans, platform});
+      // Lecture réelle (playReel), pas seulement la formule : somme des attentes demandées.
+      const joue = async spec => page.evaluate(async ({spec, platform}) => {
+        window.loadReel(spec, {platform});
+        const st = window.setTimeout; let total = 0;
+        window.setTimeout = (f, ms, ...a) => { total += ms || 0; return st(f, 0, ...a); };
+        try { await window.playReel(); } finally { window.setTimeout = st; }
+        return total;
+      }, {spec, platform});
+      m.joue = await joue(sans);
+      m.joueCta = await joue({...sans, cta: 'Lisez la légende'});
       const label = `${template} ${platform}`;
       if (platform === 'story') {
         assert.equal(m.bands, 0, label + ' : aucune bande');
@@ -52,6 +62,8 @@ try {
         assert.ok(m.Z.top >= 250 && m.Z.bottom >= 340 && m.Z.left === m.Z.right, label + ' : zone sûre de story ' + JSON.stringify(m.Z));
         assert.equal(m.ms, 3900, label + ' : durée sans bouton');
         assert.equal(m.msCta, 5500, label + ' : durée avec bouton');
+        assert.equal(m.joue, 3900, label + ' : lecture sans bouton');
+        assert.equal(m.joueCta, 5500, label + ' : lecture avec bouton (contrôle positif)');
       } else {
         assert.equal(m.bands, 2, label + ' : contrôle positif, deux bandes');
       }

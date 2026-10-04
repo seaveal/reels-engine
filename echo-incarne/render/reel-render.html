@@ -222,7 +222,8 @@ function showSegment(i) {
   const page = document.getElementById('page');
   if (!isCta) {
     page.innerHTML = `<div style="font-family:var(--serif);font-weight:700;font-size:${isTitle?116:84}px;line-height:${isTitle?1.05:1.2};letter-spacing:${isTitle?'-0.01em':'0'};opacity:${isTitle?1:.92};animation:eiRise .8s ease both;white-space:pre-line;">${pivot(displaySeg.text, T.accent)}</div>`;
-    window.fitReelSegment(page, page.firstElementChild);
+    // Page que le bouton accompagne : celle juste avant le segment cta (2026-10-04).
+    window.fitReelSegment(page, page.firstElementChild, (spec.segments[i + 1] || {}).role === 'cta');
   }
   const cta = document.getElementById('ctaRow');
   cta.style.opacity = isCta ? '1' : '0';
