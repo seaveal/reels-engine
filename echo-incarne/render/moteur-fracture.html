@@ -117,8 +117,8 @@ window.loadReel=function(spec,opts={}){
       <div id="page" style="min-height:640px;display:flex;flex-direction:column;justify-content:center;"></div>
       <div id="ctaRow" style="display:flex;align-items:flex-start;justify-content:${Z.ctaAlign};gap:34px;opacity:0;transform:translateY(-36px);transition:opacity .5s ease,transform .5s ease;">
         ${Z.arrow==='up-right'?'':`<div style="font-size:70px;line-height:1;color:${T.text};transform:translateY(44px);">↓</div>`}
-        <!-- Plancher du bouton (2026-10-04) : 10e centile de sa taille sur les écrans à bouton de longueur médiane (75 car.) du corpus, 3 plateformes ; sous lui, une ligne de plus plutôt qu'un bouton illisible. -->
-        <div id="ctaCapsule" data-cta-plancher="74" style="display:inline-flex;align-items:center;background:${T.capBg};color:${T.capText};padding:32px 50px;font-family:var(--mono);font-size:34px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;box-shadow:0 14px 44px rgba(0,0,0,.3);">${esc(ctaLabel)}</div>
+        <!-- Plancher du bouton (2026-10-04, audit tour 2) : 66 px, plus petite taille où le libellé conforme (≤ 28 car.) le plus large du corpus, « LA SUITE EST DANS LA LÉGENDE », tient sur 2 lignes dans la zone Instagram (la plus étroite ; 69 TikTok, 74 YouTube). Au-dessus, des libellés conformes passaient sur 3 lignes. Sous lui, une ligne de plus. -->
+        <div id="ctaCapsule" data-cta-plancher="66" style="display:inline-flex;align-items:center;background:${T.capBg};color:${T.capText};padding:32px 50px;font-family:var(--mono);font-size:34px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;box-shadow:0 14px 44px rgba(0,0,0,.3);">${esc(ctaLabel)}</div>
         ${Z.arrow==='up-right'?`<div style="font-size:70px;line-height:1;color:${T.text};transform:translateY(-42px);">↑</div>`:''}
       </div>
     </div>

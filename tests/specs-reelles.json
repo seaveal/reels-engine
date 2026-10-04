@@ -1,0 +1,735 @@
+{
+ "source": "content-agent/reels-specs, copie du 2026-10-04 (audit tour 2)",
+ "specs": [
+  {
+   "slug": "ig-hook-2026-09-26-6a-le-calme-annonce-la-tempete",
+   "layout": "long",
+   "hand_emoji": true,
+   "pages": [
+    {
+     "lines": [
+      {
+       "text": "La vraie [[raison]] pour laquelle certains [[hommes]] s'[[éloignent]] quand tout va [[bien]]…",
+       "role": "heading"
+      },
+      {
+       "text": "Ils n'ont pas [[trouvé]] [[mieux]].",
+       "role": "body"
+      },
+      {
+       "text": "Pour eux, le [[calme]] annonce toujours la [[tempête]]…",
+       "role": "body"
+      }
+     ],
+     "arrow": true
+    },
+    {
+     "lines": [
+      {
+       "text": "L'ORAGE ? LISEZ LA LÉGENDE",
+       "role": "cta"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "slug": "ig-hook-2026-10-02-e-oui-a-tout",
+   "layout": "long",
+   "hand_emoji": true,
+   "pages": [
+    {
+     "lines": [
+      {
+       "text": "Un [[homme]] qui dit [[oui à tout]] pour éviter les [[disputes]] ne rend pas sa femme [[heureuse]].",
+       "role": "heading"
+      },
+      {
+       "text": "Elle a un [[petit garçon]] à côté d'elle, et aucun [[bonhomme]] en face.",
+       "role": "body"
+      },
+      {
+       "text": "Et plus il [[cède]], moins elle le [[respecte]]…",
+       "role": "body"
+      }
+     ],
+     "arrow": true
+    },
+    {
+     "lines": [
+      {
+       "text": "QUE FAIRE ? LISEZ LA LÉGENDE",
+       "role": "cta"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "slug": "ig-hook-2026-10-02-g-page-arrachee",
+   "layout": "long",
+   "hand_emoji": true,
+   "pages": [
+    {
+     "lines": [
+      {
+       "text": "Un [[homme]] qui se remet en [[couple]] deux semaines après une [[rupture]] n'a pas tourné la [[page]].",
+       "role": "heading"
+      },
+      {
+       "text": "Il l'a [[arrachée]].",
+       "role": "body"
+      },
+      {
+       "text": "Et la [[prochaine histoire]] finira de la [[même manière]]…",
+       "role": "body"
+      }
+     ],
+     "arrow": true
+    },
+    {
+     "lines": [
+      {
+       "text": "SA FUITE ? LISEZ LA LÉGENDE",
+       "role": "cta"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "slug": "ig-hook-2026-10-02-c-comme-son-pere",
+   "layout": "long",
+   "hand_emoji": true,
+   "pages": [
+    {
+     "lines": [
+      {
+       "text": "Trois [[comportements]] d'un [[homme]] qui refait avec sa [[femme]] ce qu'il s'était [[juré]] de ne jamais faire comme son [[père]]…",
+       "role": "heading"
+      },
+      {
+       "text": "Le [[premier]], il le [[voit]].",
+       "role": "body"
+      },
+      {
+       "text": "Les [[deux autres]], il ne les voit [[pas]]…",
+       "role": "body"
+      }
+     ],
+     "arrow": true
+    },
+    {
+     "lines": [
+      {
+       "text": "LES DEUX ? LISEZ LA LÉGENDE",
+       "role": "cta"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "slug": "ig-hook-2026-10-03-ab1-il-faut-qu-on-parle",
+   "layout": "long",
+   "hand_emoji": true,
+   "pages": [
+    {
+     "lines": [
+      {
+       "text": "Elle lui dit : « Il faut qu'on parle. »",
+       "role": "heading"
+      },
+      {
+       "text": "Un [[homme]] qui a grandi sous les [[reproches]] entend une [[attaque]], et il se défend avant qu'elle n'ait fini sa phrase.",
+       "role": "body"
+      }
+     ],
+     "arrow": true
+    },
+    {
+     "lines": [
+      {
+       "text": "Un [[homme]] en [[paix]] avec son histoire entend une [[femme]] qui veut se rapprocher de lui.",
+       "role": "body"
+      },
+      {
+       "text": "Elle a dit la même [[phrase]] aux deux…",
+       "role": "body"
+      }
+     ],
+     "arrow": true
+    },
+    {
+     "lines": [
+      {
+       "text": "POURQUOI ? LISEZ LA LÉGENDE",
+       "role": "cta"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "slug": "ig-hook-2026-09-26-2a-celui-qui-reste-ennuie",
+   "layout": "long",
+   "hand_emoji": true,
+   "pages": [
+    {
+     "lines": [
+      {
+       "text": "La véritable raison pour laquelle l'[[homme]] qui vous [[veut]] vous [[ennuie]]…",
+       "role": "heading"
+      },
+      {
+       "text": "et celui qui vous [[fuit]] vous [[obsède]].",
+       "role": "body"
+      },
+      {
+       "text": "Ce n'est pas une histoire [[goût]]. C'est votre [[conditionnement]].",
+       "role": "body"
+      }
+     ],
+     "arrow": true
+    },
+    {
+     "lines": [
+      {
+       "text": "L'ORIGINE ? LISEZ LA LÉGENDE",
+       "role": "cta"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "slug": "ig-hook-2026-09-26-5b-jamais-ete-console",
+   "layout": "long",
+   "hand_emoji": true,
+   "pages": [
+    {
+     "lines": [
+      {
+       "text": "Un [[homme]] qui n'a jamais été [[consolé]] ne sait pas [[consoler]].",
+       "role": "heading"
+      },
+      {
+       "text": "Quand [[elle]] pleure, il [[argumente]], il raisonne en [[logique]], il explique, il s'en [[va]].",
+       "role": "body"
+      },
+      {
+       "text": "Il ne peut pas [[donner]] ce qu'il n'a jamais [[reçu]], la [[présence]], l'[[affection]]…",
+       "role": "body"
+      }
+     ],
+     "arrow": true
+    },
+    {
+     "lines": [
+      {
+       "text": "LA RAISON ? LISEZ LA LÉGENDE",
+       "role": "cta"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "slug": "idee-reel-2026-w28-28-vous-encaissez-tout-au-travail-et-dans-dix-ans-v",
+   "layout": "long",
+   "hand_emoji": true,
+   "pages": [
+    {
+     "lines": [
+      {
+       "text": "UNE FEMME QUI [[ENCAISSE]] TOUT AU BUREAU",
+       "role": "heading"
+      }
+     ],
+     "arrow": true
+    },
+    {
+     "lines": [
+      {
+       "text": "Vous croyez que rester [[solide]] au travail protège votre couple.",
+       "role": "body"
+      }
+     ],
+     "arrow": true
+    },
+    {
+     "lines": [
+      {
+       "text": "Sauf que.",
+       "role": "body"
+      },
+      {
+       "text": "Ce [[silence]] que vous maîtrisez si bien au bureau,",
+       "role": "body"
+      }
+     ],
+     "arrow": true
+    },
+    {
+     "lines": [
+      {
+       "text": "dans [[dix]] ans c'est lui qui vous couchera à côté d'un [[inconnu]] que vous appellerez encore [[chéri]].",
+       "role": "body"
+      }
+     ],
+     "arrow": true
+    },
+    {
+     "lines": [
+      {
+       "text": "Personne ne vous a appris à baisser la [[garde]]. On vous a appris à [[tenir]].",
+       "role": "body"
+      }
+     ],
+     "arrow": true
+    },
+    {
+     "lines": [
+      {
+       "text": "Alors le soir vous [[tenez]] encore,",
+       "role": "body"
+      },
+      {
+       "text": "vous avalez la [[remarque]], vous ravalez la [[fatigue]], vous coupez le [[son]].",
+       "role": "body"
+      }
+     ],
+     "arrow": true
+    },
+    {
+     "lines": [
+      {
+       "text": "Et votre [[corps]], lui, [[enregistre]] tout.",
+       "role": "body"
+      }
+     ],
+     "arrow": true
+    },
+    {
+     "lines": [
+      {
+       "text": "Chaque fois que vous vous [[taisez]], il retient que même chez vous, il faut se [[protéger]].",
+       "role": "body"
+      }
+     ],
+     "arrow": true
+    },
+    {
+     "lines": [
+      {
+       "text": "La [[tête]] comprend ça très bien. Ça ne défait pas le [[nœud]].",
+       "role": "body"
+      }
+     ],
+     "arrow": true
+    },
+    {
+     "lines": [
+      {
+       "text": "Parce qu'un [[nœud]] pareil ne se dénoue pas avec des [[mots]].",
+       "role": "body"
+      }
+     ],
+     "arrow": true
+    },
+    {
+     "lines": [
+      {
+       "text": "Le [[corps]] ne [[triche]] jamais, et c'est là, dans le corps, qu'il finit par [[lâcher]].",
+       "role": "body"
+      }
+     ],
+     "arrow": true
+    },
+    {
+     "lines": [
+      {
+       "text": "Le jour où vous poserez les [[armes]], ce n'est pas votre [[couple]] qui reviendra en premier.",
+       "role": "body"
+      }
+     ],
+     "arrow": true
+    },
+    {
+     "lines": [
+      {
+       "text": "[[C'est]] vous.",
+       "role": "body",
+       "color": "yellow"
+      }
+     ],
+     "arrow": true
+    },
+    {
+     "lines": [
+      {
+       "text": "LA SUITE EST DANS LA LÉGENDE",
+       "role": "cta"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "slug": "excuses-permission-se-croire",
+   "reveal": "staggered",
+   "hand_emoji": true,
+   "duration_s": null,
+   "segments": [
+    {
+     "role": "title",
+     "text": "VOUS N'ATTENDEZ PAS SES [[EXCUSES]], VOUS ATTENDEZ DE VOUS [[FAIRE CONFIANCE]]"
+    },
+    {
+     "role": "block",
+     "text": "Quand l'autre refuse d'assumer, ce n'est pas le présent qui [[brûle]]. C'est une [[blessure]] d'enfant qui se rouvre."
+    },
+    {
+     "role": "block",
+     "text": "Cet enfant en vous a tant attendu d'être [[cru]]. Son silence, vous le portez encore dans le [[corps]]."
+    },
+    {
+     "role": "block",
+     "text": "Vous n'attendez plus ses mots. Vous attendez la [[permission]] de vous croire [[vous-même]]."
+    },
+    {
+     "role": "cta",
+     "text": "(LISEZ LA LÉGENDE)"
+    }
+   ]
+  },
+  {
+   "slug": "ig-hook-2026-09-26-7a-elle-range-quand-il-se-tait",
+   "layout": "long",
+   "hand_emoji": true,
+   "pages": [
+    {
+     "lines": [
+      {
+       "text": "Ce que fait une [[femme]] qui a [[peur]] d'être [[quittée]] quand il ne [[répond]] pas…",
+       "role": "heading"
+      },
+      {
+       "text": "Elle [[range]]. Elle [[trie]]. Elle [[nettoie]] ce qui est déjà [[propre]].",
+       "role": "body"
+      },
+      {
+       "text": "Tout, sauf [[ressentir]] ce qui se passe en [[elle]]…",
+       "role": "body"
+      }
+     ],
+     "arrow": true
+    },
+    {
+     "lines": [
+      {
+       "text": "CE QUI SE PASSE EN ELLE EST DANS LA LÉGENDE",
+       "role": "cta"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "slug": "2026-06-20-wm-277-une-femme-souveraine-ne-ferme-pas-la",
+   "layout": "long",
+   "hand_emoji": true,
+   "pages": [
+    {
+     "lines": [
+      {
+       "text": "Une femme souveraine ne ferme pas la porte pour [[punir]].",
+       "role": "heading"
+      }
+     ],
+     "arrow": true
+    },
+    {
+     "lines": [
+      {
+       "text": "Elle la ferme pour [[respirer]].",
+       "role": "heading"
+      }
+     ],
+     "arrow": true
+    },
+    {
+     "lines": [
+      {
+       "text": "La femme blessée [[claque]] la porte.",
+       "role": "body"
+      }
+     ],
+     "arrow": true
+    },
+    {
+     "lines": [
+      {
+       "text": "Elle attend qu'il [[coure]] derrière.",
+       "role": "body"
+      },
+      {
+       "text": "Il ne court pas.",
+       "role": "body"
+      }
+     ],
+     "arrow": true
+    },
+    {
+     "lines": [
+      {
+       "text": "Elle s'[[effondre]].",
+       "role": "body"
+      }
+     ],
+     "arrow": true
+    },
+    {
+     "lines": [
+      {
+       "text": "La femme souveraine ferme la porte [[doucement]].",
+       "role": "body"
+      }
+     ],
+     "arrow": true
+    },
+    {
+     "lines": [
+      {
+       "text": "Elle ne joue pas.",
+       "role": "body"
+      },
+      {
+       "text": "Elle se retire parce que l'air [[manque]].",
+       "role": "body"
+      }
+     ],
+     "arrow": true
+    },
+    {
+     "lines": [
+      {
+       "text": "Aucune [[menace]]. Aucune mise en scène.",
+       "role": "body"
+      }
+     ],
+     "arrow": true
+    },
+    {
+     "lines": [
+      {
+       "text": "Juste une porte fermée parce que rester [[abîme]].",
+       "role": "body"
+      }
+     ],
+     "arrow": true
+    },
+    {
+     "lines": [
+      {
+       "text": "Tant que vous fermez la porte pour qu'il revienne,",
+       "role": "body"
+      },
+      {
+       "text": "c'est lui qui [[décide]] quand vous respirez.",
+       "role": "body"
+      }
+     ],
+     "arrow": true
+    },
+    {
+     "lines": [
+      {
+       "text": "Le jour où vous fermez la porte pour vous,",
+       "role": "body"
+      },
+      {
+       "text": "vous arrêtez de [[quémander]].",
+       "role": "body"
+      }
+     ],
+     "arrow": true
+    },
+    {
+     "lines": [
+      {
+       "text": "Vous reprenez votre [[souffle]].",
+       "role": "body"
+      }
+     ],
+     "arrow": true
+    },
+    {
+     "lines": [
+      {
+       "text": "La porte se ferme d'abord en vous. Lisez la légende.",
+       "role": "cta"
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "texte_note": "Taille du texte de l'écran à bouton (px) : tiktok/youtube mesurées à 571c5b5, instagram à la nouvelle zone (2026-10-04).",
+ "texte": {
+  "ig-hook-2026-09-26-6a-le-calme-annonce-la-tempete": {
+   "echo/instagram": 75,
+   "echo/tiktok": 72,
+   "echo/youtube": 69,
+   "braise/instagram": 76,
+   "braise/tiktok": 63,
+   "braise/youtube": 63,
+   "fracture/instagram": 68,
+   "fracture/tiktok": 60,
+   "fracture/youtube": 59,
+   "manifeste/instagram": 75,
+   "manifeste/tiktok": 72,
+   "manifeste/youtube": 69
+  },
+  "ig-hook-2026-10-02-e-oui-a-tout": {
+   "echo/instagram": 70,
+   "echo/tiktok": 61,
+   "echo/youtube": 62,
+   "braise/instagram": 72,
+   "braise/tiktok": 60,
+   "braise/youtube": 59,
+   "fracture/instagram": 63,
+   "fracture/tiktok": 57,
+   "fracture/youtube": 55,
+   "manifeste/instagram": 70,
+   "manifeste/tiktok": 61,
+   "manifeste/youtube": 62
+  },
+  "ig-hook-2026-10-02-g-page-arrachee": {
+   "echo/instagram": 75,
+   "echo/tiktok": 67,
+   "echo/youtube": 68,
+   "braise/instagram": 76,
+   "braise/tiktok": 62,
+   "braise/youtube": 63,
+   "fracture/instagram": 70,
+   "fracture/tiktok": 62,
+   "fracture/youtube": 60,
+   "manifeste/instagram": 75,
+   "manifeste/tiktok": 67,
+   "manifeste/youtube": 67
+  },
+  "ig-hook-2026-10-02-c-comme-son-pere": {
+   "echo/instagram": 75,
+   "echo/tiktok": 66,
+   "echo/youtube": 64,
+   "braise/instagram": 74,
+   "braise/tiktok": 62,
+   "braise/youtube": 63,
+   "fracture/instagram": 67,
+   "fracture/tiktok": 58,
+   "fracture/youtube": 58,
+   "manifeste/instagram": 75,
+   "manifeste/tiktok": 66,
+   "manifeste/youtube": 64
+  },
+  "ig-hook-2026-10-03-ab1-il-faut-qu-on-parle": {
+   "echo/instagram": 88,
+   "echo/tiktok": 74,
+   "echo/youtube": 75,
+   "braise/instagram": 91,
+   "braise/tiktok": 78,
+   "braise/youtube": 77,
+   "fracture/instagram": 76,
+   "fracture/tiktok": 69,
+   "fracture/youtube": 67,
+   "manifeste/instagram": 88,
+   "manifeste/tiktok": 73,
+   "manifeste/youtube": 73
+  },
+  "ig-hook-2026-09-26-2a-celui-qui-reste-ennuie": {
+   "echo/instagram": 75,
+   "echo/tiktok": 67,
+   "echo/youtube": 66,
+   "braise/instagram": 75,
+   "braise/tiktok": 63,
+   "braise/youtube": 64,
+   "fracture/instagram": 66,
+   "fracture/tiktok": 58,
+   "fracture/youtube": 59,
+   "manifeste/instagram": 75,
+   "manifeste/tiktok": 67,
+   "manifeste/youtube": 66
+  },
+  "ig-hook-2026-09-26-5b-jamais-ete-console": {
+   "echo/instagram": 69,
+   "echo/tiktok": 61,
+   "echo/youtube": 62,
+   "braise/instagram": 67,
+   "braise/tiktok": 57,
+   "braise/youtube": 56,
+   "fracture/instagram": 60,
+   "fracture/tiktok": 54,
+   "fracture/youtube": 55,
+   "manifeste/instagram": 69,
+   "manifeste/tiktok": 61,
+   "manifeste/youtube": 62
+  },
+  "idee-reel-2026-w28-28-vous-encaissez-tout-au-travail-et-dans-dix-ans-v": {
+   "echo/instagram": 191,
+   "echo/tiktok": 146,
+   "echo/youtube": 179,
+   "braise/instagram": 158,
+   "braise/tiktok": 141,
+   "braise/youtube": 160,
+   "fracture/instagram": 164,
+   "fracture/tiktok": 124,
+   "fracture/youtube": 149,
+   "manifeste/instagram": 184,
+   "manifeste/tiktok": 139,
+   "manifeste/youtube": 171
+  },
+  "excuses-permission-se-croire": {
+   "echo/instagram": 119,
+   "echo/tiktok": 103,
+   "echo/youtube": 105,
+   "braise/instagram": 115,
+   "braise/tiktok": 93,
+   "braise/youtube": 93,
+   "fracture/instagram": 94,
+   "fracture/tiktok": 87,
+   "fracture/youtube": 84,
+   "manifeste/instagram": 117,
+   "manifeste/tiktok": 100,
+   "manifeste/youtube": 101
+  },
+  "ig-hook-2026-09-26-7a-elle-range-quand-il-se-tait": {
+   "echo/instagram": 70,
+   "echo/tiktok": 62,
+   "echo/youtube": 62,
+   "braise/instagram": 70,
+   "braise/tiktok": 62,
+   "braise/youtube": 63,
+   "fracture/instagram": 63,
+   "fracture/tiktok": 54,
+   "fracture/youtube": 55,
+   "manifeste/instagram": 70,
+   "manifeste/tiktok": 61,
+   "manifeste/youtube": 62
+  },
+  "2026-06-20-wm-277-une-femme-souveraine-ne-ferme-pas-la": {
+   "echo/instagram": 123,
+   "echo/tiktok": 94,
+   "echo/youtube": 95,
+   "braise/instagram": 120,
+   "braise/tiktok": 105,
+   "braise/youtube": 103,
+   "fracture/instagram": 102,
+   "fracture/tiktok": 86,
+   "fracture/youtube": 83,
+   "manifeste/instagram": 119,
+   "manifeste/tiktok": 90,
+   "manifeste/youtube": 91
+  }
+ }
+}
