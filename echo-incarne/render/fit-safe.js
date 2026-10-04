@@ -13,28 +13,24 @@ window.fitReelSegment = function (page, text, porteBouton) {
   wrapper.style.width = availableWidth + 'px';
   // Le bouton suit la taille du texte : sa hauteur (une ou plusieurs lignes) se déduit à chaque essai.
   // `porteBouton` : cette page est celle que le bouton accompagne (la page juste avant le segment cta).
-  // Calcul d'origine d'abord (bouton à la taille du texte). Sur l'écran du bouton seulement, si le libellé
-  // y dépasse alors 2 lignes (3 au-delà de 28 caractères) ou sa capsule, second calcul avec le bouton borné
-  // (fitReelCta) : un écran déjà conforme et toutes les autres pages restent tels quels (2026-10-04).
+  // Le texte prend toujours la taille du calcul d'origine (bouton à sa taille) : le bouton ne le fait
+  // jamais rapetisser. Ensuite, sur l'écran du bouton seulement, si le libellé dépasse 2 lignes (3 au-delà
+  // de 28 caractères) ou sa capsule, le bouton seul est réduit (fitReelCta, `borne`) ; la page, plus haute,
+  // garde le texte centré entre l'en-tête et le bouton. Pages sans bouton et écrans conformes : inchangés.
   const capsule = document.getElementById('ctaCapsule');
-  let borne = false;
   const fits = size => {
     text.style.fontSize = size + 'px';
-    if (window.__ctaZone) window.fitReelCta(window.__ctaZone, size, borne);
-    return wrapper.scrollHeight <= page.clientHeight - 2 && wrapper.scrollWidth <= availableWidth
-      && (!borne || capsule.dataset.tient === '1');
+    if (window.__ctaZone) window.fitReelCta(window.__ctaZone, size);
+    return wrapper.scrollHeight <= page.clientHeight - 2 && wrapper.scrollWidth <= availableWidth;
   };
-  const search = () => {
-    let lo = 1, hi = Math.ceil(page.clientHeight * 2);
-    while (lo < hi) {
-      const mid = Math.ceil((lo + hi) / 2);
-      if (fits(mid)) lo = mid; else hi = mid - 1;
-    }
-    fits(lo);
-    return lo;
-  };
-  let lo = search();
-  if (porteBouton && window.__ctaZone && !libelleTient(capsule)) { borne = true; lo = search(); }
+  let lo = 1, hi = Math.ceil(page.clientHeight * 2);
+  while (lo < hi) {
+    const mid = Math.ceil((lo + hi) / 2);
+    if (fits(mid)) lo = mid; else hi = mid - 1;
+  }
+  fits(lo);
+  const borne = !!(porteBouton && window.__ctaZone && !libelleTient(capsule));
+  if (borne) window.fitReelCta(window.__ctaZone, lo, true);
   text.dataset.bouton = borne ? 'borne' : 'texte';
   text.dataset.maxFontSize = String(lo);
   text.dataset.availableHeight = String(page.clientHeight - 2);
@@ -51,10 +47,11 @@ window.fitReelSegment = function (page, text, porteBouton) {
 // libellé maximisé sur une ligne.
 // `borne` (2026-10-04, fin d'écran ≤ 28 caractères = 2 lignes, décision du 2026-10-02) : sur l'écran qui
 // montre le bouton, le libellé tient sur 2 lignes au plus (3 au-delà de 28 caractères) et jamais hors de
-// la capsule. D'abord à la taille du texte ; sinon marges intérieures resserrées ; sinon police réduite
-// juste assez, jamais sous 80 % du texte. Si même là il ne tient pas, `data-tient="0"` : le texte rapetisse.
-function libelleTient(capsule) {
-  const max = capsule.textContent.trim().length <= 28 ? 2 : 3;
+// la capsule. Plus grande taille ≤ celle du texte : marges intérieures resserrées d'abord, puis police
+// réduite, jamais sous le plancher du moteur (`data-cta-plancher`, px) ; si le plancher ne tient pas sur
+// ces lignes, une ligne de plus est permise plutôt que de rapetisser le texte.
+function libelleTient(capsule, plus = 0) {
+  const max = (capsule.textContent.trim().length <= 28 ? 2 : 3) + plus;
   const cs = getComputedStyle(capsule), r = document.createRange();
   r.selectNodeContents(capsule);
   const lignes = new Set([...r.getClientRects()].map(x => Math.round(x.top))).size;
@@ -95,24 +92,24 @@ window.fitReelCta = function (zone, size, borne) {
     });
     capsule.dataset.maxFontSize = String(size);
     if (borne) {
-      const tient = () => libelleTient(capsule);
-      let ok = tient();
-      if (!ok) { capsule.style.padding = '.3em .35em'; ok = tient(); }
-      if (!ok) {
-        let lo = Math.ceil(size * .8), hi = size - 1;
+      const plancher = Math.min(size, Number(capsule.dataset.ctaPlancher) || 1);
+      const essai = plus => {
+        capsule.style.fontSize = size + 'px';
+        if (libelleTient(capsule, plus)) return size;
+        let lo = plancher, hi = size - 1;
         capsule.style.fontSize = lo + 'px';
-        ok = tient();
-        if (ok) {
-          while (lo < hi) {
-            const mid = Math.ceil((lo + hi) / 2);
-            capsule.style.fontSize = mid + 'px';
-            if (tient()) lo = mid; else hi = mid - 1;
-          }
-          capsule.style.fontSize = lo + 'px';
+        if (!libelleTient(capsule, plus)) return 0;
+        while (lo < hi) {
+          const mid = Math.ceil((lo + hi) / 2);
+          capsule.style.fontSize = mid + 'px';
+          if (libelleTient(capsule, plus)) lo = mid; else hi = mid - 1;
         }
-        capsule.dataset.maxFontSize = String(lo);
-      }
-      capsule.dataset.tient = ok ? '1' : '0';
+        return lo;
+      };
+      capsule.style.padding = '.3em .35em';
+      const f = essai(0) || essai(1) || plancher;
+      capsule.style.fontSize = f + 'px';
+      capsule.dataset.maxFontSize = String(f);
     }
   } else {
     // Compact padding preserves the capsule while giving its label more width.

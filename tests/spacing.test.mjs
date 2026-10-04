@@ -29,13 +29,13 @@ try {
       const availableHeight=Number(content.dataset.availableHeight), availableWidth=Number(content.dataset.availableWidth);
       const chosen=parseFloat(getComputedStyle(content).fontSize),wrapper=page.firstElementChild;
       // Le bouton suit la taille du texte (Cyrille 2026-10-02) : un pixel de plus vaut pour les deux.
-      // Même mode que le moteur : bouton borné seulement s'il l'a été (écran du bouton non conforme sinon).
-      const porte=content.dataset.bouton==='borne',cap=document.getElementById('ctaCapsule');
+      // Le texte est maximal pour le calcul d'origine (bouton à sa taille) ; le bouton borné ne le change pas.
+      const borne=content.dataset.bouton==='borne';
       content.style.fontSize=(chosen+1)+'px';
-      if(window.__ctaZone) window.fitReelCta(window.__ctaZone,chosen+1,porte);
-      const largerFits=wrapper.scrollHeight<=page.clientHeight-2&&wrapper.scrollWidth<=availableWidth&&(!porte||!window.__ctaZone||cap.dataset.tient==='1');
+      if(window.__ctaZone) window.fitReelCta(window.__ctaZone,chosen+1);
+      const largerFits=wrapper.scrollHeight<=page.clientHeight-2&&wrapper.scrollWidth<=availableWidth;
       content.style.fontSize=chosen+'px';
-      if(window.__ctaZone) window.fitReelCta(window.__ctaZone,chosen,porte);
+      if(window.__ctaZone) window.fitReelCta(window.__ctaZone,chosen,borne);
       return {availableHeight,availableWidth,largerFits,text:content.textContent,fontSize:parseFloat(getComputedStyle(content).fontSize),height:content.scrollHeight,width:content.scrollWidth,clientWidth:content.clientWidth,top:r.top,bottom:r.bottom,pageBottom:bounds.bottom,ctaTop:document.getElementById('ctaRow').offsetTop,safeBottom:1920-parseFloat(getComputedStyle(page.parentElement).paddingBottom),lines:[...page.querySelectorAll('.segLine')].map(el=>({text:el.textContent,margin:parseFloat(getComputedStyle(el).marginTop)})),whiteSpace:getComputedStyle(content).whiteSpace};
     });
     assert.ok(metrics.availableHeight>0);

@@ -32,7 +32,7 @@ try {
     const r=rect(cap),range=document.createRange();range.selectNodeContents(cap);
     const text=rect({getBoundingClientRect:()=>range.getBoundingClientRect()});
     cap.style.fontSize=(chosen+1)+'px';const largerFits=cap.getBoundingClientRect().width<=available;cap.style.fontSize=chosen+'px';
-    const seg=document.querySelector('#page [data-max-font-size]');const bands=document.getElementById('platformBands');const cs=getComputedStyle(cap);const lh=parseFloat(cs.lineHeight)||chosen*1.12;return {zone:CFG.Z,lines:Math.round(text.height/lh),capOverflow:text.width-(cap.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight)),cap:r,text,children:[...row.children].map(rect),fontSize:chosen,largerFits,whiteSpace:getComputedStyle(cap).whiteSpace,label:cap.textContent,spacers:document.querySelectorAll('#ctaSpace').length,segSize:seg?Number(seg.dataset.maxFontSize):null,bands:bands?[...bands.children].map(rect):null};
+    const seg=document.querySelector('#page [data-max-font-size]');let segRef=null;if(seg&&seg.dataset.bouton==='borne'){const pg=document.getElementById('page');window.fitReelSegment(pg,seg,false);segRef=Number(seg.dataset.maxFontSize);window.fitReelSegment(pg,seg,true);}const bands=document.getElementById('platformBands');const cs=getComputedStyle(cap);const lh=parseFloat(cs.lineHeight)||chosen*1.12;return {zone:CFG.Z,lines:Math.round(text.height/lh),capOverflow:text.width-(cap.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight)),cap:r,text,children:[...row.children].map(rect),fontSize:chosen,largerFits,whiteSpace:getComputedStyle(cap).whiteSpace,label:cap.textContent,spacers:document.querySelectorAll('#ctaSpace').length,segSize:seg?Number(seg.dataset.maxFontSize):null,segRef,plancher:Number(cap.dataset.ctaPlancher)||0,lignesAuPlancher:(()=>{if(!seg)return 0;const f=cap.style.fontSize;cap.style.fontSize=Math.min(Number(seg.dataset.maxFontSize),Number(cap.dataset.ctaPlancher)||1)+'px';const rr=document.createRange();rr.selectNodeContents(cap);const n=Math.round(rr.getBoundingClientRect().height/(parseFloat(getComputedStyle(cap).lineHeight)||1));cap.style.fontSize=f;return n;})(),bands:bands?[...bands.children].map(rect):null};
    });
    const label=`${template} ${platform} ${theme} ${source.slug}`;
    assert.equal(m.spacers,1,label+' duplicate spacer');
@@ -55,10 +55,18 @@ try {
    const segmented=!!m.segSize;
    if(segmented){
     // Réel à segments (Cyrille 2026-10-02) : bouton aussi gros que le texte, sur 2 lignes au plus pour un
-    // libellé de 28 caractères ou moins (3 au-delà) ; il ne descend jamais sous 80 % du texte.
+    // libellé de 28 caractères ou moins (3 au-delà). Le bouton ne fait jamais rapetisser le texte : celui-ci
+    // a la taille du calcul sans bouton ; c'est le bouton qui réduit, jamais sous le plancher du moteur
+    // (une ligne de plus permise quand le plancher est atteint).
     assert.equal(m.whiteSpace,'normal',label+' wrapping allowed');
-    assert.ok(m.fontSize<=m.segSize&&m.fontSize>=Math.ceil(m.segSize*.8),label+` button 80-100 % of reel text (${m.fontSize}/${m.segSize})`);
-    assert.ok(m.lines<=(m.label.trim().length<=28?2:3),label+` button lines (${m.lines}, ${m.label.trim().length} car.)`);
+    if(m.segRef!==null) assert.equal(m.segSize,m.segRef,label+' text keeps the size it has without the button');
+    assert.ok(m.fontSize<=m.segSize,label+` button no larger than text (${m.fontSize}/${m.segSize})`);
+    assert.ok(m.plancher>0&&m.fontSize>=Math.min(m.segSize,m.plancher),label+` button not below the engine floor (${m.fontSize}/${m.plancher})`);
+    // Lignes : 2 (≤ 28 car.) ou 3 ; une de plus seulement si, au plancher, le libellé ne tient pas sur ses
+    // lignes de base. Un libellé ≤ 28 car. ne dépasse jamais 3 lignes.
+    const base=m.label.trim().length<=28?2:3;
+    if(m.lines>base) assert.ok(m.lignesAuPlancher>base,label+` extra button line only when the floor needs it (${m.lines} lines, ${m.lignesAuPlancher} at floor)`);
+    if(base===2) assert.ok(m.lines<=3,label+` short label on 3 lines at most (${m.lines})`);
    } else {
     assert.equal(m.whiteSpace,'nowrap',label+' wrapping');
     assert.equal(m.largerFits,false,label+' maximum size');
