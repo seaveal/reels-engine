@@ -77,7 +77,7 @@ window.loadReel = function(spec, opts = {}) {
     ? String(spec.cta).replace(/^\s*\(|\)\s*$/g, '').replace(/\[\[|\]\]/g, '')
     : (ctaSeg ? ctaSeg.text.replace(/^\s*\(|\)\s*$/g, '').replace(/\[\[|\]\]/g, '') : ''); // sans CTA dans la spec (story mantra) : aucun bouton (2026-10-03)
   if ((opts.platform || 'instagram') === 'youtube') ctaLabel = ctaLabel.replace(/l[ée]gende/gi, 'DESCRIPTION');
-  const handleHtml = `@le<span style="color:${T.accent}">corps</span>ne<span style="color:${T.accent}">triche</span>jamais`;
+  const handleHtml = window.handleCompte(opts.platform, T.accent);
 
   document.getElementById('stage').innerHTML = `
     <div style="position:absolute;inset:0;background:${T.bg}"></div>

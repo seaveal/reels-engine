@@ -175,6 +175,13 @@ const BANDES = {
 // Zone du texte et du bouton sur Instagram. Le bouton se pose U/2 au-dessus de la vignette (bas à 1644,
 // avant 1370), soit U/2 au-dessus de la barre par défaut : ancré sur la vignette, il ne la chevauche dans
 // aucune position de la barre. Texte et bouton s'arrêtent à IG_MARGE de la colonne.
+// Nom du compte en tête du réel : celui du réseau où le réel sort (Cyrille 2026-10-05 : sur YouTube
+// la chaîne s'appelle @CyrilleNovou, pas @lecorpsnetrichejamais). `accent` colore la partie mise en
+// avant ; sans lui, texte nu (Fracture).
+window.handleCompte = function (platform, accent) {
+  const c = t => (accent ? `<span style="color:${accent}">${t}</span>` : t);
+  return platform === 'youtube' ? '@Cyrille' + c('Novou') : '@le' + c('corps') + 'ne' + c('triche') + 'jamais';
+};
 window.ZONE_INSTAGRAM = {
   bottom: Math.round(1920 - (IG_VIGNETTE_HAUT - U / 2)),            // 276 (avant 550)
   right: Math.round(1080 - BANDES.instagram.colonneX + IG_MARGE),   // 216 (avant 180)
