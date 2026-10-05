@@ -58,7 +58,7 @@ const pivot = (s, accent) => esc(s).replace(/\[\[([^\]]+)\]\]/g,
 
 // Loi moteur : durée d'affichage = f(nombre de caractères) = caractères ÷ 27, borné 2–26 s.
 // Plancher abaissé 4→2 s le 2026-07-17 (Cyrille) : à 4 s la plupart des pages courtes s'y collaient → la durée ne variait plus avec le texte.
-const holdMs = seg => Math.min(26, Math.max(2, seg.text.replace(/\[\[|\]\]/g,'').length / 27)) * 1000;
+const holdMs = seg => seg.hold_s > 0 ? seg.hold_s * 1000 : Math.min(26, Math.max(2, seg.text.replace(/\[\[|\]\]/g,'').length / 27)) * 1000; // hold_s de la page prime (2026-10-05)
 
 let CFG = null; // {spec, theme, platform, T, Z}
 

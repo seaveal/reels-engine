@@ -60,6 +60,8 @@ if (!spec.segments && Array.isArray(spec.pages)) {
     return {
       role: isCta ? 'cta' : (i === 0 && isHeading ? 'title' : 'block'),
       text: lines.map(l => String(l.text)).join('\n\n'),
+      // hold_s de la page (durée imposée, ex. un écran relu en boucle) : prime sur la loi caractères÷27.
+      ...(Number(p.hold_s) > 0 ? { hold_s: Number(p.hold_s) } : {}),
     };
   }).filter(s => s.text);
 }
@@ -84,7 +86,7 @@ if (NEED[spec.layout] && !spec[NEED[spec.layout]]) {
 }
 
 // Même loi que la page : caractères ÷ 27, borné 4–26 s
-const holdMs = seg => Math.min(26, Math.max(4, seg.text.replace(/\[\[|\]\]/g, '').length / 27)) * 1000;
+const holdMs = seg => seg.hold_s > 0 ? seg.hold_s * 1000 : Math.min(26, Math.max(4, seg.text.replace(/\[\[|\]\]/g, '').length / 27)) * 1000;
 // Durée RÉELLE pilotée par window.playReel (awaité au rendu) ; totalMs = estimation pour le log.
 const msgReadMs = t => Math.min(4200, Math.max(1300, String(t || '').length / 22 * 1000));
 const cfBottomReadMs = t => Math.min(5200, Math.max(2600, String(t || '').length / 20 * 1000));
