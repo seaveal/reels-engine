@@ -148,50 +148,58 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 const pageUrl = pathToFileURL(path.join(here, template)).href + '?norun=1';
 
 const hasFfmpeg = spawnSync('ffmpeg', ['-version'], { stdio: 'ignore' }).status === 0;
-const browser = await chromium.launch();
 
 // Rendu d'UNE plateforme (contexte + enregistrement + conversion mp4). Isolé pour pouvoir
 // exécuter les plateformes EN PARALLÈLE (fix masse 2026-07-15) : l'enregistrement est en temps
 // réel (~la durée du réel), or c'était fait 3× en SÉQUENTIEL → ~2min40/réel. En parallèle
-// (contextes indépendants, même navigateur), un réel passe à ~la durée d'UNE plateforme (×3).
+// (un navigateur par plateforme depuis le 2026-10-12), un réel passe à ~la durée d'UNE plateforme (×3).
 async function renderPlatform(platform) {
-  const ctx = await browser.newContext({
-    viewport: { width: 1080, height: 1920 },
-    deviceScaleFactor: 1,
-    recordVideo: { dir: outDir, size: { width: 1080, height: 1920 } },
-  });
-  // Rideau vert plein cadre, du chargement de la page au départ du jeu : il marque dans la vidéo
-  // elle-même où commence le réel. L'horloge ne le donne pas : l'amorce enregistrée a duré jusqu'à
-  // 1,8 s de plus que le temps mesuré, autant d'écran vide en tête des mp4 (pub-kit du 2026-10-12).
-  await ctx.addInitScript(() => {
-    window.poserRideau = () => {
-      const r = document.createElement('div'); r.id = 'rideauExport';
-      r.style.cssText = 'position:fixed;inset:0;background:#00ff00;z-index:2147483647';
-      document.body.append(r);
-    };
-    document.addEventListener('DOMContentLoaded', window.poserRideau);
-  });
-  const page = await ctx.newPage();
-  await page.goto(pageUrl);
-  await page.evaluate(async () => {
-    await Promise.all(Array.from(document.fonts, face => face.load()));
-    await document.fonts.ready;
-  });
-  await page.evaluate(({ s, o }) => window.loadReel(s, o), { s: spec, o: { platform: story ? 'story' : platform, theme } });
-  // Page au repos, rideau tenu : sous charge la capture tombe à 2-4 images/s, et un rideau jamais
-  // filmé laisse le début du réel inconnu (1 rendu sur 126 à 200 ms, six captures en parallèle).
-  await page.waitForTimeout(600);
-  // Délai début du mp4 → début du karaoké : l'amorce interne de playAudio (AUDIO_LEAD_MS).
-  const leadMs = await page.evaluate(() => window.AUDIO_LEAD_MS || 0);
-  // Rideau retiré dans la tâche qui lance le jeu : la première image sans rideau est la première du réel.
-  await page.evaluate(() => { window.debutJeu = performance.now(); document.getElementById('rideauExport').remove(); return window.playReel(); });
-  await page.waitForTimeout(800);  // laisse le CTA respirer en fin
-  // Rideau de fin : il marque la fin du réel dans la vidéo, et la durée filmée entre les deux rideaux
-  // se compare à la durée écoulée à l'horloge de la page.
-  const dureePage = await page.evaluate(() => { window.poserRideau(); return (performance.now() - window.debutJeu) / 1000; });
-  await page.waitForTimeout(600);
-  const video = page.video();
-  await ctx.close();               // finalise l'enregistrement
+  // Un navigateur par plateforme (2026-10-12) : trois captures dans le même navigateur passent par
+  // un seul compositeur, qui prend du retard. Mesuré sur le bouton d'un réel : 0,14 à 0,86 s de
+  // retard à l'image dans un navigateur partagé, 0,10 à 0,26 s avec un navigateur chacune.
+  const browser = await chromium.launch();
+  let video, leadMs, dureePage;
+  try {
+    const ctx = await browser.newContext({
+      viewport: { width: 1080, height: 1920 },
+      deviceScaleFactor: 1,
+      recordVideo: { dir: outDir, size: { width: 1080, height: 1920 } },
+    });
+    // Rideau vert plein cadre, du chargement de la page au départ du jeu : il marque dans la vidéo
+    // elle-même où commence le réel. L'horloge ne le donne pas : l'amorce enregistrée a duré jusqu'à
+    // 1,8 s de plus que le temps mesuré, autant d'écran vide en tête des mp4 (pub-kit du 2026-10-12).
+    await ctx.addInitScript(() => {
+      window.poserRideau = () => {
+        const r = document.createElement('div'); r.id = 'rideauExport';
+        r.style.cssText = 'position:fixed;inset:0;background:#00ff00;z-index:2147483647';
+        document.body.append(r);
+      };
+      document.addEventListener('DOMContentLoaded', window.poserRideau);
+    });
+    const page = await ctx.newPage();
+    await page.goto(pageUrl);
+    await page.evaluate(async () => {
+      await Promise.all(Array.from(document.fonts, face => face.load()));
+      await document.fonts.ready;
+    });
+    await page.evaluate(({ s, o }) => window.loadReel(s, o), { s: spec, o: { platform: story ? 'story' : platform, theme } });
+    // Page au repos, rideau tenu : sous charge la capture tombe à 2-4 images/s, et un rideau jamais
+    // filmé laisse le début du réel inconnu (1 rendu sur 126 à 200 ms, six captures en parallèle).
+    await page.waitForTimeout(600);
+    // Délai début du mp4 → début du karaoké : l'amorce interne de playAudio (AUDIO_LEAD_MS).
+    leadMs = await page.evaluate(() => window.AUDIO_LEAD_MS || 0);
+    // Rideau retiré dans la tâche qui lance le jeu : la première image sans rideau est la première du réel.
+    await page.evaluate(() => { window.debutJeu = performance.now(); document.getElementById('rideauExport').remove(); return window.playReel(); });
+    await page.waitForTimeout(800);  // laisse le CTA respirer en fin
+    // Rideau de fin : il marque la fin du réel dans la vidéo, et la durée filmée entre les deux rideaux
+    // se compare à la durée écoulée à l'horloge de la page.
+    dureePage = await page.evaluate(() => { window.poserRideau(); return (performance.now() - window.debutJeu) / 1000; });
+    await page.waitForTimeout(600);
+    video = page.video();
+    await ctx.close();               // finalise l'enregistrement
+  } finally {
+    await browser.close(); // même après une erreur : un navigateur resté ouvert retient le processus
+  }
 
   const webm = path.join(outDir, `${slug}-${platform}${theme === 'nuit' ? '-nuit' : ''}.webm`);
   await rename(await video.path(), webm);
@@ -234,5 +242,4 @@ await Promise.all(platforms.map(p => renderPlatform(p).catch(e => {
   console.error(`✗ ${p} : ${(e && e.message) || e}`);
 })));
 
-await browser.close();
 console.log(`Durée séquence : ${(totalMs / 1000).toFixed(1)} s (${isStructured ? 'layout:' + spec.layout : spec.segments.length + ' segments'}, loi caractères÷27 bornée 4–26 s)`);
