@@ -13,7 +13,7 @@
 //   { "slug": "...", "reveal": "staggered", "segments": [ { "role": "title|block|cta", "text": "... [[pivot]] ..." } ] }
 
 import { chromium } from 'playwright';
-import { readFile, mkdir, rename } from 'node:fs/promises';
+import { readFile, mkdir, rename, rm } from 'node:fs/promises';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import path from 'node:path';
@@ -21,8 +21,42 @@ import path from 'node:path';
 const args = process.argv.slice(2);
 const specPath = args.find(a => !a.startsWith('--'));
 const opt = (name, dflt) => (args.find(a => a.startsWith(`--${name}=`)) || '').split('=')[1] || dflt;
+
+// Contrôle de sortie (2026-10-12, Cyrille : un réel dont le texte tarde ne retient personne, et en
+// publicité c'est de l'argent perdu). Mesuré sur le mp4 final, pas sur ce que la page annonce :
+// netteté (Sobel) de la zone de texte commune aux plateformes, image par image sur 2 s. Mesures :
+// zone vide 0 à 0,5 ; balayage d'entrée seul 1,2 (1,8 au plus par construction) ; le plus petit
+// texte du corpus (citation courte d'une story, 36 px) 3,3 ; un écran de réel 20 à 60. Le texte est
+// lisible à la première image qui atteint NETTETE_TEXTE ; au-delà de TEXTE_MAX_S, le mp4 est refusé.
+const TEXTE_MAX_S = 0.5;
+const NETTETE_TEXTE = 2.5;
+const ZONE_TEXTE = 'crop=760:920:104:440';
+function texteLisibleS(mp4) {
+  const r = spawnSync('ffmpeg', ['-v', 'error', '-t', '2', '-i', mp4, '-vf',
+    `${ZONE_TEXTE},format=gray,sobel,signalstats,metadata=print:key=lavfi.signalstats.YAVG:file=-`,
+    '-f', 'null', '-'], { encoding: 'utf8' });
+  const i = [...String(r.stdout).matchAll(/YAVG=([\d.]+)/g)].findIndex(m => Number(m[1]) >= NETTETE_TEXTE);
+  return i < 0 ? Infinity : i / 30;
+}
+const verdictTexte = t => Number.isFinite(t) ? `texte lisible à ${t.toFixed(2)} s` : 'aucun texte lisible dans les 2 premières secondes';
+// Le même contrôle sur un mp4 déjà rendu : node render/export-reel.mjs --controle=<fichier.mp4>
+if (opt('controle', '')) {
+  const t = texteLisibleS(opt('controle'));
+  console.log(`${t <= TEXTE_MAX_S ? '✓' : '✗'} ${verdictTexte(t)} (maximum ${TEXTE_MAX_S} s) : ${opt('controle')}`);
+  process.exit(t <= TEXTE_MAX_S ? 0 : 1);
+}
+// Première image du réel dans le webm : celle qui suit la dernière image du rideau vert (0 = rideau absent).
+function premiereImage(webm) {
+  const r = spawnSync('ffmpeg', ['-v', 'error', '-i', webm, '-vf', 'crop=16:16:8:8,scale=1:1,format=rgb24',
+    '-fps_mode', 'passthrough', '-f', 'rawvideo', '-'], { maxBuffer: 1 << 26 });
+  const px = r.stdout || [];
+  let derniere = -1;
+  for (let i = 0; i * 3 + 2 < px.length; i++) if (px[i * 3] < 90 && px[i * 3 + 1] > 170 && px[i * 3 + 2] < 90) derniere = i;
+  return derniere + 1;
+}
+
 if (!specPath) {
-  console.error('usage: node render/export-reel.mjs <spec.json> [--platform=instagram|tiktok|youtube|all] [--theme=papier|nuit] [--out=dir] [--story]');
+  console.error('usage: node render/export-reel.mjs <spec.json> [--platform=instagram|tiktok|youtube|all] [--theme=papier|nuit] [--out=dir] [--story]\n       node render/export-reel.mjs --controle=<fichier.mp4>');
   process.exit(1);
 }
 
@@ -113,7 +147,14 @@ async function renderPlatform(platform) {
     deviceScaleFactor: 1,
     recordVideo: { dir: outDir, size: { width: 1080, height: 1920 } },
   });
-  const recStart = Date.now(); // l'enregistrement démarre avec le contexte : sert à caler l'audio
+  // Rideau vert plein cadre, du chargement de la page au départ du jeu : il marque dans la vidéo
+  // elle-même où commence le réel. L'horloge ne le donne pas : l'amorce enregistrée a duré jusqu'à
+  // 1,8 s de plus que le temps mesuré, autant d'écran vide en tête des mp4 (pub-kit du 2026-10-12).
+  await ctx.addInitScript(() => document.addEventListener('DOMContentLoaded', () => {
+    const r = document.createElement('div'); r.id = 'rideauExport';
+    r.style.cssText = 'position:fixed;inset:0;background:#00ff00;z-index:2147483647';
+    document.body.append(r);
+  }));
   const page = await ctx.newPage();
   await page.goto(pageUrl);
   await page.evaluate(async () => {
@@ -121,14 +162,13 @@ async function renderPlatform(platform) {
     await document.fonts.ready;
   });
   await page.evaluate(({ s, o }) => window.loadReel(s, o), { s: spec, o: { platform: story ? 'story' : platform, theme } });
-  // Start the hook immediately; the branded entry effect supplies the visual introduction.
-  await page.evaluate(() => new Promise(resolve => requestAnimationFrame(resolve)));
-  // Délai vidéo → début du karaoké : lead mesuré + amorce interne de playAudio (AUDIO_LEAD_MS).
-  const audioLeadMs = await page.evaluate(() => window.AUDIO_LEAD_MS || 0);
-  const visualLeadMs = Date.now() - recStart;
-  // Discard browser/font-loading frames so the published video opens on the effect.
-  const leadMs = audioLeadMs;
-  await page.evaluate(() => window.playReel());
+  // Page au repos, rideau tenu : sous charge la capture tombe à 2-4 images/s, et un rideau jamais
+  // filmé laisse le début du réel inconnu (1 rendu sur 126 à 200 ms, six captures en parallèle).
+  await page.waitForTimeout(600);
+  // Délai début du mp4 → début du karaoké : l'amorce interne de playAudio (AUDIO_LEAD_MS).
+  const leadMs = await page.evaluate(() => window.AUDIO_LEAD_MS || 0);
+  // Rideau retiré dans la tâche qui lance le jeu : la première image sans rideau est la première du réel.
+  await page.evaluate(() => { document.getElementById('rideauExport').remove(); return window.playReel(); });
   await page.waitForTimeout(800);  // laisse le CTA respirer en fin
   const video = page.video();
   await ctx.close();               // finalise l'enregistrement
@@ -138,16 +178,26 @@ async function renderPlatform(platform) {
 
   if (hasFfmpeg) {
     const mp4 = webm.replace(/\.webm$/, '.mp4');
+    const debut = premiereImage(webm);
+    if (!debut) throw new Error(`rideau de départ introuvable dans ${webm} : début du réel inconnu, mp4 non produit`);
+    const coupe = `select='gte(n,${debut})',setpts=PTS-STARTPTS`;
     const ffArgs = audioPath
-      ? ['-y', '-ss', (visualLeadMs / 1000).toFixed(3), '-i', webm, '-i', audioPath, '-map', '0:v:0', '-map', '1:a:0', '-c:v', 'libx264', '-pix_fmt', 'yuv420p',
+      ? ['-y', '-i', webm, '-i', audioPath, '-map', '0:v:0', '-map', '1:a:0', '-vf', coupe, '-c:v', 'libx264', '-pix_fmt', 'yuv420p',
          '-r', '30', '-af', `adelay=${Math.max(0, Math.round(leadMs))}:all=1,apad`, '-c:a', 'aac', '-b:a', '160k',
          '-shortest', '-movflags', '+faststart', mp4]
-      : ['-y', '-ss', (visualLeadMs / 1000).toFixed(3), '-i', webm, '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-r', '30', '-movflags', '+faststart', '-an', mp4];
+      : ['-y', '-i', webm, '-vf', coupe, '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-r', '30', '-movflags', '+faststart', '-an', mp4];
     const r = spawnSync('ffmpeg', ffArgs, { stdio: 'ignore' });
     if (r.status !== 0) {
       process.exitCode = 1; // le pipeline attend les .mp4 : échec ffmpeg = run en échec (2026-07-07)
       console.error(`✗ conversion mp4 échouée, webm conservé : ${webm}`);
-    } else console.log(`✓ ${mp4}`);
+      return;
+    }
+    const t = texteLisibleS(mp4);
+    if (t > TEXTE_MAX_S) {
+      await rm(mp4); // un mp4 refusé ne reste pas sur le disque : aucun appelant ne peut le publier
+      throw new Error(`${verdictTexte(t)} (maximum ${TEXTE_MAX_S} s) : mp4 refusé, webm conservé : ${webm}`);
+    }
+    console.log(`✓ ${mp4} (${verdictTexte(t)})`);
   } else {
     console.log(`✓ ${webm}  (mp4 : ffmpeg -i "${webm}" -c:v libx264 -pix_fmt yuv420p -movflags +faststart out.mp4)`);
   }

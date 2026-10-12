@@ -7,10 +7,15 @@ window.playReelEntry = function ({spec, T, Z}) {
   if (spec.entry_fx === false || spec.entry_fx === 'none') return;
   const stage = document.getElementById('stage');
   const page = document.getElementById('page');
-  // The first segment is installed synchronously by playReel after this call.
-  requestAnimationFrame(() => {
+  // The first screen is installed synchronously by playReel after this call. A microtask, not the
+  // next frame: the wipe covers the text from the very first frame of the reel.
+  queueMicrotask(() => {
     if (sequence !== reelEntrySequence) return;
     if (!page?.isConnected || !stage?.isConnected) return;
+    // The wipe is the entrance: under it the first screen is already complete, so the text is
+    // readable as soon as the wipe passes (2026-10-12: text must reach the screen at once).
+    for (const fade of page.getAnimations({subtree: true}))
+      if (Number.isFinite(fade.effect.getComputedTiming().endTime)) fade.finish();
     document.getElementById('reelEntryFx')?.remove();
     const content = page.getBoundingClientRect(), bounds = stage.getBoundingClientRect();
     const top = Math.max(Z.top, content.top - bounds.top);

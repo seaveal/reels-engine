@@ -162,13 +162,13 @@ function buildConfrontation(spec, T) {
 const cfBottomReadMs = spec => Math.min(5200, Math.max(2600, String((spec.bottom || {}).text || '').length / 20 * 1000));
 window.playConfrontationReel = async function() {
   const top = document.getElementById('cfTop'), div = document.getElementById('cfDivider'), bot = document.getElementById('cfBottom');
-  await msgWait(400);
   if (top) { top.style.opacity = '1'; top.style.transform = 'translateY(0)'; }
   await msgWait(2600);
   if (div) div.style.opacity = '1';
   await msgWait(650);
   if (bot) { bot.style.opacity = '1'; bot.style.transform = 'translateY(0)'; }
   await msgWait(cfBottomReadMs(CFG.spec));
+  await msgWait(400); // respiration d'ouverture, déplacée ici : le premier écran arrive tout de suite (2026-10-12)
   const cta = document.getElementById('ctaRow');
   if (cta) { cta.style.opacity = '1'; cta.style.transform = 'translateY(0)'; }
   await msgWait(1600);
@@ -267,8 +267,8 @@ function buildAvantApres(spec, T) {
 }
 window.playAvantApres = async function() {
   const holds = [2400, 2600, 3000];
-  await msgWait(400);
   for (let i = 0; i < 3; i++) { const el = document.getElementById('aa' + i); if (el) { el.style.opacity = '1'; el.style.transform = 'none'; } await msgWait(holds[i]); }
+  await msgWait(400); // respiration d'ouverture, déplacée ici : le premier écran arrive tout de suite (2026-10-12)
   revealCta(); await msgWait(1600); return true;
 };
 
@@ -291,8 +291,8 @@ function buildTimeline(spec, T) {
 }
 window.playTimeline = async function() {
   const steps = (CFG.spec.steps || []).slice(0, 4);
-  await msgWait(400);
   for (let i = 0; i < steps.length; i++) { const el = document.getElementById('tl' + i); if (el) { el.style.opacity = '1'; el.style.transform = 'none'; } await msgWait(readMs(steps[i].text, 22, 2000, 3400)); }
+  await msgWait(400); // respiration d'ouverture, déplacée ici : le premier écran arrive tout de suite (2026-10-12)
   revealCta(); await msgWait(1600); return true;
 };
 
@@ -309,8 +309,8 @@ function buildListe(spec, T) {
 }
 window.playListe = async function() {
   const items = (CFG.spec.items || []).slice(0, 6);
-  await msgWait(500);
   for (let i = 0; i < items.length; i++) { const el = document.getElementById('li' + i); if (el) { el.style.opacity = '1'; el.style.transform = 'none'; } await msgWait(readMs(items[i], 24, 1500, 2600)); }
+  await msgWait(500); // respiration d'ouverture, déplacée ici : le premier écran arrive tout de suite (2026-10-12)
   revealCta(); await msgWait(1700); return true;
 };
 
@@ -326,10 +326,10 @@ function buildCitation(spec, T) {
   fitPage(page, '.ctFit');
 }
 window.playCitation = async function() {
-  await msgWait(500);
   const q = document.getElementById('ct0'); if (q) { q.style.opacity = '1'; q.style.transform = 'none'; }
   await msgWait(3400);
   const d = document.getElementById('ct1'); if (d) { d.style.opacity = '1'; d.style.transform = 'none'; await msgWait(3000); }
+  await msgWait(500); // respiration d'ouverture, déplacée ici : le premier écran arrive tout de suite (2026-10-12)
   // Sans bouton (story mantra, 2026-10-04) : aucune attente du CTA, la story dure ~5 s.
   if (document.getElementById('ctaRow').style.display !== 'none') { revealCta(); await msgWait(1600); }
   return true;
@@ -356,12 +356,12 @@ function buildNotes(spec, T) {
 }
 window.playNotes = async function() {
   const items = (CFG.spec.items || []).slice(0, 8);
-  await msgWait(500);
   for (let i = 0; i < items.length; i++) {
     const el = document.getElementById('nt' + i); if (el) { el.style.opacity = '1'; el.style.transform = 'none'; }
     const t = (items[i] && typeof items[i] === 'object') ? items[i].text : items[i];
     await msgWait(readMs(t, 24, 1500, 2600) + (i === items.length - 1 ? 900 : 0));
   }
+  await msgWait(500); // respiration d'ouverture, déplacée ici : le premier écran arrive tout de suite (2026-10-12)
   revealCta(); await msgWait(1700); return true;
 };
 
@@ -391,11 +391,11 @@ function buildCalendrier(spec, T) {
 }
 window.playCalendrier = async function() {
   const blocks = (CFG.spec.blocks || []).slice(0, 8);
-  await msgWait(500);
   for (let i = 0; i < blocks.length; i++) {
     const el = document.getElementById('cal' + i); if (el) { el.style.opacity = '1'; el.style.transform = 'none'; }
     await msgWait(readMs(blocks[i].title, 24, 1300, 2400) + (i === blocks.length - 1 ? 1000 : 0));
   }
+  await msgWait(500); // respiration d'ouverture, déplacée ici : le premier écran arrive tout de suite (2026-10-12)
   revealCta(); await msgWait(1800); return true;
 };
 
@@ -429,9 +429,7 @@ function buildPage(spec, T) {
 }
 window.playPage = async function() {
   const paras = (CFG.spec.paras || []).slice(0, 4);
-  await msgWait(400);
   const sheet = document.getElementById('pgSheet'); if (sheet) { sheet.style.opacity = '1'; sheet.style.transform = 'none'; }
-  await msgWait(900);
   for (let i = 0; i < paras.length; i++) {
     const el = document.getElementById('pg' + i); if (el) el.style.opacity = '1';
     await msgWait(500);
@@ -440,6 +438,8 @@ window.playPage = async function() {
     await msgWait(Math.max(900, readMs(paras[i].text, 30, 2500, 6000) - 500 - marks.length * 1200));
   }
   if (sheet) sheet.style.transform = 'translateY(-10px)';
+  await msgWait(900); // respiration d'ouverture, déplacée ici : le premier écran arrive tout de suite (2026-10-12)
+  await msgWait(400); // respiration d'ouverture, déplacée ici : le premier écran arrive tout de suite (2026-10-12)
   revealCta(); await msgWait(1800); return true;
 };
 
