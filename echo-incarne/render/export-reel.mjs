@@ -46,14 +46,26 @@ if (opt('controle', '')) {
   console.log(`${t <= TEXTE_MAX_S ? '✓' : '✗'} ${verdictTexte(t)} (maximum ${TEXTE_MAX_S} s) : ${opt('controle')}`);
   process.exit(t <= TEXTE_MAX_S ? 0 : 1);
 }
-// Première image du réel dans le webm : celle qui suit la dernière image du rideau vert (0 = rideau absent).
-function premiereImage(webm) {
+// Bornes du réel dans le webm, entre le rideau vert de départ et celui de fin : [première image du
+// réel, première image du rideau de fin]. Une borne absente rend l'indice -1.
+const IPS_WEBM = 25; // cadence d'écriture du magnétoscope de Playwright
+// Écart toléré entre la durée filmée et la durée à l'horloge de la page. En retard : la capture a
+// pris du retard sur la page (machine saturée), les écrans et le bouton sortent décalés dans la
+// vidéo. En avance : la première image du réel a tardé d'autant. Hors bornes, le mp4 n'est pas produit.
+const RETARD_MAX_S = 0.3;
+const AVANCE_MAX_S = 0.6;
+function bornesDuReel(webm) {
   const r = spawnSync('ffmpeg', ['-v', 'error', '-i', webm, '-vf', 'crop=16:16:8:8,scale=1:1,format=rgb24',
     '-fps_mode', 'passthrough', '-f', 'rawvideo', '-'], { maxBuffer: 1 << 26 });
   const px = r.stdout || [];
-  let derniere = -1;
-  for (let i = 0; i * 3 + 2 < px.length; i++) if (px[i * 3] < 90 && px[i * 3 + 1] > 170 && px[i * 3 + 2] < 90) derniere = i;
-  return derniere + 1;
+  const vert = i => px[i * 3] < 90 && px[i * 3 + 1] > 170 && px[i * 3 + 2] < 90;
+  const n = Math.floor(px.length / 3);
+  let i = 0;
+  while (i < n && !vert(i)) i++;      // amorce du navigateur
+  while (i < n && vert(i)) i++;       // rideau de départ
+  const debut = i < n && i > 0 ? i : -1;
+  while (i < n && !vert(i)) i++;      // le réel
+  return [debut, debut >= 0 && i < n ? i : -1];
 }
 
 if (!specPath) {
@@ -151,11 +163,14 @@ async function renderPlatform(platform) {
   // Rideau vert plein cadre, du chargement de la page au départ du jeu : il marque dans la vidéo
   // elle-même où commence le réel. L'horloge ne le donne pas : l'amorce enregistrée a duré jusqu'à
   // 1,8 s de plus que le temps mesuré, autant d'écran vide en tête des mp4 (pub-kit du 2026-10-12).
-  await ctx.addInitScript(() => document.addEventListener('DOMContentLoaded', () => {
-    const r = document.createElement('div'); r.id = 'rideauExport';
-    r.style.cssText = 'position:fixed;inset:0;background:#00ff00;z-index:2147483647';
-    document.body.append(r);
-  }));
+  await ctx.addInitScript(() => {
+    window.poserRideau = () => {
+      const r = document.createElement('div'); r.id = 'rideauExport';
+      r.style.cssText = 'position:fixed;inset:0;background:#00ff00;z-index:2147483647';
+      document.body.append(r);
+    };
+    document.addEventListener('DOMContentLoaded', window.poserRideau);
+  });
   const page = await ctx.newPage();
   await page.goto(pageUrl);
   await page.evaluate(async () => {
@@ -169,8 +184,12 @@ async function renderPlatform(platform) {
   // Délai début du mp4 → début du karaoké : l'amorce interne de playAudio (AUDIO_LEAD_MS).
   const leadMs = await page.evaluate(() => window.AUDIO_LEAD_MS || 0);
   // Rideau retiré dans la tâche qui lance le jeu : la première image sans rideau est la première du réel.
-  await page.evaluate(() => { document.getElementById('rideauExport').remove(); return window.playReel(); });
+  await page.evaluate(() => { window.debutJeu = performance.now(); document.getElementById('rideauExport').remove(); return window.playReel(); });
   await page.waitForTimeout(800);  // laisse le CTA respirer en fin
+  // Rideau de fin : il marque la fin du réel dans la vidéo, et la durée filmée entre les deux rideaux
+  // se compare à la durée écoulée à l'horloge de la page.
+  const dureePage = await page.evaluate(() => { window.poserRideau(); return (performance.now() - window.debutJeu) / 1000; });
+  await page.waitForTimeout(600);
   const video = page.video();
   await ctx.close();               // finalise l'enregistrement
 
@@ -179,9 +198,13 @@ async function renderPlatform(platform) {
 
   if (hasFfmpeg) {
     const mp4 = webm.replace(/\.webm$/, '.mp4');
-    const debut = premiereImage(webm);
-    if (!debut) throw new Error(`rideau de départ introuvable dans ${webm} : début du réel inconnu, mp4 non produit`);
-    const coupe = `select='gte(n,${debut})',setpts=PTS-STARTPTS`;
+    const [debut, fin] = bornesDuReel(webm);
+    if (debut < 0) throw new Error(`rideau de départ introuvable dans ${webm} : début du réel inconnu, mp4 non produit`);
+    if (fin < 0) throw new Error(`rideau de fin introuvable dans ${webm} : la capture n'a pas suivi la page, mp4 non produit`);
+    const ecart = (fin - debut) / IPS_WEBM - dureePage;
+    if (ecart > RETARD_MAX_S || ecart < -AVANCE_MAX_S)
+      throw new Error(`capture décalée de ${ecart.toFixed(2)} s sur l'horloge de la page (toléré : -${AVANCE_MAX_S} à +${RETARD_MAX_S} s), mp4 non produit, webm conservé : ${webm}`);
+    const coupe = `select='between(n,${debut},${fin - 1})',setpts=PTS-STARTPTS`;
     const ffArgs = audioPath
       ? ['-y', '-i', webm, '-i', audioPath, '-map', '0:v:0', '-map', '1:a:0', '-vf', coupe, '-c:v', 'libx264', '-pix_fmt', 'yuv420p',
          '-r', '30', '-af', `adelay=${Math.max(0, Math.round(leadMs))}:all=1,apad`, '-c:a', 'aac', '-b:a', '160k',
@@ -198,7 +221,7 @@ async function renderPlatform(platform) {
       await rm(mp4); // un mp4 refusé ne reste pas sur le disque : aucun appelant ne peut le publier
       throw new Error(`${verdictTexte(t)} (maximum ${TEXTE_MAX_S} s) : mp4 refusé, webm conservé : ${webm}`);
     }
-    console.log(`✓ ${mp4} (${verdictTexte(t)})`);
+    console.log(`✓ ${mp4} (${verdictTexte(t)}, minutage à ${ecart >= 0 ? '+' : ''}${ecart.toFixed(2)} s de la page)`);
   } else {
     console.log(`✓ ${webm}  (mp4 : ffmpeg -i "${webm}" -c:v libx264 -pix_fmt yuv420p -movflags +faststart out.mp4)`);
   }
