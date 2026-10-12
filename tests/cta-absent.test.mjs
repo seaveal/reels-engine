@@ -20,9 +20,13 @@ try {
         row.style.opacity = '1';
         const r = row.getBoundingClientRect();
         return {label: document.getElementById('ctaCapsule').textContent.trim(), display: getComputedStyle(row).display,
-          height: r.height, spacer: document.querySelectorAll('#ctaSpace').length};
+          height: r.height, spacer: document.querySelectorAll('#ctaSpace').length,
+          police: parseFloat(getComputedStyle(document.querySelector('#page .ctFit')).fontSize)};
       }, {spec: {...sans, ...(cta ? {cta} : {})}, platform});
       const label = `${template} ${platform} ${cta ? 'avec' : 'sans'} CTA`;
+      // Une citation courte garde sa taille de gabarit : l'ajustement mesure le contenu, pas la boîte
+      // flex (en Écho il la descendait au plancher de 36 px jusqu'au 2026-10-12).
+      assert.ok(m.police >= 60, label + ' : citation courte à ' + m.police + ' px');
       if (cta) {
         assert.ok(m.label && m.display !== 'none' && m.height > 0 && m.spacer === 1, label + ' : bouton attendu');
       } else {

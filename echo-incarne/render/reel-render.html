@@ -150,14 +150,7 @@ function buildConfrontation(spec, T) {
       `<div class="cfFit" style="font-family:var(--serif);font-weight:500;font-size:84px;line-height:1.16;color:${T.text};">${pivot(bottom.text || '', T.accent)}</div>` +
     `</div>`;
   // auto-fit : rétrécit les 2 panneaux si l'ensemble déborde la zone utile.
-  const avail = 1920 - CFG.Z.top - CFG.Z.bottom - 340;
-  let guard = 0;
-  while (page.scrollHeight > avail && guard++ < 40) {
-    page.querySelectorAll('.cfFit').forEach(el => {
-      const fs = parseFloat(getComputedStyle(el).fontSize);
-      if (fs > 40) el.style.fontSize = (fs - 4) + 'px';
-    });
-  }
+  fitPage(page, '.cfFit', 40);
 }
 const cfBottomReadMs = spec => Math.min(5200, Math.max(2600, String((spec.bottom || {}).text || '').length / 20 * 1000));
 window.playConfrontationReel = async function() {
@@ -232,15 +225,22 @@ function showSegment(i) {
 }
 
 // ---- helpers partagés des layouts structurés ----
-function fitPage(page, sel) {
+function fitPage(page, sel, plancher = 36) {
+  // Mesure le CONTENU, pas la boîte flex : #page a flex:1, son scrollHeight vaut la hauteur de la
+  // zone flex, toujours au-dessus de avail. Sans neutraliser flex le temps de la mesure, la boucle
+  // descendait chaque texte au plancher (citation, liste… à 36 px en Écho, corrigé le 2026-10-12 ;
+  // les trois autres moteurs le faisaient déjà).
   const avail = 1920 - CFG.Z.top - CFG.Z.bottom - 340;
+  const pf = page.style.flex, ph = page.style.height, pm = page.style.minHeight;
+  page.style.flex = 'none'; page.style.height = 'auto'; page.style.minHeight = '0';
   let guard = 0;
   while (page.scrollHeight > avail && guard++ < 60) {
     page.querySelectorAll(sel).forEach(el => {
       const fs = parseFloat(getComputedStyle(el).fontSize);
-      if (fs > 36) el.style.fontSize = (fs - 4) + 'px';
+      if (fs > plancher) el.style.fontSize = (fs - 4) + 'px';
     });
   }
+  page.style.flex = pf; page.style.height = ph; page.style.minHeight = pm;
 }
 function revealCta() { const c = document.getElementById('ctaRow'); if (c) { c.style.opacity = '1'; c.style.transform = 'translateY(0)'; } }
 const readMs = (t, div, lo, hi) => Math.min(hi, Math.max(lo, String(t || '').length / div * 1000));

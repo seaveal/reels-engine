@@ -26,8 +26,9 @@ const opt = (name, dflt) => (args.find(a => a.startsWith(`--${name}=`)) || '').s
 // publicité c'est de l'argent perdu). Mesuré sur le mp4 final, pas sur ce que la page annonce :
 // netteté (Sobel) de la zone de texte commune aux plateformes, image par image sur 2 s. Mesures :
 // zone vide 0 à 0,5 ; balayage d'entrée seul 1,2 (1,8 au plus par construction) ; le plus petit
-// texte du corpus (citation courte d'une story, 36 px) 3,3 ; un écran de réel 20 à 60. Le texte est
-// lisible à la première image qui atteint NETTETE_TEXTE ; au-delà de TEXTE_MAX_S, le mp4 est refusé.
+// texte possible (une ligne au plancher de 36 px des formats structurés) 3,3 ; un écran de réel
+// 20 à 60. Le texte est lisible à la première image qui atteint NETTETE_TEXTE ; au-delà de
+// TEXTE_MAX_S, le mp4 est refusé.
 const TEXTE_MAX_S = 0.5;
 const NETTETE_TEXTE = 2.5;
 const ZONE_TEXTE = 'crop=760:920:104:440';
